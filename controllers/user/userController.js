@@ -17,17 +17,23 @@ const loadSignup = async (req, res) => {
   }
 };
 
+function genarateOtp() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 const signup = async (req, res) => {
-  const { name, email, phone, password } = req.body;
   try {
-    const newUser = new User({ name, email, phone, password });
-    console.log(newUser);
-    await newUser.save();
-    return res.redirect("/signup");
-  } catch (error) {
-    console.error("Error for save user", error);
-    res.status(500), send("Internal server error");
-  }
+    const { email, password, cpassword } = req.body;
+    if (password !== confirmpassword) {
+      return res.render("signup", { message: "Password not match" });
+    }
+
+    const findUser = await User.findOne({ email });
+    if (findUser) {
+      return res.render("signup", { message: "User already exists" });
+    }
+    const otp = genarateOtp();
+  } catch (error) {}
 };
 
 module.exports = {

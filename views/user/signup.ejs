@@ -29,6 +29,10 @@
         color: white;
         padding: 30px 0;
       }
+      .err-msg {
+        color: red;
+        font-size: 0.75rem;
+      }
     </style>
   </head>
   <body>
@@ -63,7 +67,6 @@
               id="name"
               placeholder="Name"
               name="name"
-              required
             />
             <div id="name-err" class="err-msg"></div>
           </div>
@@ -74,7 +77,6 @@
               id="email"
               placeholder="E-mail"
               name="email"
-              required
             />
             <div id="email-err" class="err-msg"></div>
           </div>
@@ -85,7 +87,6 @@
               id="phone"
               placeholder="Phone"
               name="phone"
-              required
             />
             <div id="phone-err" class="err-msg"></div>
           </div>
@@ -96,9 +97,8 @@
               id="password"
               placeholder="Password"
               name="password"
-              required
             />
-            <div id="password" class="err-msg"></div>
+            <div id="password-err" class="err-msg"></div>
           </div>
           <div class="mb-3">
             <input
@@ -107,7 +107,6 @@
               id="cpassword"
               placeholder="Confirm Password"
               name="confirmpassword"
-              required
             />
             <div id="cpassword-err" class="err-msg"></div>
           </div>
@@ -224,6 +223,122 @@
       const phoneId = document.getElementById("phone");
       const passwordId = document.getElementById("password");
       const cpasswordId = document.getElementById("cpassword");
+      const nameerr = document.getElementById("name-err");
+      const emailerr = document.getElementById("email-err");
+      const phoneerr = document.getElementById("phone-err");
+      const passworderr = document.getElementById("password-err");
+      const cpassworderr = document.getElementById("cpassword-err");
+      const signupform = document.getElementById("signupId");
+      // name field cheching
+      function nameValidateCheking(e) {
+        const nameVal = nameId.value;
+        const nameexp = /^[A-Za-z\s]+$/;
+
+        if (nameVal.trim() === "") {
+          nameerr.style.display = "block";
+          nameerr.innerHTML = "Enter a valied name";
+        } else if (!nameexp.test(nameVal)) {
+          nameerr.style.display = "block";
+          nameerr.innerHTML = "Enter name with alphabets and spaces";
+        } else {
+          nameerr.style.display = "none";
+          nameerr.innerHTML = "";
+        }
+      }
+
+      // email cheching
+
+      function emailValidateCheking(e) {
+        const emailVal = emailId.value;
+        const emailpat = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (emailVal.trim() === "") {
+          emailerr.style.display = "block";
+          emailerr.innerHTML = "Enter email";
+        } else if (!emailpat.test(emailVal)) {
+          emailerr.style.display = "block";
+          emailerr.innerHTML = "Enter a valied email";
+        } else {
+          emailerr.style.display = "none";
+          emailerr.innerHTML = "";
+        }
+      }
+
+      // phoene field checking
+      function phoneValidateCheking(e) {
+        const phoneVal = phoneId.value;
+
+        if (phoneVal.trim() === "") {
+          phoneerr.style.display = "block";
+          phoneerr.innerHTML = "Enter phone no";
+        } else if (phoneVal.length < 10 || phoneVal.length > 10) {
+          phoneerr.style.display = "block";
+          phoneerr.innerHTML = "Enter 10 digit phone no";
+        } else {
+          phoneerr.style.display = "none";
+          phoneerr.innerHTML = "";
+        }
+      }
+
+      // password checking
+
+      function passwordValidateCheking(e) {
+        const passVal = passwordId.value;
+        const cpassVal = cpasswordId.value;
+        const alpha = /[a-zA-Z]/;
+        const digits = /\d/;
+
+        if (passVal.length < 8) {
+          passworderr.style.display = "block";
+          passworderr.innerHTML = "password should contain 8 charecter";
+        } else if (!alpha.test(passVal) || !digits.test(passVal)) {
+          passworderr.style.display = "block";
+          passworderr.innerHTML = "Should contain numbers and alphabets";
+        } else {
+          passworderr.style.display = "non";
+          passworderr.innerHTML = "";
+        }
+        if (passVal !== cpassVal) {
+          cpassworderr.style.display = "block";
+          cpassworderr.innerHTML = "password not match";
+        } else {
+          cpassworderr.style.display = "none";
+          cpassworderr.innerHTML = "";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        signupform.addEventListener("submit", function (e) {
+          nameValidateCheking();
+          emailValidateCheking();
+          phoneValidateCheking();
+          passwordValidateCheking();
+
+          if (
+            !nameId ||
+            !emailId ||
+            !phoneId ||
+            !passwordId ||
+            !nameerr ||
+            !emailerr ||
+            !phoneerr ||
+            !passworderr ||
+            !cpassworderr ||
+            !signupform
+          ) {
+            console.error("One or more element not found");
+          }
+          if (
+            nameerr.innerHTML ||
+            emailerr.innerHTML ||
+            phoneerr.innerHTML ||
+            passworderr.innerHTML ||
+            cpassworderr.innerHTML
+          ) {
+            e.preventDefault();
+          }
+        });
+      });
     </script>
   </body>
 </html>
