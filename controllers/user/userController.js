@@ -1,5 +1,6 @@
 const User = require("../../models/userSchema");
 const env = require("dotenv").config();
+const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const loadHome = async (req, res) => {
   try {
@@ -44,7 +45,7 @@ async function sendVerificationEmail(email, otp) {
     });
     return info.accepted.length > 0;
   } catch (error) {
-    console.error("Error in sending email");
+    console.error("Error in sending email from verification email", error);
     return false;
   }
 }
@@ -77,8 +78,72 @@ const signup = async (req, res) => {
   }
 };
 
+const securePassword = async (password) => {
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+    return passwordHash;
+  } catch (error) {}
+};
+
+const verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    console.log(otp);
+    if (otp === req.session.userOtp) {
+      const user = req.session.userData;
+      const passwordHash = await securePassword(user.password);
+
+      const saveUserData = new User({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: passwordHash,
+      });
+      await saveUserData.save();
+      req.session.user = saveUserData._id;
+      res.json({ success: true, redirectUrl: "/" });
+    } else {
+      res
+        .status(400)
+        .json({ success: false, message: "Invalid OTP, Please try again " });
+    }
+  } catch (error) {
+    console.error("Error Verifying OTP", error);
+    res.status(500).json({ success: false, message: "An error occured" });
+  }
+};
+
+const resendOtp = async (req, res) => {
+  try {
+    const { email } = req.session.userData;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found" });
+    }
+
+    const otp = genarateOtp();
+    req.session.userOtp = otp;
+
+    const emailSend = sendVerificationEmail();
+    if (emailSend) {
+      console.log("Resend OTP : ", otp);
+      res
+        .status(200)
+        .json({ success: true, message: "Resend otp successfull" });
+    } else {
+      res.status(500).json({ success: false, message: "Failed to resend otp" });
+    }
+  } catch (error) {
+    console.error("Error in sending otp", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   loadHome,
   loadSignup,
   signup,
+  verifyOtp,
+  resendOtp,
 };
