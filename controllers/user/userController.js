@@ -24,6 +24,7 @@ function genarateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 async function sendVerificationEmail(email, otp) {
+  console.log("Attempting to send OTP to:", email);
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -125,7 +126,7 @@ const resendOtp = async (req, res) => {
     const otp = genarateOtp();
     req.session.userOtp = otp;
 
-    const emailSend = sendVerificationEmail();
+    const emailSend = sendVerificationEmail(email, otp);
     if (emailSend) {
       console.log("Resend OTP : ", otp);
       res
