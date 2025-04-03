@@ -88,6 +88,7 @@ const securePassword = async (password) => {
 
 const verifyOtp = async (req, res) => {
   try {
+    console.log(req.body);
     const { otp } = req.body;
     console.log(otp);
     if (otp === req.session.userOtp) {

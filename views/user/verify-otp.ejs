@@ -81,24 +81,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      let countdown; // Ensure countdown is globally accessible
-      let timeLeft = 60; // Initial countdown time
+      let countdown;
+      let timeLeft = 60;
       const timerElement = document.getElementById("timer");
       const resendOtpElement = document.getElementById("resendOtpLink");
 
       resendOtpElement.style.display = "none";
 
-      // ✅ Function to Start Countdown
+      //  Function to Start Countdown
       function startCountdown() {
         console.log("Starting countdown...");
 
-        // ❌ Stop existing interval if it's running
+        //  Stop existing interval if it's running
         if (countdown) {
           clearInterval(countdown);
           console.log("Previous countdown stopped.");
         }
 
-        // ✅ Start a new countdown
+        //  Start a new countdown
         countdown = setInterval(() => {
           timeLeft--;
           timerElement.textContent = timeLeft;
@@ -114,29 +114,59 @@
         }, 1000);
       }
 
-      // ✅ Start countdown when the page loads
+      //  Start countdown when the page loads
       startCountdown();
+      function validateOTPForm() {
+        const otpInput = document.getElementById("otp").value;
 
-      // ✅ Function to Handle OTP Resend
+        $.ajax({
+          type: "POST",
+          url: "/verify-otp",
+          data: { otp: otpInput },
+          success: function (responce) {
+            if (responce.success) {
+              Swal.fire({
+                icon: "success",
+                title: "OTP Verified Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                window.location.href = responce.redirectUrl;
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: responce.message,
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Invalied OTP",
+              text: "Please try again",
+            });
+          },
+        });
+        return false;
+      }
+
       function resendOtp() {
         console.log("Resend OTP clicked!");
 
-        // ✅ Stop and reset the countdown
         if (countdown) {
           clearInterval(countdown);
           console.log("Cleared previous countdown.");
         }
 
-        // ✅ Reset timer and UI
-        timeLeft = 60; // Reset to 60 seconds
+        timeLeft = 60;
         timerElement.textContent = timeLeft;
         document.getElementById("otp").disabled = false;
         document.getElementById("timer").classList.remove("expired");
 
-        // ✅ Restart countdown
         startCountdown();
 
-        // ✅ Send AJAX Request to Resend OTP
         $.ajax({
           type: "POST",
           url: "/resend-otp",
