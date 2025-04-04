@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/user/userController");
 const passport = require("passport");
 
+// router.get("/pageNotFound", userController.pageNotFound);
 router.get("/", userController.loadHome);
 router.get("/signup", userController.loadSignup);
 router.post("/signup", userController.signup);
@@ -21,5 +22,9 @@ router.get(
     res.redirect("/");
   }
 );
+
+router.get("/login", userController.loadLogin);
+router.post("/login", userController.login);
+router.get("/logout", userController.logout);
 
 module.exports = router;

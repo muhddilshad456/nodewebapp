@@ -110,6 +110,9 @@
             />
             <div id="cpassword-err" class="err-msg"></div>
           </div>
+          <%if(locals.message && message.length>0){%>
+          <div class="alert alert-danger text-center"><%=message%></div>
+          <%}%>
           <button type="submit" class="btn btn-dark w-100 mb-3">
             Create Account
           </button>

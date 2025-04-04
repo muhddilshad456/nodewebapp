@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WatchSy - Login</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .navbar-top {
+        background-color: #000;
+        color: white;
+        padding: 8px 0;
+      }
+      .logo-img {
+        max-width: 120px;
+      }
+      footer {
+        background-color: #000;
+        color: white;
+        padding: 40px 0;
+      }
+      .login-container {
+        max-width: 500px;
+        margin: 60px auto;
+        text-align: center;
+      }
+      .login-form {
+        margin-top: 20px;
+        text-align: left;
+      }
+      .login-form input {
+        margin-bottom: 15px;
+      }
+      .btn-login {
+        background-color: #000;
+        color: white;
+        width: 100px;
+      }
+      .btn-google {
+        background-color: #fff;
+        color: #757575;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .btn-google img {
+        margin-right: 6px;
+        width: 18px;
+      }
+      .forgot-password {
+        color: #dc3545;
+        text-decoration: none;
+      }
+      .signup-text {
+        margin-top: 30px;
+      }
+      .social-icons i {
+        font-size: 20px;
+        margin-right: 15px;
+        color: white;
+      }
+      .download-app img {
+        max-width: 120px;
+      }
+      .qr-code {
+        max-width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top navbar with language selector -->
+    <div class="navbar-top">
+      <div class="container-fluid d-flex justify-content-end">
+        <div class="dropdown">
+          <button
+            class="btn btn-link dropdown-toggle text-white text-decoration-none"
+            type="button"
+            id="languageDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            English
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+            <li><a class="dropdown-item" href="#">English</a></li>
+            <li><a class="dropdown-item" href="#">Bangla</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="logo.png" alt="WatchSy" class="logo-img" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Sign Up</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <div class="input-group">
+              <input
+                class="form-control"
+                type="search"
+                placeholder="What are you looking for?"
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-dark" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Logo and Login Form -->
+    <div class="container">
+      <div class="login-container">
+        <div class="text-center mb-4">
+          <img
+            src="watchsy-logo.png"
+            alt="WatchSy Logo"
+            class="mb-3"
+            style="width: 120px"
+          />
+          <h2 class="fw-bold">WatchSy</h2>
+        </div>
+
+        <h3 class="text-center mb-3">LOGIN</h3>
+        <p class="text-center mb-4">Enter your details below</p>
+        <form action="/login" method="post">
+          <div class="login-form">
+            <div class="mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Email "
+                name="email"
+              />
+            </div>
+            <div class="mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Password"
+                name="password"
+              />
+            </div>
+            <%if(locals.message && message.length>0){%>
+            <div class="alert alert-danger text-center"><%=message%></div>
+            <%}%>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-login">Log In</button>
+                <a href="/auth/google" class="btn btn-google">
+                  <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA4CAMAAABuU5ChAAAA+VBMVEX////pQjU0qFNChfT6uwU0f/O4zvs6gfSJr/j6twDoOisjePPoNSXpPjDrWU/oLRr+9vZ7pff/vAAUoUAkpEn0ran619b82pT7wgD+68j947H/+e7//PafvPm/0vuBw5Df7+P63tz3xcPxl5HnJQ7qUEXxj4n4z83zoJzqSz/vgXrucWrsY1r1tbHrSBPoOjbvcSr0kx74rRH80XntZC3xhSPmGRr86+r4sk/936EJcfPS3/yowvnbwVKjsTjx9f5urEjkuBu9tC+ErkJyvoRRpj2az6hWs23j6/0emX2z2btAiuI8k8AyqkE5nZU1pGxCiOxVmtHJ5M+PSt3WAAACGElEQVRIieWSa3fSQBCGk20CJRcW2AWKxgJtqCmieNdatV5SUtFq5f//GJeE7CXJJOT4TZ+PO+c58+7MaNr/SWd60mecTDs1pMFp28dODPZnZw/369TXseXqHNfCblDdte84krTDwUFFwnMnJyXm+bSsmZ/vlcb1+6A2x5C1xYeyPgIyJlhtYDjzjOYyZA3oFighLYxni8UMY6dCG/jy9KzTQfI8DXSnTNN0kcl1lNE9dlxYC8TnnEVmAJ02qHlPllyb58vgmQ2Np0tYgzGMo2ex6IKRihi1mPhcZyYuO8McL4yYl0vrrI6mJZpx9Or1mzqa10rFt8p7o5ArXh+lXutC8d6ZBdiXvH6PeyPFsw8KMBu8fsG9+3t473l9yD1vD+/BX3v1cgqv3lzE/8A9NCUK5sn33vugeN1DQTcVTbG/9M56H+lEAzg2d54t7iW5657xCdEx5PF+B9Lj9oO9z4hBgIZX6YyaXfmZaV9QQkU781h+Hra+7jQaFv6Or8RW3r1rhErES641D9XKigox8jJaQxyAfZOpIQm6kiuT6BvfujqVuEpkkY43u+d1RBBF35v55aVJidKSEBRFiJAk/+0PM3NjgjFFMLc/WVYzlzImLBPprzvzrlBjHUmZSH8DmqatS0QSZtcjTxUBWSlZw1bckhaYlISTcm1rIqKolJJxtRWnXUVscTFsjWFFwoy7WTM2+zX69/gDaLcy7SET9nsAAAAASUVORK5CYII="
+                    alt="Google logo"
+                  />
+                  Google
+                </a>
+              </div>
+              <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+          </div>
+        </form>
+
+        <div class="signup-text">
+          <p>
+            Don't have an account?
+            <a href="#" class="text-dark fw-bold">Sign Up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <!-- Exclusive Column -->
+          <div class="col-md-3 mb-4">
+            <h5 class="mb-3">Exclusive</h5>
+            <p>Subscribe</p>
+            <p>Get 10% off your first order</p>
+            <div class="input-group mb-3">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="Enter your email"
+              />
+              <button class="btn btn-outline-light" type="submit">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Support Column -->
+          <div class="col-md-3 mb-4">
+            <h5 class="mb-3">Support</h5>
+            <p>111 Bijoy sarani, Dhaka,</p>
+            <p>DH 1515, Bangladesh.</p>
+            <p>exclusive@gmail.com</p>
+            <p>+88016-88888-9999</p>
+          </div>
+
+          <!-- Account Column -->
+          <div class="col-md-2 mb-4">
+            <h5 class="mb-3">Account</h5>
+            <p>
+              <a href="#" class="text-white text-decoration-none">My Account</a>
+            </p>
+            <p>
+              <a href="#" class="text-white text-decoration-none"
+                >Login / Register</a
+              >
+            </p>
+            <p><a href="#" class="text-white text-decoration-none">Cart</a></p>
+            <p>
+              <a href="#" class="text-white text-decoration-none">Wishlist</a>
+            </p>
+            <p><a href="#" class="text-white text-decoration-none">Shop</a></p>
+          </div>
+
+          <!-- Quick Link Column -->
+          <div class="col-md-2 mb-4">
+            <h5 class="mb-3">Quick Link</h5>
+            <p>
+              <a href="#" class="text-white text-decoration-none"
+                >Privacy Policy</a
+              >
+            </p>
+            <p>
+              <a href="#" class="text-white text-decoration-none"
+                >Terms Of Use</a
+              >
+            </p>
+            <p><a href="#" class="text-white text-decoration-none">FAQ</a></p>
+            <p>
+              <a href="#" class="text-white text-decoration-none">Contact</a>
+            </p>
+          </div>
+
+          <!-- Download App Column -->
+          <div class="col-md-2 mb-4">
+            <h5 class="mb-3">Download App</h5>
+            <img src="qr-code.png" alt="QR Code" class="qr-code mb-2" />
+            <div class="d-flex mt-2">
+              <img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA4CAMAAABuU5ChAAAA+VBMVEX////pQjU0qFNChfT6uwU0f/O4zvs6gfSJr/j6twDoOisjePPoNSXpPjDrWU/oLRr+9vZ7pff/vAAUoUAkpEn0ran619b82pT7wgD+68j947H/+e7//PafvPm/0vuBw5Df7+P63tz3xcPxl5HnJQ7qUEXxj4n4z83zoJzqSz/vgXrucWrsY1r1tbHrSBPoOjbvcSr0kx74rRH80XntZC3xhSPmGRr86+r4sk/936EJcfPS3/yowvnbwVKjsTjx9f5urEjkuBu9tC+ErkJyvoRRpj2az6hWs23j6/0emX2z2btAiuI8k8AyqkE5nZU1pGxCiOxVmtHJ5M+PSt3WAAACGElEQVRIieWSa3fSQBCGk20CJRcW2AWKxgJtqCmieNdatV5SUtFq5f//GJeE7CXJJOT4TZ+PO+c58+7MaNr/SWd60mecTDs1pMFp28dODPZnZw/369TXseXqHNfCblDdte84krTDwUFFwnMnJyXm+bSsmZ/vlcb1+6A2x5C1xYeyPgIyJlhtYDjzjOYyZA3oFighLYxni8UMY6dCG/jy9KzTQfI8DXSnTNN0kcl1lNE9dlxYC8TnnEVmAJ02qHlPllyb58vgmQ2Np0tYgzGMo2ex6IKRihi1mPhcZyYuO8McL4yYl0vrrI6mJZpx9Or1mzqa10rFt8p7o5ArXh+lXutC8d6ZBdiXvH6PeyPFsw8KMBu8fsG9+3t473l9yD1vD+/BX3v1cgqv3lzE/8A9NCUK5sn33vugeN1DQTcVTbG/9M56H+lEAzg2d54t7iW5657xCdEx5PF+B9Lj9oO9z4hBgIZX6YyaXfmZaV9QQkU781h+Hra+7jQaFv6Or8RW3r1rhErES641D9XKigox8jJaQxyAfZOpIQm6kiuT6BvfujqVuEpkkY43u+d1RBBF35v55aVJidKSEBRFiJAk/+0PM3NjgjFFMLc/WVYzlzImLBPprzvzrlBjHUmZSH8DmqatS0QSZtcjTxUBWSlZw1bckhaYlISTcm1rIqKolJJxtRWnXUVscTFsjWFFwoy7WTM2+zX69/gDaLcy7SET9nsAAAAASUVORK5CYII="
+                alt="Google Play"
+                class="me-2"
+                style="width: 80px"
+              />
+              <img src="app-store.png" alt="App Store" style="width: 80px" />
+            </div>
+            <div class="social-icons mt-3">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

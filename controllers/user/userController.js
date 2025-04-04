@@ -142,10 +142,60 @@ const resendOtp = async (req, res) => {
   }
 };
 
+const loadLogin = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.render("login");
+    } else {
+      res.redirect("/");
+    }
+  } catch (error) {
+    res.redirect("/pageNotFound");
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const findUser = await User.findOne({ isAdmin: 0, email: email });
+    if (!findUser) {
+      return res.render("login", { message: "User not found" });
+    }
+    if (findUser.isBlocked) {
+      return res.render("login", { message: "Blocked by admin" });
+    }
+    const passwordMatch = await bcrypt.compare(password, findUser.password);
+    if (!passwordMatch) {
+      return res.render("login", { message: "Incorrect password" });
+    }
+
+    req.session.user = findUser._id;
+    res.redirect("/");
+  } catch (error) {}
+};
+
+const logout = async (req, res) => {
+  try {
+    req.session.destroy((err) => {
+      if (err) {
+        console.log("Session destruction error", err.message);
+        return res.redirect("/pageNotFound");
+      }
+      return res.redirect("/login");
+    });
+  } catch (error) {
+    console.log("Logout error", error);
+    res.redirect("/redirect");
+  }
+};
+
 module.exports = {
   loadHome,
   loadSignup,
   signup,
   verifyOtp,
   resendOtp,
+  loadLogin,
+  login,
+  logout,
 };
