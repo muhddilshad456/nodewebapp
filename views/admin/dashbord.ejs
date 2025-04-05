@@ -1,0 +1,150 @@
+<%- include("../../views/partials/admin/header") %>
+<!-- Main Content -->
+<div class="content">
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Dashboard</span>
+      <div class="d-flex">
+        <span class="me-3">Today</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card card-custom">
+        <h5>Views</h5>
+        <h3>721K <span class="text-success">+11.02% ↑</span></h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom">
+        <h5>Visits</h5>
+        <h3>367K <span class="text-danger">-0.03% ↓</span></h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom">
+        <h5>New Users</h5>
+        <h3>1,156 <span class="text-success">+15.03% ↑</span></h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-custom">
+        <h5>Active Users</h5>
+        <h3>239K <span class="text-success">+6.08% ↑</span></h3>
+        <a href="#" class="text-primary">Show more ></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Image</th>
+          <th>Product Name</th>
+          <th>Brand</th>
+          <th>Amount</th>
+          <th>Revenue</th>
+          <th>Qty Sold</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#11225</td>
+          <td>
+            <img
+              src="https://via.placeholder.com/50"
+              alt="Watch"
+              class="img-fluid"
+            />
+          </td>
+          <td>TIMEX EASY READER</td>
+          <td>TIMEX</td>
+          <td>₹705</td>
+          <td>₹18,360</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>#11226</td>
+          <td>
+            <img
+              src="https://via.placeholder.com/50"
+              alt="Watch"
+              class="img-fluid"
+            />
+          </td>
+          <td>APPLE WATCH SERIES 10</td>
+          <td>APPLE</td>
+          <td>₹55,000</td>
+          <td>₹55,000</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>#11227</td>
+          <td>
+            <img
+              src="https://via.placeholder.com/50"
+              alt="Watch"
+              class="img-fluid"
+            />
+          </td>
+          <td>REDMI WATCH 5</td>
+          <td>REDMI</td>
+          <td>₹2,800</td>
+          <td>₹14,000</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>#11228</td>
+          <td>
+            <img
+              src="https://via.placeholder.com/50"
+              alt="Watch"
+              class="img-fluid"
+            />
+          </td>
+          <td>CASIO G-SHOCK G160</td>
+          <td>G-SHOCK</td>
+          <td>₹8,795</td>
+          <td>₹61,565</td>
+          <td>7</td>
+        </tr>
+        <tr>
+          <td>#11229</td>
+          <td>
+            <img
+              src="https://via.placeholder.com/50"
+              alt="Watch"
+              class="img-fluid"
+            />
+          </td>
+          <td>R.D.S.K TEC GEN 9 SMARTWATCH</td>
+          <td>R.D.S.K</td>
+          <td>₹1,373</td>
+          <td>₹4,119</td>
+          <td>3</td>
+        </tr>
+      </tbody>
+    </table>
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-end">
+        <li class="page-item">
+          <a class="page-link" href="#">Previous</a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">4</a></li>
+        <li class="page-item"><a class="page-link" href="#">5</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+      </ul>
+    </nav>
+    <p class="text-muted">Showing 1 of 10</p>
+  </div>
+</div>
+<%- include("../../views/partials/admin/footer") %>

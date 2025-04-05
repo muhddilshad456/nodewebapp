@@ -93,6 +93,10 @@
           />
         </div>
 
+        <%if(locals.message && message.length>0){%>
+        <div class="alert alert-danger text-center"><%=message%></div>
+        <%}%>
+
         <button type="submit" class="btn btn-login">Log in</button>
       </form>
     </div>
