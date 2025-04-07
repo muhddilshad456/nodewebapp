@@ -1,0 +1,84 @@
+<%- include("../../views/partials/admin/header") %>
+
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Users</h2>
+    <div class="input-group" style="width: 300px">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search for User Name"
+        aria-label="Search"
+      />
+      <button class="btn btn-dark" type="button">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th>USER IMAGE</th>
+          <th>USER NAME</th>
+          <th>EMAIL</th>
+          <th>PHONE</th>
+          <th>DATE OF CREATION</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let i = 0; i < data.length; i++) { %>
+        <tr>
+          <td>
+            <img
+              src="https://via.placeholder.com/40"
+              alt="User"
+              class="rounded-circle img-fluid"
+            />
+          </td>
+          <td><%= data[i].name %></td>
+          <td><%= data[i].email %></td>
+          <td><%= data[i].phone %></td>
+          <td><%= data[i].createdOn.toISOString().split('T')[0] %></td>
+          <td>
+            <%if(!data[i].isBlocked){%>
+            <button class="btn btn-danger">
+              <a
+                href="/admin/blockCustomer?id=<%=data[i]._id%>"
+                class="text-white"
+                >BLOCK</a
+              >
+            </button>
+            <%}else{%>
+            <button class="btn btn-success">
+              <a
+                href="/admin/unblockCustomer?id=<%=data[i]._id%>"
+                class="text-white"
+                >UNBLOCK</a
+              >
+            </button>
+            <%}%>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-between align-items-start">
+    <nav aria-label="Page navigation" class="ms-auto">
+      <ul class="pagination">
+        <% for(let i=1;i<=totalPages;i++){ %>
+
+        <li class="page-item <%=(i===currentPage) ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>
