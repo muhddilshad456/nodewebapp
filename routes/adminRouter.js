@@ -14,7 +14,7 @@ router.get("/users", costumerController.costumerInfo);
 router.get("/blockCustomer", costumerController.customerBlock);
 router.get("/unblockCustomer", costumerController.customerUnblock);
 //category
-router.get("/category", adminAuth, categoryController.categoryInfo);
+router.get("/category", categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
 
 module.exports = router;
