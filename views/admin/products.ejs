@@ -1,0 +1,118 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!-- Content -->
+<div class="content">
+  <div
+    class="d-flex justify-content-between align-items-center mb-4"
+    style="padding-top: 20px"
+  >
+    <h2>Products</h2>
+    <div class="d-flex">
+      <div class="input-group me-2" style="width: 300px">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search for Products"
+          aria-label="Search"
+        />
+        <button class="btn btn-dark" type="button">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <button class="btn btn-success">
+        ADD PRODUCT <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Product Image</th>
+          <th scope="col">Product Name</th>
+          <th scope="col">Brand</th>
+          <th scope="col">Price</th>
+          <th scope="col">Status</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Last Updated</th>
+          <th scope="col">Color Available</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let i = products.length-1; i >=0 ; i--) { %>
+        <tr>
+          <td><%= products[i].id %></td>
+          <td>
+            <img
+              src="<%= products[i].imageUrl %>"
+              alt="<%= products[i].productName %>"
+              style="width: 50px; height: auto"
+            />
+          </td>
+          <td><%= products[i].productName %></td>
+          <td><%= products[i].brand %></td>
+          <td><%= products[i].price %></td>
+          <td>
+            <% if (products[i].status) { %>
+            <span class="text-success">✔ <%= products[i].status %></span>
+            <% } else { %>
+            <span class="text-danger">✘</span>
+            <% } %>
+          </td>
+          <td><%= products[i].amount %></td>
+          <td><%= products[i].lastUpdated %></td>
+          <td>
+            <% products[i].colors.forEach(color => { %>
+            <span
+              class="badge"
+              style="background-color: <%= color %>; margin-right: 5px"
+            ></span>
+            <% }); %>
+          </td>
+          <td>
+            <div class="d-flex">
+              <a href="#" class="btn btn-sm btn-outline-light me-1"
+                ><i class="bi bi-pencil"></i
+              ></a>
+              <a href="#" class="btn btn-sm btn-outline-light"
+                ><i class="bi bi-trash"></i
+              ></a>
+            </div>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <p class="text-muted">SHOWING 1 OF <%= products.length %></p>
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">«</span>
+          </a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item active"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">4</a></li>
+        <li class="page-item"><a class="page-link" href="#">5</a></li>
+        <li class="page-item"><a class="page-link" href="#">6</a></li>
+        <li class="page-item"><a class="page-link" href="#">7</a></li>
+        <li class="page-item"><a class="page-link" href="#">8</a></li>
+        <li class="page-item"><a class="page-link" href="#">9</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">»</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>

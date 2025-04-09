@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require("../controllers/admin/adminController");
 const costumerController = require("../controllers/admin/costumerController");
 const categoryController = require("../controllers/admin/categoryController");
+const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
 router.get("/login", adminController.loadLogin);
@@ -16,5 +17,8 @@ router.get("/unblockCustomer", costumerController.customerUnblock);
 //category
 router.get("/category", categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
+
+//product
+router.get("/productList", adminAuth, productController.listProduct);
 
 module.exports = router;

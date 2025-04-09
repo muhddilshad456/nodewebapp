@@ -25,7 +25,7 @@ const productSchema = new Schema(
     },
     salePrice: {
       type: String,
-      required: trusted,
+      required: true,
     },
     productOffer: {
       type: Number,
