@@ -145,20 +145,20 @@
 
     if (!categoryName) {
       alert("Name field cannot be empty");
-      return false;
+      return;
     }
     if (!/^[a-zA-Z\s]+$/.test(categoryName)) {
       alert("Name must contain only alphabets and spaces.");
-      return false;
+      return;
     }
 
     if (!categoryDescription) {
       alert("Description field cannot be empty.");
-      return false;
+      return;
     }
     if (!/^[a-zA-Z\s]+$/.test(categoryDescription)) {
       alert("Description must contain only alphabets and spaces.");
-      return false;
+      return;
     }
 
     const formData = {

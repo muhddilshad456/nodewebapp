@@ -19,7 +19,11 @@
           <i class="bi bi-search"></i>
         </button>
       </div>
-      <button class="btn btn-success">
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#addProductModal"
+      >
         ADD PRODUCT <i class="bi bi-plus-lg"></i>
       </button>
     </div>
@@ -33,44 +37,35 @@
           <th scope="col">Product Image</th>
           <th scope="col">Product Name</th>
           <th scope="col">Brand</th>
-          <th scope="col">Price</th>
-          <th scope="col">Status</th>
+          <th scope="col">Piece</th>
           <th scope="col">Amount</th>
           <th scope="col">Last Updated</th>
-          <th scope="col">Color Available</th>
+          <th scope="col">Status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <% for (let i = products.length-1; i >=0 ; i--) { %>
+        <% for (let i = data.length-1; i >=0 ; i--) { %>
         <tr>
-          <td><%= products[i].id %></td>
+          <td><%= data[i].id %></td>
           <td>
             <img
-              src="<%= products[i].imageUrl %>"
-              alt="<%= products[i].productName %>"
+              src="<%= data[i].imageUrl %>"
+              alt="<%= data[i].dataName %>"
               style="width: 50px; height: auto"
             />
           </td>
-          <td><%= products[i].productName %></td>
-          <td><%= products[i].brand %></td>
-          <td><%= products[i].price %></td>
+          <td><%= data[i].productName %></td>
+          <td><%= data[i].brand %></td>
+          <td><%= data[i].quantity %></td>
+          <td><%= data[i].amount %></td>
+          <td><%= data[i].lastUpdated %></td>
           <td>
-            <% if (products[i].status) { %>
-            <span class="text-success">✔ <%= products[i].status %></span>
+            <% if (data[i].status) { %>
+            <span class="text-success">✔ <%= data[i].status %></span>
             <% } else { %>
             <span class="text-danger">✘</span>
             <% } %>
-          </td>
-          <td><%= products[i].amount %></td>
-          <td><%= products[i].lastUpdated %></td>
-          <td>
-            <% products[i].colors.forEach(color => { %>
-            <span
-              class="badge"
-              style="background-color: <%= color %>; margin-right: 5px"
-            ></span>
-            <% }); %>
           </td>
           <td>
             <div class="d-flex">
@@ -88,7 +83,7 @@
     </table>
   </div>
   <div class="d-flex justify-content-between align-items-center mt-3">
-    <p class="text-muted">SHOWING 1 OF <%= products.length %></p>
+    <p class="text-muted">SHOWING 1 OF <%= data.length %></p>
     <nav aria-label="Page navigation">
       <ul class="pagination">
         <li class="page-item">
@@ -114,5 +109,192 @@
     </nav>
   </div>
 </div>
+<!-- Add Product Modal -->
+<div
+  class="modal fade"
+  id="addProductModal"
+  tabindex="-1"
+  aria-labelledby="addProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addProductModalLabel">Add Products</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row">
+          <!-- Image Upload Areas (Three Photos) -->
+          <div class="col-md-4">
+            <div
+              class="image-upload"
+              data-bs-toggle="tooltip"
+              title="Drop or click to upload image 1"
+            >
+              <span class="text-muted">Image 1</span>
+            </div>
+            <div
+              class="image-upload"
+              data-bs-toggle="tooltip"
+              title="Drop or click to upload image 2"
+            >
+              <span class="text-muted">Image 2</span>
+            </div>
+            <div
+              class="image-upload"
+              data-bs-toggle="tooltip"
+              title="Drop or click to upload image 3"
+            >
+              <span class="text-muted">Image 3</span>
+            </div>
+          </div>
+          <!-- Form Fields -->
+          <div class="col-md-8">
+            <form id="addProductsForm" onsubmit="handleFormSubmit(event)">
+              <div class="mb-4">
+                <label for="productName" class="form-label"
+                  >Product Name:</label
+                >
+                <input type="text" class="form-control" id="productName" />
+              </div>
+              <div class="mb-4">
+                <label for="productDescription" class="form-label"
+                  >Product Description:</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="productDescription"
+                />
+              </div>
+              <div class="mb-4">
+                <label for="brand" class="form-label">Brand:</label>
+                <select class="form-select" id="category">
+                  <option value="" selected disabled>Select a category</option>
+                </select>
+              </div>
+              <div class="mb-4">
+                <label for="category" class="form-label">Category:</label>
+                <select class="form-select" id="category" name="category">
+                  <% for (let i = 0; i < cat.length; i++) { %>
+                  <option value="<%= cat[i].name %>"><%= cat[i].name %></option>
+                  <% } %>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label for="productAmount" class="form-label"
+                  >Product Amount:</label
+                >
+                <input type="number" class="form-control" id="productAmount" />
+              </div>
+              <div class="mb-4">
+                <label for="stockCount" class="form-label">Stock Count:</label>
+                <input type="number" class="form-control" id="stockCount" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-dark" form="addProductsForm">
+          Add Product
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const productName = document.getElementById("productName").value.trim();
+    const productDescription = document
+      .getElementById("productDescription")
+      .value.trim();
+    const productAmount = document.getElementById("productAmount").value.trim();
+    const stockCount = document.getElementById("stockCount").value.trim();
+
+    if (!productName) {
+      alert("Name field cannot be empty");
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(productName)) {
+      alert("Name must contain only alphabets and spaces.");
+      return;
+    }
+    if (!productDescription) {
+      alert("Description field cannot be empty");
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(productDescription)) {
+      alert("Description must contain only alphabets and spaces.");
+      return;
+    }
+    if (!productAmount || isNaN(productAmount)) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    if (!stockCount || isNaN(stockCount)) {
+      alert("Please enter a valid stock count.");
+      return;
+    }
+    document.getElementById("addProductsForm").submit();
+  }
+</script>
+<script>
+  function viewImage1(event) {
+    document.getElementById("imgView1").src = URL.createObjectURL(
+      event.target.files[0]
+    );
+  }
+  function viewImage2(event) {
+    document.getElementById("imgView2").src = URL.createObjectURL(
+      event.target.files[0]
+    );
+  }
+  function viewImage3(event) {
+    document.getElementById("imgView3").src = URL.createObjectURL(
+      event.target.files[0]
+    );
+  }
+
+  function viewImage(event, index) {
+    let input = event.target;
+    let reader = new FileReader();
+    reader.onload = function () {
+      let dataURL = reader.result;
+      let image = document.getElementById("imgView" + index);
+      image.src = dataURL;
+      let cropper = new Cropper(image, {
+        aspectRation: 1,
+        viewMode: 1,
+        guides: true,
+        background: false,
+        autoCropArea: 1,
+        zoomable: true,
+      });
+
+      let cropperContainer = document.querySelector(
+        "#croppedImg" + index
+      ).parentNode;
+      cropperContainer.style.display = "block";
+
+      let saveButton = document.querySelector("#saveButton" + index);
+      saveButton.addEventListener("click", async function () {
+        let croppedCanvas = cropper.getCroppedCanvas();
+      });
+    };
+  }
+</script>
 
 <%- include("../../views/partials/admin/footer") %>
