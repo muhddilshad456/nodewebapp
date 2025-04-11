@@ -21,7 +21,7 @@ const login = async (req, res) => {
     if (!passwordMatch) {
       res.render("admin-login", { message: "Incorrect password" });
     }
-    req.session.admin = true;
+    req.session.admin = findAdmin._id;
     res.redirect("/admin");
   } catch (error) {
     console.log("login error", error);

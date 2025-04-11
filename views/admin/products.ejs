@@ -19,13 +19,9 @@
           <i class="bi bi-search"></i>
         </button>
       </div>
-      <button
-        class="btn btn-success"
-        data-bs-toggle="modal"
-        data-bs-target="#addProductModal"
-      >
+      <a href="/admin/addproductpage" class="btn btn-success">
         ADD PRODUCT <i class="bi bi-plus-lg"></i>
-      </button>
+      </a>
     </div>
   </div>
 
@@ -109,110 +105,7 @@
     </nav>
   </div>
 </div>
-<!-- Add Product Modal -->
-<div
-  class="modal fade"
-  id="addProductModal"
-  tabindex="-1"
-  aria-labelledby="addProductModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addProductModalLabel">Add Products</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body p-4">
-        <div class="row">
-          <!-- Image Upload Areas (Three Photos) -->
-          <div class="col-md-4">
-            <div
-              class="image-upload"
-              data-bs-toggle="tooltip"
-              title="Drop or click to upload image 1"
-            >
-              <span class="text-muted">Image 1</span>
-            </div>
-            <div
-              class="image-upload"
-              data-bs-toggle="tooltip"
-              title="Drop or click to upload image 2"
-            >
-              <span class="text-muted">Image 2</span>
-            </div>
-            <div
-              class="image-upload"
-              data-bs-toggle="tooltip"
-              title="Drop or click to upload image 3"
-            >
-              <span class="text-muted">Image 3</span>
-            </div>
-          </div>
-          <!-- Form Fields -->
-          <div class="col-md-8">
-            <form id="addProductsForm" onsubmit="handleFormSubmit(event)">
-              <div class="mb-4">
-                <label for="productName" class="form-label"
-                  >Product Name:</label
-                >
-                <input type="text" class="form-control" id="productName" />
-              </div>
-              <div class="mb-4">
-                <label for="productDescription" class="form-label"
-                  >Product Description:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="productDescription"
-                />
-              </div>
-              <div class="mb-4">
-                <label for="brand" class="form-label">Brand:</label>
-                <select class="form-select" id="category">
-                  <option value="" selected disabled>Select a category</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label for="category" class="form-label">Category:</label>
-                <select class="form-select" id="category" name="category">
-                  <% for (let i = 0; i < cat.length; i++) { %>
-                  <option value="<%= cat[i].name %>"><%= cat[i].name %></option>
-                  <% } %>
-                </select>
-              </div>
 
-              <div class="mb-4">
-                <label for="productAmount" class="form-label"
-                  >Product Amount:</label
-                >
-                <input type="number" class="form-control" id="productAmount" />
-              </div>
-              <div class="mb-4">
-                <label for="stockCount" class="form-label">Stock Count:</label>
-                <input type="number" class="form-control" id="stockCount" />
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
-        <button type="submit" class="btn btn-dark" form="addProductsForm">
-          Add Product
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 <script>
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -251,7 +144,7 @@
     document.getElementById("addProductsForm").submit();
   }
 </script>
-<script>
+<!-- <script>
   function viewImage1(event) {
     document.getElementById("imgView1").src = URL.createObjectURL(
       event.target.files[0]
@@ -292,9 +185,50 @@
       let saveButton = document.querySelector("#saveButton" + index);
       saveButton.addEventListener("click", async function () {
         let croppedCanvas = cropper.getCroppedCanvas();
+        let croppedImage = document.getElementById("croppedImg" + index);
+        croppedImage.src = croppedCanvas.toDataURL("image/jpeg", 1.0);
+
+        let timestamp = new Date().getTime();
+        let fileName = `cropped-img-${timestamp}-${index}.png`;
+
+        await croppedCanvas.toBlob((blob) => {
+          let input = document.getElementById("input" + index);
+          let imgFile = new File([blob], fileName.blob);
+          const fileList = new DataTransfer();
+          fileList.items.add(imgFile);
+          input.files = fileList.files;
+        });
+
+        cropperContainer.style.display = "none";
+        cropper.destroy();
       });
     };
+    reader.readAsDataURL(input.files[0]);
   }
-</script>
+
+  const selectedImages = [];
+  document
+    .getElementById("input1")
+    .addEventListener("change", handleFileSelect);
+
+  function handleFileSelect(event) {
+    const addedImagesContainer = document.getElementById(
+      "addedImagesContainer"
+    );
+    addedImagesContainer.innerHTML = "";
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      selectedImages.push(file);
+      const thumbnail = document.createElement("div");
+      thumbnail.classList.add("thumbnail");
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.alt = "thumbnail";
+      img.style.width = "50";
+    }
+  }
+</script> -->
 
 <%- include("../../views/partials/admin/footer") %>

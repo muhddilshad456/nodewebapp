@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .add-product-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .image-upload {
+        border: 2px dashed #dee2e6;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .image-upload span {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+      .form-label {
+        font-weight: 500;
+      }
+      .btn-dark {
+        background-color: #212529;
+        border-color: #212529;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Add Product Page -->
+    <div class="container add-product-container">
+      <h2 class="mb-4">Add Product</h2>
+      <form
+        method="post"
+        action="/admin/addProduct"
+        id="addProductsForm"
+        onsubmit="handleFormSubmit(event)"
+      >
+        <div class="row">
+          <!-- Image Upload Areas -->
+          <div class="image-upload">
+            <label for="image1">Image 1</label>
+            <input type="file" accept="image/*" id="image1" name="image1" />
+            <div class="preview" id="preview1" style="display: none">
+              <img
+                id="previewImage1"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
+          </div>
+          <div class="image-upload">
+            <label for="image1">Image 2</label>
+            <input type="file" accept="image/*" id="image2" name="image2" />
+            <div class="preview" id="preview1" style="display: none">
+              <img
+                id="previewImage1"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
+          </div>
+          <div class="image-upload">
+            <label for="image1">Image 3</label>
+            <input type="file" accept="image/*" id="image3" name="image3" />
+            <div class="preview" id="preview1" style="display: none">
+              <img
+                id="previewImage1"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
+          </div>
+          <!-- ------------ -->
+          <div class="col-md-8">
+            <div class="mb-4">
+              <label for="productName" class="form-label">Product Name:</label>
+              <input type="text" class="form-control" id="productName" />
+            </div>
+            <div class="mb-4">
+              <label for="productDescription" class="form-label"
+                >Product Description:</label
+              >
+              <input type="text" class="form-control" id="productDescription" />
+            </div>
+            <div class="mb-4">
+              <label for="brand" class="form-label">Brand:</label>
+              <select class="form-select" id="brand">
+                <option value="" selected disabled>Select a brand</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="category" class="form-label">Category:</label>
+              <select class="form-select" id="category" name="category">
+                <option value="" selected disabled>Select a category</option>
+                <% for (let i = 0; i < cat.length; i++) { %>
+                <option value="<%= cat[i].name %>"><%= cat[i].name %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="productAmount" class="form-label"
+                >Product Amount:</label
+              >
+              <input type="number" class="form-control" id="productAmount" />
+            </div>
+            <div class="mb-4">
+              <label for="stockCount" class="form-label">Stock Count:</label>
+              <input type="number" class="form-control" id="stockCount" />
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-dark">Add Product</button>
+              <button type="button" class="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <script>
+      function handleFormSubmit(event) {
+        event.preventDefault();
+        const productName = document.getElementById("productName").value.trim();
+        const productDescription = document
+          .getElementById("productDescription")
+          .value.trim();
+        const productAmount = document
+          .getElementById("productAmount")
+          .value.trim();
+        const stockCount = document.getElementById("stockCount").value.trim();
+
+        if (!productName) {
+          alert("Name field cannot be empty");
+          return;
+        }
+        if (!/^[a-zA-Z\s]+$/.test(productName)) {
+          alert("Name must contain only alphabets and spaces.");
+          return;
+        }
+        if (!productDescription) {
+          alert("Description field cannot be empty");
+          return;
+        }
+        if (!/^[a-zA-Z\s]+$/.test(productDescription)) {
+          alert("Description must contain only alphabets and spaces.");
+          return;
+        }
+        if (!productAmount || isNaN(productAmount)) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+
+        if (!stockCount || isNaN(stockCount)) {
+          alert("Please enter a valid stock count.");
+          return;
+        }
+        document.getElementById("addProductsForm").submit();
+      }
+    </script>
+  </body>
+</html>

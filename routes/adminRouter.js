@@ -20,6 +20,7 @@ router.post("/addCategory", adminAuth, categoryController.addCategory);
 
 //product
 router.get("/productList", adminAuth, productController.listProduct);
+router.get("/addproductpage", adminAuth, productController.addProductPage);
 router.post("/addProduct", adminAuth, productController.addProduct);
 
 module.exports = router;

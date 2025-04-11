@@ -53,7 +53,20 @@ const addProduct = async (req, res) => {
   } catch (error) {}
 };
 
+const addProductPage = async (req, res) => {
+  try {
+    const category = await Category.find({ isListed: true });
+    const brand = await Brand.find({ isBlocked: false });
+
+    res.render("addProducts", {
+      cat: category,
+      brand: brand,
+    });
+  } catch (error) {}
+};
+
 module.exports = {
   listProduct,
   addProduct,
+  addProductPage,
 };
