@@ -137,7 +137,7 @@
               <select class="form-select" id="category" name="category">
                 <option value="" selected disabled>Select a category</option>
                 <% for (let i = 0; i < cat.length; i++) { %>
-                <option value="<%= cat[i].name %>"><%= cat[i].name %></option>
+                <option value="<%= cat[i]._id %>"><%= cat[i].name %></option>
                 <% } %>
               </select>
             </div>

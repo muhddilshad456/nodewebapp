@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 
 const costumerInfo = async (req, res) => {
   try {
+    console.log(req.query.search);
     let search = "";
     if (req.query.search) {
       search = req.query.search;

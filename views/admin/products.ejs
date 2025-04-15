@@ -8,17 +8,20 @@
   >
     <h2>Products</h2>
     <div class="d-flex">
-      <div class="input-group me-2" style="width: 300px">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search for Products"
-          aria-label="Search"
-        />
-        <button class="btn btn-dark" type="button">
-          <i class="bi bi-search"></i>
-        </button>
-      </div>
+      <form action="/admin/productList" method="get">
+        <div class="input-group me-2" style="width: 300px">
+          <input
+            type="text"
+            class="form-control"
+            name="search"
+            placeholder="Search for Products"
+            aria-label="Search"
+          />
+          <button class="btn btn-dark" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
       <a href="/admin/addproductpage" class="btn btn-success">
         ADD PRODUCT <i class="bi bi-plus-lg"></i>
       </a>
@@ -53,8 +56,8 @@
           </td>
           <td><%= data[i].productName %></td>
           <td><%= data[i].brand %></td>
-          <td><%= data[i].quantity %></td>
-          <td><%= data[i].amount %></td>
+          <td><%= data[i].stockCount %></td>
+          <td><%= data[i].productAmount %></td>
           <td><%= data[i].lastUpdated %></td>
           <td>
             <% if (data[i].status) { %>
@@ -78,34 +81,20 @@
       </tbody>
     </table>
   </div>
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <p class="text-muted">SHOWING 1 OF <%= data.length %></p>
-    <nav aria-label="Page navigation">
+  <div class="d-flex justify-content-between align-items-start">
+    <nav aria-label="Page navigation" class="ms-auto">
       <ul class="pagination">
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">«</span>
-          </a>
+        <% for(let i=1;i<=totalPages;i++){ %>
+
+        <li class="page-item <%=(i===currentPage) ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
         </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item active"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">4</a></li>
-        <li class="page-item"><a class="page-link" href="#">5</a></li>
-        <li class="page-item"><a class="page-link" href="#">6</a></li>
-        <li class="page-item"><a class="page-link" href="#">7</a></li>
-        <li class="page-item"><a class="page-link" href="#">8</a></li>
-        <li class="page-item"><a class="page-link" href="#">9</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">»</span>
-          </a>
-        </li>
+
+        <% } %>
       </ul>
     </nav>
   </div>
 </div>
-
 <script>
   function handleFormSubmit(event) {
     event.preventDefault();

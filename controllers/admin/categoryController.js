@@ -1,12 +1,17 @@
 const Category = require("../../models/categorySchema");
+console.log("hi");
 //category info
 const categoryInfo = async (req, res) => {
   try {
+    console.log("hihih");
+    let search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 4;
     const skip = (page - 1) * limit;
 
-    const categoryData = await Category.find({})
+    const categoryData = await Category.find({
+      name: { $regex: ".*" + search + ".*" },
+    })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

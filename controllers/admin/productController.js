@@ -6,11 +6,10 @@ const path = require("path");
 const multer = require("multer");
 
 // Ensure uploads directory exists
-const uploadsDir = "Uploads";
+const uploadsDir = path.join(__dirname, "../../public", "Uploads");
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
-
 // Multer configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,6 +41,7 @@ const uploadFields = upload.fields([
 
 const listProduct = async (req, res) => {
   try {
+    console.log(req.query.search);
     const search = req.query.search || "";
     const page = req.query.page || 1;
     const limit = 4;
@@ -100,15 +100,12 @@ const addProduct = async (req, res) => {
 
     // Extract image paths
     const files = req.files || {};
-    const image1 = files.image1
-      ? path.join(uploadsDir, files.image1[0].filename)
-      : null;
-    const image2 = files.image2
-      ? path.join(uploadsDir, files.image2[0].filename)
-      : null;
-    const image3 = files.image3
-      ? path.join(uploadsDir, files.image3[0].filename)
-      : null;
+    const image1 = files.image1 ? `/Uploads/${files.image1[0].filename}` : null;
+    const image2 = files.image2 ? `/Uploads/${files.image2[0].filename}` : null;
+    const image3 = files.image3 ? `/Uploads/${files.image3[0].filename}` : null;
+
+    // Combine images into array
+    const productImage = [image1, image2, image3].filter((img) => img !== null);
 
     // Validate required fields (match frontend)
     if (!productName || !/^[a-zA-Z\s]+$/.test(productName)) {
@@ -148,9 +145,7 @@ const addProduct = async (req, res) => {
       category: category || "",
       productAmount: Number(productAmount),
       stockCount: Number(stockCount),
-      image1,
-      image2,
-      image3,
+      productImage,
     });
 
     await product.save();
@@ -162,12 +157,10 @@ const addProduct = async (req, res) => {
       category,
       productAmount,
       stockCount,
-      image1,
-      image2,
-      image3,
+      productImage,
     });
 
-    res.redirect("/admin/products");
+    res.redirect("/admin/productList");
   } catch (error) {
     console.error("Error in addProduct:", error);
     res.status(500).render("addProducts", {

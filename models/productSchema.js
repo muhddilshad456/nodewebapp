@@ -7,38 +7,39 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
-    description: {
+    productDescription: {
       type: String,
       required: true,
     },
     brand: {
       type: String,
-      required: true,
+      required: false,
     },
     category: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
     },
     regularPrice: {
       type: Number,
+      required: false,
+    },
+    productAmount: {
+      type: Number,
       required: true,
     },
-    salePrice: {
-      type: String,
+    // productOffer: {
+    //   type: Number,
+    //   default: 0,
+    // },
+    stockCount: {
+      type: Number,
       required: true,
-    },
-    productOffer: {
-      type: Number,
-      default: 0,
-    },
-    quantity: {
-      type: Number,
-      require: true,
       default: 1,
     },
     color: {
       type: String,
-      required: true,
+      required: false,
     },
     productImage: {
       type: [String],

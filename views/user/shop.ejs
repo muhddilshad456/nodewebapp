@@ -1,0 +1,214 @@
+<%- include("../../views/partials/user/header") %>
+
+<!-- Main Content -->
+<section class="main-content py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3">
+        <div
+          class="sidebar p-4 rounded shadow-lg"
+          style="
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            position: sticky;
+            top: 20px;
+          "
+        >
+          <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
+          <select
+            class="form-select mb-4 rounded-pill border-secondary"
+            id="categoryDropdown"
+          >
+            <option value="" selected disabled>Select a category</option>
+            <% for (let i = 0; i < category.length; i++) { %>
+            <option value="low-budget"><%=category[i].name %></option>
+            <% } %>
+          </select>
+
+          <h4 class="text-dark mb-3 fw-bold">BRANDS</h4>
+          <select
+            class="form-select mb-4 rounded-pill border-secondary"
+            id="brandDropdown"
+          >
+            <option value="" selected disabled>Select a brand</option>
+
+            <% for (let i = 0; i < brands.length; i++) { %>
+            <option value="low-budget"><%=brands[i].name %></option>
+            <% } %>
+          </select>
+
+          <h4 class="text-dark mb-3 fw-bold">SORT</h4>
+          <select
+            class="form-select mb-4 rounded-pill border-secondary"
+            id="sortDropdown"
+          >
+            <option value="" selected disabled>Select sorting</option>
+            <option value="a-z">Aa-Zz</option>
+            <option value="a-z">Zz-Aa</option>
+            <option value="a-z">Price low-high</option>
+            <option value="a-z">Price high-low</option>
+          </select>
+
+          <h4 class="text-dark mb-3 fw-bold">FILTER</h4>
+          <div class="mb-3">
+            <label for="priceFrom" class="form-label text-dark fw-medium"
+              >Price From:</label
+            >
+            <input
+              type="number"
+              class="form-control rounded-pill border-secondary"
+              id="priceFrom"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="priceTo" class="form-label text-dark fw-medium"
+              >Price To:</label
+            >
+            <input
+              type="number"
+              class="form-control rounded-pill border-secondary"
+              id="priceTo"
+            />
+          </div>
+          <button class="btn btn-dark rounded-pill w-100" id="applyFilter">
+            Apply
+          </button>
+        </div>
+      </div>
+      <!-- Product Grid -->
+      <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="input-group w-50">
+            <input
+              type="text"
+              class="form-control rounded-start-pill border-secondary"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-dark rounded-end-pill" type="button">
+              <i class="bi bi-search" style="color: #fff"></i>
+            </button>
+          </div>
+        </div>
+        <div class="row g-4">
+          <!-- Product Cards -->
+          <% for (let i = 0; i < products.length; i++) { %>
+          <div class="col-lg-3 col-md-4 col-6">
+            <div
+              class="product-card p-3 bg-white rounded-3 shadow-sm position-relative overflow-hidden"
+              style="transition: all 0.3s ease"
+            >
+              <a
+                href="/productDetails?id=<%= products[i]._id %>"
+                class="text-decoration-none"
+              >
+                <img
+                  class="product-image img-fluid rounded-2 w-100"
+                  src="<%= products[i].productImage[0] %>"
+                  alt="<%= products[i].productName %>"
+                  style="height: 220px; object-fit: cover"
+                />
+                <div
+                  class="product-overlay bg-dark opacity-0 position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                  style="transition: opacity 0.3s ease"
+                >
+                  <span class="text-white fw-bold">View Details</span>
+                </div>
+              </a>
+              <h5
+                class="product-title text-dark mt-3 fw-semibold"
+                style="
+                  font-size: 1.1rem;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                "
+              >
+                <%= products[i].productName %>
+              </h5>
+              <div class="ratings text-warning mb-2">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <div
+                class="product-price text-dark fw-bold"
+                style="font-size: 1.2rem"
+              >
+                ₹<%= products[i].productAmount %>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-5">
+          <nav>
+            <ul class="pagination">
+              <% for(let i=1;i<=totalPages;i++){ %>
+              <li class="page-item <%=(i===page) ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+              </li>
+              <% } %>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<%- include("../../views/partials/user/footer") %>
+
+<style>
+  .sidebar {
+    border-left: 4px solid #4b6cb7;
+  }
+
+  .sidebar a:hover {
+    color: #4b6cb7 !important;
+  }
+
+  .input-group .form-control {
+    border-right: none;
+  }
+
+  .input-group .btn {
+    border-left: none;
+  }
+
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-card:hover .product-overlay {
+    opacity: 0.8;
+  }
+
+  .product-overlay {
+    z-index: 1;
+  }
+
+  .product-image {
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .form-select {
+    background-color: #fff;
+    border-color: #ced4da;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-select:focus {
+    border-color: #4b6cb7;
+    box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+  }
+</style>

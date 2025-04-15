@@ -1,15 +1,40 @@
 const User = require("../../models/userSchema");
+const Category = require("../../models/categorySchema");
+const Brand = require("../../models/brandSchema");
+const Product = require("../../models/productSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+
+// home
+
 const loadHome = async (req, res) => {
   try {
-    return res.render("home");
+    const user = req.session.user;
+    const allProducts = await Product.find();
+    console.log("All Products:", allProducts);
+    const categories = await Category.find({ isListed: true });
+    let productData = await Product.find({
+      isBlocked: false,
+      category: { $in: categories.map((category) => category._id) },
+      stockCount: { $gt: 0 },
+    });
+    // sort product
+    productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+    console.log("product data:", productData);
+    if (user) {
+      const userData = await User.findOne({ _id: user._id });
+      return res.render("home", { user: userData, products: productData });
+    } else {
+      return res.render("home", { products: productData });
+    }
   } catch (error) {
     console.log("home page render error");
     res.status(500).send("Home page not found");
   }
 };
+
+//signup page
 
 const loadSignup = async (req, res) => {
   try {
@@ -51,6 +76,8 @@ async function sendVerificationEmail(email, otp) {
   }
 }
 
+//signup
+
 const signup = async (req, res) => {
   try {
     const { name, phone, email, password, confirmpassword } = req.body;
@@ -79,12 +106,16 @@ const signup = async (req, res) => {
   }
 };
 
+//password hashing
+
 const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {}
 };
+
+//verify otp
 
 const verifyOtp = async (req, res) => {
   try {
@@ -115,6 +146,8 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+//resend otp
+
 const resendOtp = async (req, res) => {
   try {
     const { email } = req.session.userData;
@@ -142,6 +175,8 @@ const resendOtp = async (req, res) => {
   }
 };
 
+//login page
+
 const loadLogin = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -153,6 +188,8 @@ const loadLogin = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
+
+//login
 
 const login = async (req, res) => {
   try {
@@ -174,6 +211,8 @@ const login = async (req, res) => {
   } catch (error) {}
 };
 
+//logout
+
 const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
@@ -189,6 +228,54 @@ const logout = async (req, res) => {
   }
 };
 
+//shop page
+
+const loadShopPage = async (req, res) => {
+  try {
+    const user = req.session.user;
+    const userData = await User.findOne({ _id: user });
+    const categories = await Category.find({ isListed: true });
+    const categoryIds = categories.map((category) => category._id);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find({
+      isBlocked: false,
+      category: { $in: categoryIds },
+      stockCount: { $gt: 0 },
+    })
+      .sort({ createdOn: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // count products
+    const totalProducts = await Product.countDocuments({
+      isBlocked: false,
+      category: { $in: categoryIds },
+      stockCount: { $gt: 0 },
+    });
+
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    const brands = await Brand.find({ isBlocked: false });
+    const categoriesWithIds = categories.map((category) => ({
+      _id: category._id,
+      name: category.name,
+    }));
+
+    res.render("shop", {
+      user: userData,
+      products,
+      category: categoriesWithIds,
+      brands,
+      totalProducts,
+      totalPages,
+      page,
+    });
+  } catch (error) {}
+};
+
 module.exports = {
   loadHome,
   loadSignup,
@@ -198,4 +285,5 @@ module.exports = {
   loadLogin,
   login,
   logout,
+  loadShopPage,
 };

@@ -75,15 +75,18 @@
     </p>
 
     <div class="row">
-      <!-- Product 1 -->
+      <!-- Product  -->
+      <% for (let i = 0; i < products.length; i++) { %>
       <div class="col-lg-3 col-md-4 col-6">
         <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Smart Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">SAMSUNG GALAXY WATCH</h5>
+          <a href="/productDetails?id=<%=products[i]._id %>">
+            <img
+              class="product-image"
+              src="<%= products[i].productImage[0] %>"
+              alt="<%=products[i].productName %>"
+            />
+          </a>
+          <h5 class="product-title"><%=products[i].productName %></h5>
           <div class="ratings">
             <i class="fas fa-star"></i>
             <i class="fas fa-star"></i>
@@ -91,149 +94,10 @@
             <i class="fas fa-star"></i>
             <i class="fas fa-star-half-alt"></i>
           </div>
-          <div class="product-price">$299.99</div>
+          <div class="product-price"><%=products[i].productAmount %></div>
         </div>
       </div>
-
-      <!-- Product 2 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Diver Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">SEIKO PROSPEX</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <div class="product-price">$385.00</div>
-        </div>
-      </div>
-
-      <!-- Product 3 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Luxury Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">TISSOT PRX 35</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="far fa-star"></i>
-          </div>
-          <div class="product-price">$425.00</div>
-        </div>
-      </div>
-
-      <!-- Product 4 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Sport Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">NORDGREEN PIONEER</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-          </div>
-          <div class="product-price">$329.00</div>
-        </div>
-      </div>
-
-      <!-- Product 5 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Smart Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">APPLE WATCH SE</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <div class="product-price">$249.00</div>
-        </div>
-      </div>
-
-      <!-- Product 6 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Digital Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">CASIO G-SHOCK</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-            <i class="far fa-star"></i>
-          </div>
-          <div class="product-price">$119.95</div>
-        </div>
-      </div>
-
-      <!-- Product 7 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Luxury Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">TUDOR BLACK BAY</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-          </div>
-          <div class="product-price">$3,950.00</div>
-        </div>
-      </div>
-
-      <!-- Product 8 -->
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="product-card p-3">
-          <img
-            src="https://placehold.co/300x300"
-            alt="Diver Watch"
-            class="img-fluid product-img w-100"
-          />
-          <h5 class="product-title">OMEGA SEAMASTER</h5>
-          <div class="ratings">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <div class="product-price">$5,400.00</div>
-        </div>
-      </div>
+      <% } %>
     </div>
 
     <!-- Pagination -->
