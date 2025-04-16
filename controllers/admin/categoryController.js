@@ -1,5 +1,4 @@
 const Category = require("../../models/categorySchema");
-console.log("hi");
 //category info
 const categoryInfo = async (req, res) => {
   try {

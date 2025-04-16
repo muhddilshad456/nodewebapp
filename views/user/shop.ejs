@@ -6,74 +6,76 @@
     <div class="row">
       <!-- Sidebar -->
       <div class="col-md-3">
-        <div
-          class="sidebar p-4 rounded shadow-lg"
-          style="
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            position: sticky;
-            top: 20px;
-          "
-        >
-          <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
-          <select
-            class="form-select mb-4 rounded-pill border-secondary"
-            id="categoryDropdown"
+        <form method="post" action="/shop">
+          <div
+            class="sidebar p-4 rounded shadow-lg"
+            style="
+              background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+              position: sticky;
+              top: 20px;
+            "
           >
-            <option value="" selected disabled>Select a category</option>
-            <% for (let i = 0; i < category.length; i++) { %>
-            <option value="low-budget"><%=category[i].name %></option>
-            <% } %>
-          </select>
-
-          <h4 class="text-dark mb-3 fw-bold">BRANDS</h4>
-          <select
-            class="form-select mb-4 rounded-pill border-secondary"
-            id="brandDropdown"
-          >
-            <option value="" selected disabled>Select a brand</option>
-
-            <% for (let i = 0; i < brands.length; i++) { %>
-            <option value="low-budget"><%=brands[i].name %></option>
-            <% } %>
-          </select>
-
-          <h4 class="text-dark mb-3 fw-bold">SORT</h4>
-          <select
-            class="form-select mb-4 rounded-pill border-secondary"
-            id="sortDropdown"
-          >
-            <option value="" selected disabled>Select sorting</option>
-            <option value="a-z">Aa-Zz</option>
-            <option value="a-z">Zz-Aa</option>
-            <option value="a-z">Price low-high</option>
-            <option value="a-z">Price high-low</option>
-          </select>
-
-          <h4 class="text-dark mb-3 fw-bold">FILTER</h4>
-          <div class="mb-3">
-            <label for="priceFrom" class="form-label text-dark fw-medium"
-              >Price From:</label
+            <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
+            <select
+              class="form-select mb-4 rounded-pill border-secondary"
+              id="categoryDropdown"
             >
-            <input
-              type="number"
-              class="form-control rounded-pill border-secondary"
-              id="priceFrom"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="priceTo" class="form-label text-dark fw-medium"
-              >Price To:</label
+              <option value="" selected disabled>Select a category</option>
+              <% for (let i = 0; i < category.length; i++) { %>
+              <option value="low-budget"><%=category[i].name %></option>
+              <% } %>
+            </select>
+
+            <h4 class="text-dark mb-3 fw-bold">BRANDS</h4>
+            <select
+              class="form-select mb-4 rounded-pill border-secondary"
+              id="brandDropdown"
             >
-            <input
-              type="number"
-              class="form-control rounded-pill border-secondary"
-              id="priceTo"
-            />
+              <option value="" selected disabled>Select a brand</option>
+
+              <% for (let i = 0; i < brands.length; i++) { %>
+              <option value="low-budget"><%=brands[i].name %></option>
+              <% } %>
+            </select>
+
+            <h4 class="text-dark mb-3 fw-bold">SORT</h4>
+            <select
+              class="form-select mb-4 rounded-pill border-secondary"
+              id="sortDropdown"
+            >
+              <option value="" selected disabled>Select sorting</option>
+              <option value="a-z">Aa-Zz</option>
+              <option value="a-z">Zz-Aa</option>
+              <option value="a-z">Price low-high</option>
+              <option value="a-z">Price high-low</option>
+            </select>
+
+            <h4 class="text-dark mb-3 fw-bold">FILTER</h4>
+            <div class="mb-3">
+              <label for="priceFrom" class="form-label text-dark fw-medium"
+                >Price From:</label
+              >
+              <input
+                type="number"
+                class="form-control rounded-pill border-secondary"
+                id="priceFrom"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="priceTo" class="form-label text-dark fw-medium"
+                >Price To:</label
+              >
+              <input
+                type="number"
+                class="form-control rounded-pill border-secondary"
+                id="priceTo"
+              />
+            </div>
+            <button type="submit" class="btn btn-dark rounded-pill w-100">
+              Apply
+            </button>
           </div>
-          <button class="btn btn-dark rounded-pill w-100" id="applyFilter">
-            Apply
-          </button>
-        </div>
+        </form>
       </div>
       <!-- Product Grid -->
       <div class="col-md-9">

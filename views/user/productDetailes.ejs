@@ -1,0 +1,208 @@
+<%- include("../../views/partials/user/header") %>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="gallery">
+        <img
+          src="https://via.placeholder.com/100x100"
+          alt="Watch Image 1"
+          class="product-img"
+        />
+        <img
+          src="https://via.placeholder.com/100x100"
+          alt="Watch Image 2"
+          class="product-img"
+        />
+        <img
+          src="https://via.placeholder.com/100x100"
+          alt="Watch Image 3"
+          class="product-img"
+        />
+      </div>
+      <img
+        src="https://via.placeholder.com/300x300"
+        alt="Samsung Watch6"
+        class="product-img"
+      />
+    </div>
+    <div class="col-md-6 highlight">
+      <h2 class="text-warning">SAMSUNG Watch6 Bluetooth (Gold)</h2>
+      <p class="display-6 text-success">
+        ₹24,999
+        <span class="text-decoration-line-through text-muted">₹30,000</span>
+        <span class="badge bg-danger">-20% off</span>
+      </p>
+      <p class="coupon">Coupon Applied: Save ₹2,000!</p>
+      <div class="mb-3">
+        <span class="badge bg-secondary">Graphite</span>
+        <span class="badge bg-secondary">Silver</span>
+        <span class="badge bg-secondary">Gold</span>
+      </div>
+      <table class="spec-table">
+        <tr>
+          <td>Model Number</td>
+          <td>SM-R805</td>
+        </tr>
+        <tr>
+          <td>Usage</td>
+          <td>Fitness, Wearable, Quick Snap</td>
+        </tr>
+        <tr>
+          <td>Dial Shape</td>
+          <td>Circle & Gold</td>
+        </tr>
+        <tr>
+          <td>Compatible OS</td>
+          <td>Android</td>
+        </tr>
+        <tr>
+          <td>Quantity</td>
+          <td>1</td>
+        </tr>
+      </table>
+      <p class="out-of-stock">Out of Stock</p>
+      <button class="btn-custom mt-3" disabled>Add to Cart</button>
+      <button class="btn-custom ms-2 mt-3" disabled>Add to Wishlist</button>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-md-6">
+      <p class="text-info">
+        With one full charge, the watch lasts up to 40 hours.
+      </p>
+      <img
+        src="https://via.placeholder.com/200x200"
+        alt="Battery Life"
+        class="product-img"
+      />
+    </div>
+    <div class="col-md-6 highlight">
+      <h4 class="text-primary">Dimensions</h4>
+      <p>Width: 40.4 mm</p>
+      <p>Height: 38.8 mm</p>
+      <p>Thickness: 9 mm</p>
+      <p>Weight: 26.7 mm</p>
+    </div>
+  </div>
+  <div class="row mt-5 rating-section">
+    <h4 class="text-primary">Rating & Reviews</h4>
+    <div class="star-rating mb-2">★★★★☆ (4.5/5)</div>
+    <p class="text-muted">
+      If you like this product, you might also like some related items.
+    </p>
+    <div class="row">
+      <div class="col-md-2">
+        <div class="card">
+          <img
+            src="https://via.placeholder.com/150x150"
+            alt="Samsung Watch LTE"
+            class="card-img"
+          />
+          <p class="text-center">Samsung Watch LTE<br />₹22,000</p>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <img
+            src="https://via.placeholder.com/150x150"
+            alt="R.S.A TEC Smartwatch"
+            class="card-img"
+          />
+          <p class="text-center">R.S.A TEC Smartwatch<br />₹1,172</p>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <img
+            src="https://via.placeholder.com/150x150"
+            alt="Samsung Galaxy Fit"
+            class="card-img"
+          />
+          <p class="text-center">Samsung Galaxy Fit<br />₹11,200</p>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <img
+            src="https://via.placeholder.com/150x150"
+            alt="Empower Watch"
+            class="card-img"
+          />
+          <p class="text-center">Empower Watch<br />₹2,200</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../../views/partials/user/footer") %>
+<style>
+  .product-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  .product-img:hover {
+    transform: scale(1.2);
+  }
+  .spec-table {
+    width: 100%;
+  }
+  .spec-table td {
+    padding: 5px;
+  }
+  .rating-section {
+    margin-top: 20px;
+  }
+  .card-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  .gallery {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .gallery img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .gallery img:hover {
+    transform: scale(1.1);
+  }
+  .btn-custom {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  .btn-custom:hover {
+    background-color: #0056b3;
+  }
+  .highlight {
+    background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .star-rating {
+    color: #ffca08;
+    font-size: 20px;
+  }
+  .out-of-stock {
+    color: red;
+    font-weight: bold;
+  }
+  .coupon {
+    color: green;
+    font-weight: bold;
+  }
+</style>
