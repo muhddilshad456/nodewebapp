@@ -12,7 +12,6 @@ const loadHome = async (req, res) => {
   try {
     const user = req.session.user;
     const allProducts = await Product.find();
-    console.log("All Products:", allProducts);
     const categories = await Category.find({ isListed: true });
     let productData = await Product.find({
       isBlocked: false,
@@ -21,7 +20,6 @@ const loadHome = async (req, res) => {
     });
     // sort product
     productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-    console.log("product data:", productData);
     if (user) {
       const userData = await User.findOne({ _id: user._id });
       return res.render("home", { user: userData, products: productData });
@@ -121,24 +119,48 @@ const verifyOtp = async (req, res) => {
   try {
     console.log(req.body);
     const { otp } = req.body;
-    console.log(otp);
-    if (otp === req.session.userOtp) {
-      const user = req.session.userData;
-      const passwordHash = await securePassword(user.password);
+    console.log("typed otp", otp);
+    console.log("Session OTP:", req.session.userfOtp);
 
-      const saveUserData = new User({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: passwordHash,
-      });
-      await saveUserData.save();
-      req.session.user = saveUserData._id;
-      res.json({ success: true, redirectUrl: "/" });
-    } else {
-      res
+    if (otp != req.session.userfOtp) {
+      return res
         .status(400)
-        .json({ success: false, message: "Invalid OTP, Please try again " });
+        .json({ success: false, message: "Invalid OTP, Please try again" });
+    }
+
+    if (req.session.userEmail) {
+      const user = await User.findOne({ email: req.session.userEmail });
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      res.render("newPasswordPage");
+
+      res.on("finish", () => {
+        delete req.session.userOtp;
+        delete req.session.userEmail;
+      });
+    } else if (req.session.userData) {
+      if (otp == req.session.userOtp) {
+        const user = req.session.userData;
+        const passwordHash = await securePassword(user.password);
+
+        const saveUserData = new User({
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          password: passwordHash,
+        });
+        await saveUserData.save();
+        req.session.user = saveUserData._id;
+        res.json({ success: true, redirectUrl: "/" });
+      } else {
+        res
+          .status(400)
+          .json({ success: false, message: "Invalid OTP, Please try again " });
+      }
     }
   } catch (error) {
     console.error("Error Verifying OTP", error);
@@ -235,47 +257,149 @@ const loadShopPage = async (req, res) => {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true });
+    const brands = await Brand.find({ isListed: true });
     const categoryIds = categories.map((category) => category._id);
+    const brandIds = brands.map((brand) => brand._id);
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({
+    let { search, sort, brandFil, categoryFil, minPrice, maxPrice } = req.query;
+
+    if (!minPrice) {
+      minPrice = 0;
+    }
+
+    if (!maxPrice) {
+      maxPrice = Infinity;
+    }
+
+    let filter = {
       isBlocked: false,
-      category: { $in: categoryIds },
       stockCount: { $gt: 0 },
-    })
-      .sort({ createdOn: -1 })
+      category: { $in: categoryIds },
+      // brand: { $in: brandIds },
+      $and: [
+        { productAmount: { $gte: minPrice } },
+        { productAmount: { $lte: maxPrice } },
+      ],
+    };
+
+    // if (search) {
+    //   filter.productName = { $regex: search, $options: "i" };
+    // }
+
+    if (categoryFil) {
+      filter.category = categoryFil;
+    }
+
+    if (brandFil) {
+      filter.brand = brandFil;
+    }
+
+    let sortOptions = {};
+
+    switch (sort) {
+      case "":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "A-Z":
+        sortOptions = { productName: 1 };
+        break;
+      case "Z-A":
+        sortOptions = { productName: -1 };
+        break;
+      case "Price:low-high":
+        sortOptions = { productAmount: 1 };
+        break;
+      case "Price:high-low":
+        sortOptions = { productAmount: -1 };
+        break;
+      default:
+        sortOptions = { createdAt: -1 };
+    }
+
+    const products = await Product.find(filter)
+      .sort(sortOptions)
       .skip(skip)
       .limit(limit);
 
     // count products
-    const totalProducts = await Product.countDocuments({
-      isBlocked: false,
-      category: { $in: categoryIds },
-      stockCount: { $gt: 0 },
-    });
+    const totalProducts = await Product.countDocuments(filter);
 
     const totalPages = Math.ceil(totalProducts / limit);
 
-    const brands = await Brand.find({ isBlocked: false });
-    const categoriesWithIds = categories.map((category) => ({
-      _id: category._id,
-      name: category.name,
-    }));
+    // const categoriesWithIds = categories.map((category) => ({
+    //   _id: category._id,
+    //   name: category.name,
+    // }));
 
     res.render("shop", {
       user: userData,
       products,
-      category: categoriesWithIds,
-      brands,
+      category: categories,
+      brand: brands,
       totalProducts,
       totalPages,
       page,
+      categoryFil,
+      brandFil,
+      sort,
+      minPrice,
+      maxPrice,
     });
   } catch (error) {}
 };
 
+//forget password
+
+const forgetPasswordPage = async (req, res) => {
+  try {
+    res.render("fpassword");
+  } catch (error) {
+    console.log("error in rendering forgott password page ", error);
+  }
+};
+
+const forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(req.body);
+
+    // check is eamil exist
+    if (!email) {
+      return res.status(400).send("Email is required.");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    const otp = genarateOtp();
+    req.session.userfOtp = otp;
+    req.session.userEmail = email;
+
+    const emailSent = await sendVerificationEmail(email, otp);
+    if (!emailSent) {
+      return res.status(500).send("Failed to send OTP. Please try again.");
+    }
+
+    console.log("OTP for forget password:", otp);
+    console.log("Session after setting OTP:", req.session);
+
+    res.render("verify-otp");
+  } catch (error) {
+    console.error("Error in forgetPassword:", error);
+  }
+};
+
+const newPassword = async (req, res) => {
+  try {
+    console.log(req.body);
+  } catch (error) {}
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -286,4 +410,7 @@ module.exports = {
   login,
   logout,
   loadShopPage,
+  forgetPassword,
+  forgetPasswordPage,
+  newPassword,
 };

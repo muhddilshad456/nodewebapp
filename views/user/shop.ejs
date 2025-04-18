@@ -6,7 +6,7 @@
     <div class="row">
       <!-- Sidebar -->
       <div class="col-md-3">
-        <form method="post" action="/shop">
+        <form method="get" action="/shop">
           <div
             class="sidebar p-4 rounded shadow-lg"
             style="
@@ -15,39 +15,42 @@
               top: 20px;
             "
           >
-            <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
+          <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
             <select
               class="form-select mb-4 rounded-pill border-secondary"
               id="categoryDropdown"
+              name="categoryFil"
             >
-              <option value="" selected disabled>Select a category</option>
+              <option value="" <%= !categoryFil ? 'selected' : '' %>>Select a category</option>
               <% for (let i = 0; i < category.length; i++) { %>
-              <option value="low-budget"><%=category[i].name %></option>
+              <option value="<%= category[i]._id %>" <%=  category[i]._id== categoryFil ? 'selected' : '' %>><%= category[i].name %></option>
               <% } %>
             </select>
+          
+          
+         
 
             <h4 class="text-dark mb-3 fw-bold">BRANDS</h4>
             <select
               class="form-select mb-4 rounded-pill border-secondary"
-              id="brandDropdown"
+              id="brandDropdown" name="brandFil"
             >
-              <option value="" selected disabled>Select a brand</option>
-
-              <% for (let i = 0; i < brands.length; i++) { %>
-              <option value="low-budget"><%=brands[i].name %></option>
-              <% } %>
+            <option value="" <%= brand._id==='' ? 'selected' : '' %> >Select a brand</option>
+            <% for (let i = 0; i < brand.length; i++) { %>
+            <option value="<%= brand._id %>" <%=brand._id==brandFil ? 'selected' : '' %> ><%=brand[i].name %></option>
+            <% } %>
             </select>
 
             <h4 class="text-dark mb-3 fw-bold">SORT</h4>
             <select
               class="form-select mb-4 rounded-pill border-secondary"
-              id="sortDropdown"
+              id="sortDropdown" name="sort"
             >
-              <option value="" selected disabled>Select sorting</option>
-              <option value="a-z">Aa-Zz</option>
-              <option value="a-z">Zz-Aa</option>
-              <option value="a-z">Price low-high</option>
-              <option value="a-z">Price high-low</option>
+              <option value="" <%=sort==='' ? 'selected' : '' %> >Select sorting</option>
+              <option value="A-Z" <%=sort==='A-Z' ? 'selected' : '' %>>Aa-Zz</option>
+              <option value="Z-A" <%=sort==='Z-A' ? 'selected' : '' %>>Zz-Aa</option>
+              <option value="Price:low-high" <%=sort==='Price:low-high' ? 'selected' : '' %>>Price low-high</option>
+              <option value="Price:high-low" <%=sort==='Price:high-low' ? 'selected' : '' %>>Price high-low</option>
             </select>
 
             <h4 class="text-dark mb-3 fw-bold">FILTER</h4>
@@ -59,6 +62,8 @@
                 type="number"
                 class="form-control rounded-pill border-secondary"
                 id="priceFrom"
+                name="minPrice"
+                value="<%= minPrice || '' %>"
               />
             </div>
             <div class="mb-3">
@@ -69,6 +74,8 @@
                 type="number"
                 class="form-control rounded-pill border-secondary"
                 id="priceTo"
+                name="maxPrice"
+                value="<%= maxPrice || '' %>"
               />
             </div>
             <button type="submit" class="btn btn-dark rounded-pill w-100">
@@ -101,7 +108,7 @@
               style="transition: all 0.3s ease"
             >
               <a
-                href="/productDetails?id=<%= products[i]._id %>"
+                href="/productDetailes?id=<%= products[i]._id %>"
                 class="text-decoration-none"
               >
                 <img
@@ -149,12 +156,12 @@
         <div class="d-flex justify-content-center mt-5">
           <nav>
             <ul class="pagination">
-              <% for(let i=1;i<=totalPages;i++){ %>
-              <li class="page-item <%=(i===page) ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-              </li>
+              <% for(let i=1; i<=totalPages; i++){ %>
+                  <li class="page-item <%= (i===page) ? 'active' : '' %>">
+                      <a class="page-link" href="?page=<%= i %>&categoryFil=<%= encodeURIComponent(categoryFil || '') %>&brandFil=<%= encodeURIComponent(brandFil || '') %>&sort=<%= encodeURIComponent(sort || '') %>&minPrice=<%= encodeURIComponent(minPrice || '') %>&maxPrice=<%= encodeURIComponent(maxPrice || '') %>"><%= i %></a>
+                  </li>
               <% } %>
-            </ul>
+          </ul>
           </nav>
         </div>
       </div>

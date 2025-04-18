@@ -13,13 +13,26 @@ const loadProductDetailes = async (req, res) => {
     const product = await Product.findById(productId).populate("category");
     const findCategory = product.category;
 
+    //recomented products
+
+    const recomendedProduct = await Product.find({
+      category: findCategory._id,
+      _id: { $ne: productId },
+    }).limit(4);
+
+    console.log("productId :", productId);
+    console.log("find category :", findCategory);
+    console.log("recomented :", recomendedProduct);
     res.render("productDetailes", {
       user: userData,
       products: product,
       quantity: product.stockCount,
       category: findCategory,
+      recomendedProduct,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from product detailes catch", error);
+  }
 };
 
 module.exports = { loadProductDetailes };

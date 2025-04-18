@@ -22,12 +22,10 @@ router.post("/resend-otp", userController.resendOtp);
 //google
 router.get(
   "/auth/google",
-  userAuth,
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 router.get(
   "/auth/google/callback",
-  userAuth,
   passport.authenticate("google", { failureRedirect: "/signup" }),
   (req, res) => {
     res.redirect("/");
@@ -38,5 +36,11 @@ router.get("/login", userController.loadLogin);
 router.post("/login", userController.login);
 //logout
 router.get("/logout", userController.logout);
+
+//forget password
+
+router.get("/forgetpassword", userController.forgetPasswordPage);
+router.post("/forgetpassword", userController.forgetPassword);
+router.post("/newpassword", userController.newPassword);
 
 module.exports = router;

@@ -141,7 +141,10 @@
               });
             }
           },
-          error: function () {
+          error: function (xhr, status, error) {
+            console.error("AJAX Error - Status:", status, "Error:", error);
+            console.log("XHR Response:", xhr.responseText); // Log raw response
+
             Swal.fire({
               icon: "error",
               title: "Invalied OTP",
