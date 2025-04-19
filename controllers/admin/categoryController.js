@@ -49,7 +49,27 @@ const addCategory = async (req, res) => {
   }
 };
 
+// block unblock category
+
+const categoryBlock = async (req, res) => {
+  try {
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: true } });
+    res.redirect("/admin/category");
+  } catch (error) {}
+};
+
+const categoryUnblock = async (req, res) => {
+  try {
+    let id = req.query.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: false } });
+    res.redirect("/admin/category");
+  } catch (error) {}
+};
+
 module.exports = {
   categoryInfo,
   addCategory,
+  categoryBlock,
+  categoryUnblock,
 };

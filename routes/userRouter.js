@@ -41,6 +41,7 @@ router.get("/logout", userController.logout);
 
 router.get("/forgetpassword", userController.forgetPasswordPage);
 router.post("/forgetpassword", userController.forgetPassword);
+router.get("/newpassword", userController.newPasswordPage);
 router.post("/newpassword", userController.newPassword);
 
 module.exports = router;

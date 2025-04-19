@@ -185,9 +185,29 @@ const addProductPage = async (req, res) => {
   }
 };
 
+// block unblock products
+
+const productBlock = async (req, res) => {
+  try {
+    let id = req.query.id;
+    await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
+    res.redirect("/admin/products");
+  } catch (error) {}
+};
+
+const productUnblock = async (req, res) => {
+  try {
+    let id = req.query.id;
+    await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
+    res.redirect("/admin/products");
+  } catch (error) {}
+};
+
 module.exports = {
   listProduct,
   addProduct,
   addProductPage,
   uploadFields,
+  productBlock,
+  productUnblock,
 };

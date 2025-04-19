@@ -120,15 +120,16 @@ const verifyOtp = async (req, res) => {
     console.log(req.body);
     const { otp } = req.body;
     console.log("typed otp", otp);
-    console.log("Session OTP:", req.session.userfOtp);
-
-    if (otp != req.session.userfOtp) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid OTP, Please try again" });
-    }
+    console.log("Session signup OTP:", req.session.userOtp);
+    console.log("Session forgot password OTP:", req.session.userfOtp);
 
     if (req.session.userEmail) {
+      if (otp != req.session.userfOtp) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid OTP, Please try again" });
+      }
+
       const user = await User.findOne({ email: req.session.userEmail });
       if (!user) {
         return res
@@ -136,35 +137,45 @@ const verifyOtp = async (req, res) => {
           .json({ success: false, message: "User not found" });
       }
 
-      res.render("newPasswordPage");
+      res.json({ success: true, redirectUrl: "/newpassword" });
+
+      res.on("finish", () => {
+        delete req.session.userfOtp;
+      });
+    } else if (req.session.userData) {
+      if (otp != req.session.userOtp) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid OTP, Please try again" });
+      }
+
+      const user = req.session.userData;
+      const passwordHash = await securePassword(user.password);
+
+      const saveUserData = new User({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: passwordHash,
+      });
+      await saveUserData.save();
+      req.session.user = saveUserData._id;
+
+      res.json({ success: true, redirectUrl: "/" });
 
       res.on("finish", () => {
         delete req.session.userOtp;
-        delete req.session.userEmail;
+        delete req.session.userData;
       });
-    } else if (req.session.userData) {
-      if (otp == req.session.userOtp) {
-        const user = req.session.userData;
-        const passwordHash = await securePassword(user.password);
-
-        const saveUserData = new User({
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          password: passwordHash,
-        });
-        await saveUserData.save();
-        req.session.user = saveUserData._id;
-        res.json({ success: true, redirectUrl: "/" });
-      } else {
-        res
-          .status(400)
-          .json({ success: false, message: "Invalid OTP, Please try again " });
-      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Session expired or invalid request",
+      });
     }
   } catch (error) {
     console.error("Error Verifying OTP", error);
-    res.status(500).json({ success: false, message: "An error occured" });
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
 
@@ -285,10 +296,6 @@ const loadShopPage = async (req, res) => {
       ],
     };
 
-    // if (search) {
-    //   filter.productName = { $regex: search, $options: "i" };
-    // }
-
     if (categoryFil) {
       filter.category = categoryFil;
     }
@@ -387,17 +394,53 @@ const forgetPassword = async (req, res) => {
     }
 
     console.log("OTP for forget password:", otp);
-    console.log("Session after setting OTP:", req.session);
 
     res.render("verify-otp");
   } catch (error) {
     console.error("Error in forgetPassword:", error);
   }
 };
+//new password page
+const newPasswordPage = async (req, res) => {
+  try {
+    res.render("newPasswordPage");
+  } catch (error) {}
+};
 
 const newPassword = async (req, res) => {
   try {
     console.log(req.body);
+    const { newPassword, confirmPassword } = req.body;
+
+    if (!newPassword || !confirmPassword) {
+      return res.status(400).send("All fields are required.");
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).send("Passwords do not match.");
+    }
+
+    if (!req.session.userEmail) {
+      return res
+        .status(400)
+        .send("Session expired. Please request a new reset link.");
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const user = await User.findOne({
+      email: req.session.userEmail,
+      isAdmin: false,
+    });
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    user.password = hashedPassword;
+    await user.save();
+
+    delete req.session.userEmail;
+
+    res.redirect("/login");
   } catch (error) {}
 };
 module.exports = {
@@ -412,5 +455,6 @@ module.exports = {
   loadShopPage,
   forgetPassword,
   forgetPasswordPage,
+  newPasswordPage,
   newPassword,
 };

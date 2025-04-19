@@ -5,20 +5,24 @@ const costumerController = require("../controllers/admin/costumerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
-
+// login
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
+// logout
+router.get("/logout", adminController.adminLogout);
+// dash bord
 router.get("/", adminAuth, adminController.loadDashbord);
-//users
+//user managment
 router.get("/users", costumerController.costumerInfo);
-//user actions
 router.get("/blockCustomer", costumerController.customerBlock);
 router.get("/unblockCustomer", costumerController.customerUnblock);
-//category
+//category managment
 router.get("/category", categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
+router.get("/blockCategory", categoryController.categoryBlock);
+router.get("/unblockCategory", categoryController.categoryUnblock);
 
-//product
+//product management
 router.get("/productList", adminAuth, productController.listProduct);
 router.get("/addproductpage", adminAuth, productController.addProductPage);
 router.post(
@@ -27,5 +31,7 @@ router.post(
   productController.uploadFields,
   productController.addProduct
 );
+router.get("/blockProducts", productController.productBlock);
+router.get("/unblockProducts", productController.productUnblock);
 
 module.exports = router;

@@ -46,6 +46,7 @@
           <td><%= data[i].phone %></td>
           <td><%= data[i].createdOn.toISOString().split('T')[0] %></td>
           <td>
+            <!-- block unblock user -->
             <%if(!data[i].isBlocked){%>
             <button class="btn btn-danger">
               <a
