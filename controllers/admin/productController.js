@@ -170,7 +170,7 @@ const addProduct = async (req, res) => {
     });
   }
 };
-
+// add product page
 const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true });
@@ -183,6 +183,41 @@ const addProductPage = async (req, res) => {
   } catch (error) {
     console.error("Error in addProductPage:", error);
   }
+};
+
+//edit product page
+
+const editProductPage = async (req, res) => {
+  try {
+    const proId = req.params.id;
+    const product = await Product.findById(proId)
+      .populate("category")
+      .populate("brand");
+    console.log("product to edit : ", product);
+
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
+
+    const category = await Category.find({ isListed: true });
+    const brand = await Brand.find({ isBlocked: false });
+
+    res.render("editProduct", {
+      cat: category,
+      brand,
+      product,
+    });
+  } catch (error) {
+    console.log("catch error from product edit page ", error);
+  }
+};
+
+//edit product
+
+const editProduct = async (req, res) => {
+  try {
+    console.log("Incoming product edit values", req.body);
+  } catch (error) {}
 };
 
 // block unblock products
@@ -207,6 +242,8 @@ module.exports = {
   listProduct,
   addProduct,
   addProductPage,
+  editProduct,
+  editProductPage,
   uploadFields,
   productBlock,
   productUnblock,

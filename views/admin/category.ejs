@@ -14,11 +14,19 @@
             type="text"
             class="form-control"
             name="search"
+            id="searchInput"
             placeholder="Search for Products"
             aria-label="Search"
           />
           <button class="btn btn-dark" type="submit">
             <i class="bi bi-search"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            onclick="clearSearch()"
+          >
+            <i class="bi bi-x-lg"></i>
           </button>
         </div>
       </form>
@@ -58,26 +66,27 @@
                 class="btn btn-secondary"
                 data-bs-toggle="modal"
                 data-bs-target="#editCategoryModal"
-                data-name="<%= cat.name %>"
-                data-description="<%= cat.description %>"
+                data-name="<%= cat[i].name %>"
+                data-description="<%= cat[i].description %>"
+                data-id="<%= cat[i]._id %>"
                 onclick="openEditModal(this)"
               >
                 EDIT
               </button>
               <%if(!cat[i].isListed){%>
-              <button class="btn btn-danger">
+              <button class="btn btn-success">
                 <a
                   href="/admin/blockCategory?id=<%=cat[i]._id%>"
                   class="text-white"
-                  >BLOCK</a
+                  >UNBLOCK</a
                 >
               </button>
               <%}else{%>
-              <button class="btn btn-success">
+              <button class="btn btn-danger">
                 <a
                   href="/admin/unblockCategory?id=<%=cat[i]._id%>"
                   class="text-white"
-                  >UNBLOCK</a
+                  >BLOCK</a
                 >
               </button>
               <%}%>
@@ -128,6 +137,7 @@
               type="text"
               class="form-control"
               name="name"
+              id="categoryName"
               placeholder="Enter category name"
             />
           </div>
@@ -138,6 +148,7 @@
             <textarea
               class="form-control"
               name="description"
+              id="categoryDescription"
               placeholder="Enter category description"
               rows="3"
             ></textarea>
@@ -177,7 +188,8 @@
         ></button>
       </div>
       <div class="modal-body">
-        <form id="addCategoryForm" onsubmit="handleFormSubmit(event)">
+        <form id="editCategoryForm" onsubmit="handleEditFormSubmit(event)">
+          <input type="hidden" id="editCategoryId" name="editId" />
           <div class="mb-3">
             <label for="categoryName" class="form-label">Name</label>
             <input
@@ -204,7 +216,7 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
-        <button type="submit" class="btn btn-primary" form="addCategoryForm">
+        <button type="submit" class="btn btn-primary" form="editCategoryForm">
           Edit Category
         </button>
       </div>
@@ -212,6 +224,15 @@
   </div>
 </div>
 
+<!-- clear search input -->
+<script>
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/admin/category";
+  }
+</script>
+<!-- add category validation -->
 <script>
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -274,13 +295,93 @@
     return false;
   }
 </script>
+<!-- edit modal validation -->
+<script>
+  function handleEditFormSubmit(event) {
+    event.preventDefault();
+
+    const editCategoryName = document
+      .getElementById("editCategoryName")
+      .value.trim();
+    const editCategoryDescription = document
+      .getElementById("editCategoryDescription")
+      .value.trim();
+    const editCategoryId = document
+      .getElementById("editCategoryId")
+      .value.trim();
+
+    //pre filled name
+    const originalName =
+      document
+        .getElementById("editCategoryName")
+        .getAttribute("data-original-name") || "";
+
+    // Check if name is unchanged
+    if (editCategoryName === originalName) {
+      alert("No changes made to the category.");
+      return;
+    }
+
+    if (!editCategoryName) {
+      alert("Name field cannot be empty");
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(editCategoryName)) {
+      alert("Name must contain only alphabets and spaces.");
+      return;
+    }
+
+    if (!editCategoryDescription) {
+      alert("Description field cannot be empty.");
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(editCategoryDescription)) {
+      alert("Description must contain only alphabets and spaces.");
+      return;
+    }
+
+    const data = {
+      editName: editCategoryName,
+      editDescription: editCategoryDescription,
+      editId: editCategoryId,
+    };
+
+    fetch("/admin/editCategory", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("Category edited successfully");
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("editCategoryModal")
+        );
+        modal.hide();
+        location.reload();
+      })
+      .catch((error) => {
+        alert("Error editing category: " + error.message);
+      });
+  }
+</script>
+
 <script>
   function openEditModal(button) {
     const name = button.getAttribute("data-name");
     const description = button.getAttribute("data-description");
+    const id = button.getAttribute("data-id");
 
     document.getElementById("editCategoryName").value = name;
     document.getElementById("editCategoryDescription").value = description;
+    document.getElementById("editCategoryId").value = id;
   }
 </script>
 <%- include("../../views/partials/admin/footer") %>

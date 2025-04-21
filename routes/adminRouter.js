@@ -21,6 +21,7 @@ router.get("/category", categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
 router.get("/blockCategory", categoryController.categoryBlock);
 router.get("/unblockCategory", categoryController.categoryUnblock);
+router.post("/editCategory", categoryController.editCategory);
 
 //product management
 router.get("/productList", adminAuth, productController.listProduct);
@@ -31,6 +32,9 @@ router.post(
   productController.uploadFields,
   productController.addProduct
 );
+router.get("/editProduct/:id", productController.editProductPage);
+router.post("/editProduct", adminAuth, productController.editProduct);
+
 router.get("/blockProducts", productController.productBlock);
 router.get("/unblockProducts", productController.productUnblock);
 

@@ -20,9 +20,6 @@ const loadProductDetailes = async (req, res) => {
       _id: { $ne: productId },
     }).limit(4);
 
-    console.log("productId :", productId);
-    console.log("find category :", findCategory);
-    console.log("recomented :", recomendedProduct);
     res.render("productDetailes", {
       user: userData,
       products: product,

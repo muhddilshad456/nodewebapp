@@ -14,11 +14,19 @@
             type="text"
             class="form-control"
             name="search"
+            id="searchInput"
             placeholder="Search for Products"
             aria-label="Search"
           />
           <button class="btn btn-dark" type="submit">
             <i class="bi bi-search"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            onclick="clearSearch()"
+          >
+            <i class="bi bi-x-lg"></i>
           </button>
         </div>
       </form>
@@ -68,7 +76,9 @@
           </td>
           <td>
             <div class="d-flex">
-              <a href="#" class="btn btn-sm btn-outline-light me-1"
+              <a
+                href="/admin/editProduct/<%=data[i]._id %>"
+                class="btn btn-sm btn-outline-light me-1"
                 ><i class="bi bi-pencil"></i
               ></a>
               <!-- block unblock products -->
@@ -110,6 +120,13 @@
     </nav>
   </div>
 </div>
+<script>
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/admin/productList";
+  }
+</script>
 <script>
   function handleFormSubmit(event) {
     event.preventDefault();

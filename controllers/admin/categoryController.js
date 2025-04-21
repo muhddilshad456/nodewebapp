@@ -2,7 +2,6 @@ const Category = require("../../models/categorySchema");
 //category info
 const categoryInfo = async (req, res) => {
   try {
-    console.log("hihih");
     let search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 4;
@@ -49,6 +48,38 @@ const addCategory = async (req, res) => {
   }
 };
 
+//edit category
+
+const editCategory = async (req, res) => {
+  const { editId, editName, editDescription } = req.body;
+  try {
+    if (!editId || !editName || !editDescription) {
+      return res
+        .status(400)
+        .json({ error: "ID, name, and description are required" });
+    }
+
+    const existingCategory = await Category.findOne({
+      editName,
+      _id: { $ne: editId },
+    });
+    if (existingCategory) {
+      return res.status(400).json({ error: "category name already exists" });
+    }
+    const updatedCategory = await Category.findByIdAndUpdate(
+      editId,
+      { name: editName, description: editDescription },
+      { new: true, runValidators: true }
+    );
+    if (!updatedCategory) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    return res.json({ message: "category added successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "internal server error" });
+  }
+};
+
 // block unblock category
 
 const categoryBlock = async (req, res) => {
@@ -72,4 +103,5 @@ module.exports = {
   addCategory,
   categoryBlock,
   categoryUnblock,
+  editCategory,
 };

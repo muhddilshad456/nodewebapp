@@ -9,11 +9,19 @@
           type="text"
           class="form-control"
           name="search"
+          id="searchInput"
           placeholder="Search for User Name"
           aria-label="Search"
         />
         <button class="btn btn-dark" type="submit">
           <i class="bi bi-search"></i>
+        </button>
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          onclick="clearSearch()"
+        >
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
     </form>
@@ -84,5 +92,11 @@
     </nav>
   </div>
 </div>
-
+<script>
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/admin/users";
+  }
+</script>
 <%- include("../../views/partials/admin/footer") %>
