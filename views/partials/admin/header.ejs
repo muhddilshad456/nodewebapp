@@ -212,32 +212,30 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <h4>WATCHSY</h4>
-      <a href="/admin/dashboard" class="active"
+      <a href="/admin/dashboard"
         ><i class="bi bi-speedometer2"></i> Dashboard</a
       >
       <a href="/admin/productList"><i class="bi bi-box"></i> Product</a>
-      <a href="#"><i class="bi bi-cart"></i> Orders</a>
+      <a href="/admin/orders"><i class="bi bi-cart"></i> Orders</a>
       <a href="/admin/users"><i class="bi bi-people"></i> Users</a>
       <a href="/admin/category"><i class="bi bi-grid"></i> Categories</a>
-      <a href="#"><i class="bi bi-star"></i> Brand</a>
-      <a href="#"><i class="bi bi-tag"></i> Offers</a>
-      <a href="#"><i class="bi bi-gear"></i> Settings</a>
-      <a href="#"><i class="bi bi-image"></i> Banner</a>
-      <a href="#" class="active"><i class="bi bi-ticket"></i> Coupons</a>
-      <a href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
-      <div class="search-bar">
-        <div class="input-group">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Type here to search"
-            aria-label="Search"
-          />
-          <button class="btn btn-dark" type="button">
-            <i class="bi bi-search"></i>
-          </button>
-        </div>
-      </div>
+      <a href="/admin/brand"><i class="bi bi-star"></i> Brand</a>
+      <a href="/admin/offers"><i class="bi bi-tag"></i> Offers</a>
+      <a href="/admin/settings"><i class="bi bi-gear"></i> Settings</a>
+      <a href="/admin/banner"><i class="bi bi-image"></i> Banner</a>
+      <a href="/admin/coupons"><i class="bi bi-ticket"></i> Coupons</a>
     </div>
+
+    <script>
+      const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+      const currentPath = window.location.pathname;
+
+      sidebarLinks.forEach((link) => {
+        if (link.getAttribute("href") === currentPath) {
+          link.classList.add("active");
+        }
+      });
+    </script>
   </body>
 </html>

@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require("../controllers/admin/adminController");
 const costumerController = require("../controllers/admin/costumerController");
 const categoryController = require("../controllers/admin/categoryController");
+const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 // login
@@ -23,6 +24,13 @@ router.get("/blockCategory", categoryController.categoryBlock);
 router.get("/unblockCategory", categoryController.categoryUnblock);
 router.post("/editCategory", categoryController.editCategory);
 
+//brand managment
+router.get("/brand", brandController.brandInfo);
+router.post("/addBrand", brandController.addBrand);
+router.get("/blockBrand", brandController.brandBlock);
+router.get("/unblockBrand", brandController.brandUnblock);
+router.post("/editBrand", brandController.editBrand);
+
 //product management
 router.get("/productList", adminAuth, productController.listProduct);
 router.get("/addproductpage", adminAuth, productController.addProductPage);
@@ -33,7 +41,12 @@ router.post(
   productController.addProduct
 );
 router.get("/editProduct/:id", productController.editProductPage);
-router.post("/editProduct", adminAuth, productController.editProduct);
+router.post(
+  "/editProduct",
+  adminAuth,
+  productController.uploadFields,
+  productController.editProduct
+);
 
 router.get("/blockProducts", productController.productBlock);
 router.get("/unblockProducts", productController.productUnblock);

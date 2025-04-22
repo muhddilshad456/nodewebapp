@@ -2,18 +2,22 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const brandSchema = new Schema({
-  brandName: {
+  name: {
     type: String,
     required: true,
     unique: true,
   },
-  brandImage: {
-    type: [String],
+  description: {
+    type: String,
     required: true,
   },
-  isBlocked: {
+  isListed: {
     type: Boolean,
-    default: false,
+    default: true,
+  },
+  brandOffer: {
+    type: Number,
+    default: 0,
   },
   createdAt: {
     type: Date,

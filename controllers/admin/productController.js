@@ -217,7 +217,68 @@ const editProductPage = async (req, res) => {
 const editProduct = async (req, res) => {
   try {
     console.log("Incoming product edit values", req.body);
-  } catch (error) {}
+    console.log("Uploaded files:", req.files || "No files uploaded");
+
+    const {
+      productId,
+      productName,
+      productDescription,
+      category,
+      productAmount,
+      stockCount,
+    } = req.body;
+
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+    if (
+      !productName ||
+      !productDescription ||
+      !productAmount ||
+      !stockCount ||
+      !category
+    ) {
+      return res.status(400).json({ message: "Required fields are missing" });
+    }
+    const updateData = {
+      productName,
+      productDescription,
+      productAmount: Number(productAmount),
+      stockCount: Number(stockCount),
+      category,
+    };
+
+    if (req.files && Object.keys(req.files).length > 0) {
+      const imagePaths = [];
+      ["image1", "image2", "image3"].forEach((key) => {
+        if (req.files[key] && req.files[key][0]) {
+          imagePaths.push(`/Uploads/${req.files[key][0].filename}`);
+        }
+      });
+      updateData.productImage = imagePaths;
+    } else {
+      const currentProduct = await Product.findById(productId);
+      if (currentProduct) {
+        updateData.productImage = currentProduct.productImage;
+      }
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.redirect("/admin/ProductList");
+  } catch (error) {
+    console.log("error from product edit ", error);
+  }
 };
 
 // block unblock products

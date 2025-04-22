@@ -70,15 +70,17 @@
         enctype="multipart/form-data"
         onsubmit="handleEditFormSubmit(event)"
       >
+      <input type="hidden" name="productId" value="<%= product._id %>">
         <div class="row">
           <!-- Image Upload Areas -->
           <div class="col-md-4">
             <div class="image-upload">
               <label for="image1">Image 1</label>
               <input type="file" accept="image/*" id="image1" name="image1" />
-              <div class="preview" id="preview1" style="display: none">
+              <div class="preview" id="preview1" style="display: <%= product.productImage && product.productImage[0] ? 'block' : 'none' %>">
                 <img
                   id="previewImage1"
+                  src="<%= product.productImage && product.productImage[0] ? product.productImage[0] : '' %>"
                   style="max-width: 100px; max-height: 100px"
                 />
               </div>
@@ -86,9 +88,10 @@
             <div class="image-upload">
               <label for="image2">Image 2</label>
               <input type="file" accept="image/*" id="image2" name="image2" />
-              <div class="preview" id="preview2" style="display: none">
+              <div class="preview" id="preview2" style="display: <%= product.productImage && product.productImage[1] ? 'block' : 'none' %>">
                 <img
                   id="previewImage2"
+                  src="<%= product.productImage && product.productImage[1] ? product.productImage[1] : '' %>"
                   style="max-width: 100px; max-height: 100px"
                 />
               </div>
@@ -96,9 +99,10 @@
             <div class="image-upload">
               <label for="image3">Image 3</label>
               <input type="file" accept="image/*" id="image3" name="image3" />
-              <div class="preview" id="preview3" style="display: none">
+              <div class="preview" id="preview3" style="display: <%= product.productImage && product.productImage[2] ? 'block' : 'none' %>">
                 <img
                   id="previewImage3"
+                  src="<%= product.productImage && product.productImage[2] ? product.productImage[2] : '' %>"
                   style="max-width: 100px; max-height: 100px"
                 />
               </div>
@@ -141,7 +145,7 @@
                 <% for (let i = 0; i < cat.length; i++) { %>
                     <option
                     value="<%= cat[i]._id %>"
-                    <%= product.category && product.category._id.toString() === cat[i]._id.toString() ? 'selected' : '' %>
+                    <%= product.category && product.category._id && String(product.category._id) === String(cat[i]._id) ? 'selected' : '' %>
                   >
                     <%= cat[i].name %>
                   </option>
@@ -171,7 +175,7 @@
               />
             </div>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-dark">Add Product</button>
+              <button type="submit" class="btn btn-dark">Edit Product</button>
               <button type="button" class="btn btn-secondary">Cancel</button>
             </div>
           </div>
@@ -224,7 +228,7 @@
     </div>
     <!-- Scripts -->
     <script>
-      function handleFormSubmit(event) {
+      function handleEditFormSubmit(event) {
         event.preventDefault();
         const productName = document.getElementById("productName").value.trim();
         const productDescription = document
@@ -259,7 +263,7 @@
           alert("Please enter a valid stock count.");
           return;
         }
-        document.getElementById("addProductsForm").submit();
+        document.getElementById("editProductsForm").submit();
       }
 
       let cropper;
