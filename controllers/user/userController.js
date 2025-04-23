@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
+const Address = require("../../models/addressSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -443,6 +444,97 @@ const newPassword = async (req, res) => {
     res.redirect("/login");
   } catch (error) {}
 };
+
+//user profile
+
+const userProfilePage = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const userData = await User.findById(userId);
+    res.render("userProfile", {
+      user: userData,
+    });
+  } catch (error) {}
+};
+
+//adress
+
+const addressPage = async (req, res) => {
+  try {
+    const userId = req.session.id;
+    const userAddress = await Address.findOne({ userId: userId });
+
+    res.render("address", {
+      user: userId,
+      userAddress,
+    });
+  } catch (error) {
+    console.log("error from address page catch ", error);
+  }
+};
+
+//add address
+
+const addAddressPage = async (req, res) => {
+  try {
+    res.render("addAddress");
+  } catch (error) {}
+};
+
+const addAddress = async (req, res) => {
+  try {
+    console.log("add address : ", req.body);
+    const {
+      name,
+      state,
+      streetAddress,
+      appartment,
+      city,
+      postcode,
+      phone,
+      altPhone,
+    } = req.body;
+
+    const userId = req.session.user;
+    console.log("user id : ", userId);
+
+    let userAddress = await Address.findOne({ userId });
+
+    if (userAddress) {
+      userAddress.address.push({
+        name,
+        city,
+        streetAddress,
+        appartment,
+        state,
+        postcode,
+        phone,
+        altPhone,
+      });
+      await userAddress.save();
+    } else {
+      userAddress = new Address({
+        userId,
+        address: [
+          {
+            name,
+            city,
+            streetAddress,
+            appartment,
+            state,
+            postcode,
+            phone,
+            altPhone,
+          },
+        ],
+      });
+      await userAddress.save();
+    }
+    res.redirect("/address");
+  } catch (error) {
+    console.log("error in catch of add address", error);
+  }
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -457,4 +549,8 @@ module.exports = {
   forgetPasswordPage,
   newPasswordPage,
   newPassword,
+  userProfilePage,
+  addressPage,
+  addAddressPage,
+  addAddress,
 };

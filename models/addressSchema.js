@@ -3,16 +3,12 @@ const { Schema } = mongoose;
 
 const addressSchema = new Schema({
   userId: {
-    type: Schema.types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
   address: [
     {
-      addressType: {
-        type: String,
-        required: true,
-      },
       name: {
         type: String,
         required: true,
@@ -21,16 +17,20 @@ const addressSchema = new Schema({
         type: String,
         required: true,
       },
-      landMark: {
+      streetAddress: {
         type: String,
         required: true,
+      },
+      apartment: {
+        type: String,
+        required: false,
       },
       state: {
         type: String,
         required: true,
       },
-      pincode: {
-        type: Number,
+      postcode: {
+        type: String,
         required: true,
       },
       phone: {
@@ -39,7 +39,7 @@ const addressSchema = new Schema({
       },
       altPhone: {
         type: String,
-        required: true,
+        required: false,
       },
     },
   ],

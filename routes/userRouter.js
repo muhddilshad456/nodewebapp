@@ -44,4 +44,10 @@ router.post("/forgetpassword", userController.forgetPassword);
 router.get("/newpassword", userController.newPasswordPage);
 router.post("/newpassword", userController.newPassword);
 
+// user profile
+router.get("/userProfile", userAuth, userController.userProfilePage);
+router.get("/address", userAuth, userController.addressPage);
+router.get("/addAddress", userAuth, userController.addAddressPage);
+router.post("/addAddress", userAuth, userController.addAddress);
+
 module.exports = router;
