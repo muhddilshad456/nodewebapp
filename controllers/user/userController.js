@@ -111,7 +111,9 @@ const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from password hashing catch", error);
+  }
 };
 
 //verify otp
@@ -457,16 +459,55 @@ const userProfilePage = async (req, res) => {
   } catch (error) {}
 };
 
+//edit profile
+
+const editPersonalInfo = async (req, res) => {
+  try {
+    console.log("edit personal info : ", req.body);
+    const { editId, name, phone } = req.body;
+    const updateData = {
+      name,
+      phone,
+    };
+    await User.updateOne({ _id: editId }, { $set: updateData });
+    res.redirect("/userProfile");
+  } catch (error) {
+    console.log("error in personal info editing catch ", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
+// edit email
+
+const editEmail = async (req, res) => {
+  try {
+    console.log("edit email ", req.body);
+    const { editEmailId, email } = req.body;
+  } catch (error) {}
+};
+
 //adress
 
 const addressPage = async (req, res) => {
   try {
-    const userId = req.session.id;
-    const userAddress = await Address.findOne({ userId: userId });
+    if (!req.session.user) {
+      console.log("Session or userId missing");
+      return res.status(401).json({ message: "Unauthorized: Please log in" });
+    }
+    const userId = req.session.user;
 
+    const findUser = await User.findOne({ _id: userId });
+    if (!findUser) {
+      console.log("User not found for userId:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
+    const user = findUser._id;
+    console.log("user : ", user);
+    const userAddress = await Address.findOne({ userId: user });
+    console.log("userAddress", userAddress);
     res.render("address", {
       user: userId,
-      userAddress,
+      addressData: userAddress,
     });
   } catch (error) {
     console.log("error from address page catch ", error);
@@ -483,7 +524,6 @@ const addAddressPage = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    console.log("add address : ", req.body);
     const {
       name,
       state,
@@ -496,7 +536,6 @@ const addAddress = async (req, res) => {
     } = req.body;
 
     const userId = req.session.user;
-    console.log("user id : ", userId);
 
     let userAddress = await Address.findOne({ userId });
 
@@ -535,6 +574,78 @@ const addAddress = async (req, res) => {
     console.log("error in catch of add address", error);
   }
 };
+
+// edit Address
+
+const editAddressPage = async (req, res) => {
+  try {
+    let addressId = req.params.id;
+    const addresscol = await Address.findOne({ "address._id": addressId });
+    if (!addresscol) {
+      return res.status(404).send("Address collection not found");
+    }
+    const address = addresscol.address.find((addr) => addr._id == addressId);
+    if (!address) {
+      return res.status(404).send("Address not found");
+    }
+
+    res.render("editAddress", { address });
+  } catch (error) {}
+};
+
+const editAddress = async (req, res) => {
+  try {
+    const {
+      addressId,
+      name,
+      state,
+      streetAddress,
+      appartment,
+      city,
+      postcode,
+      phone,
+      altPhone,
+    } = req.body;
+
+    const updateData = {
+      "address.$.name": name,
+      "address.$.state": state,
+      "address.$.streetAddress": streetAddress,
+      "address.$.appartment": appartment,
+      "address.$.city": city,
+      "address.$.postcode": postcode,
+      "address.$.phone": phone,
+      "address.$.altPhone": altPhone,
+    };
+    await Address.updateOne(
+      { "address._id": addressId },
+      {
+        $set: updateData,
+      }
+    );
+
+    res.redirect("/address");
+  } catch (error) {
+    console.log("error from edit address catch", error);
+  }
+};
+
+//delete address
+
+const deleteAddress = async (req, res) => {
+  try {
+    const addressId = req.params.id;
+    await Address.updateOne(
+      { "address._id": addressId },
+      {
+        $pull: { address: { _id: addressId } },
+      }
+    );
+    res.redirect("/address");
+  } catch (error) {
+    console.log("error in delete address console", error);
+  }
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -550,7 +661,12 @@ module.exports = {
   newPasswordPage,
   newPassword,
   userProfilePage,
+  editPersonalInfo,
+  editEmail,
   addressPage,
   addAddressPage,
   addAddress,
+  editAddressPage,
+  editAddress,
+  deleteAddress,
 };

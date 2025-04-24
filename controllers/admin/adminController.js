@@ -31,7 +31,6 @@ const login = async (req, res) => {
 const adminLogout = async (req, res) => {
   try {
     delete req.session.admin;
-    console.log("responce : ", res);
     res.redirect("/admin/login");
   } catch (error) {}
 };

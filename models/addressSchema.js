@@ -21,7 +21,7 @@ const addressSchema = new Schema({
         type: String,
         required: true,
       },
-      apartment: {
+      appartment: {
         type: String,
         required: false,
       },

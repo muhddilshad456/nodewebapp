@@ -144,23 +144,49 @@
         <div class="col-md-9">
           <div class="address-section">
             <h2>My Addresses</h2>
+            <% if(addressData && addressData.address && addressData.address.length>0){ %>
+            <% addressData.address.forEach(data=>{ %>
             <div class="address-box">
               <div>
-                <strong></strong>
-               
+                <strong><%=data.name %></strong><br>
+               <%=data.streetAddress %>,<%=data.city %>,<%=data.state %>,
+               <%=data.postcode %> <br>
+               <%= data.phone %><% if (data.altPhone) { %> <br> <%= data.altPhone %><% } %>
               </div>
               <div>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-delete">Delete</button>
+                <a href="/editAddress/<%=data._id %>" class="btn btn-secondary">Edit</a>
+                <a data-bs-toggle="modal" data-bs-target="#deleteModal-<%= data._id %>" class="btn btn-danger">Delete</a>
               </div>
             </div>
-        
-            
+            <!-- confirmation modal -->
+
+    <div class="modal fade" id="deleteModal-<%= data._id %>" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this address?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <a href="/deleteAddress/<%= data._id %>" class="btn btn-danger">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+        <% }) %>
+        <% }else{ %>
+          <p> no address found </p>
+            <% } %>
             <a class="btn btn-primary" href="/addAddress">Add Address</a>
           </div>
         </div>
       </div>
     </div>
+    
 
     <%- include("../../views/partials/user/profileFooter") %>
 

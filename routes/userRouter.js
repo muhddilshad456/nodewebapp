@@ -46,8 +46,12 @@ router.post("/newpassword", userController.newPassword);
 
 // user profile
 router.get("/userProfile", userAuth, userController.userProfilePage);
+router.post("/editEmail", userAuth, userController.editEmail);
+router.post("/editPersonalInfo", userAuth, userController.editPersonalInfo);
 router.get("/address", userAuth, userController.addressPage);
 router.get("/addAddress", userAuth, userController.addAddressPage);
 router.post("/addAddress", userAuth, userController.addAddress);
-
+router.get("/editAddress/:id", userAuth, userController.editAddressPage);
+router.post("/editAddress", userAuth, userController.editAddress);
+router.get("/deleteAddress/:id", userAuth, userController.deleteAddress);
 module.exports = router;
