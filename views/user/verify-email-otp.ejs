@@ -41,12 +41,7 @@
     <div class="container">
       <div class="otp-container">
         <h5 class="mb-4">Please enter the otp in the mail:</h5>
-        <form
-          id="otpForm"
-          action="/verify-otp"
-          method="post"
-          onsubmit="return validateOTPForm()"
-        >
+        <form id="otpForm" onsubmit="return validateOTPForm()">
           <div class="row justify-content-center">
             <div class="col-12 col-md-8">
               <input
@@ -116,35 +111,32 @@
 
       //  Start countdown when the page loads
       startCountdown();
-      // ajax
       function validateOTPForm() {
         const otpInput = document.getElementById("otp").value;
+
         $.ajax({
           type: "POST",
-          url: "/verify-otp",
+          url: "/verify-email-otp",
           data: { otp: otpInput },
-          success: function (responce) {
-            if (responce.success) {
+          success: function (response) {
+            if (response.success) {
               Swal.fire({
                 icon: "success",
-                title: "OTP Verified Successfully",
+                title: "Email Updated Successfully",
                 showConfirmButton: false,
                 timer: 1500,
               }).then(() => {
-                window.location.href = responce.redirectUrl;
+                window.location.href = response.redirectUrl;
               });
             } else {
               Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: responce.message,
+                text: response.message,
               });
             }
           },
-          error: function (xhr, status, error) {
-            console.error("AJAX Error - Status:", status, "Error:", error);
-            console.log("XHR Response:", xhr.responseText); // Log raw response
-
+          error: function (error) {
             Swal.fire({
               icon: "error",
               title: "Invalied OTP",
@@ -172,7 +164,7 @@
 
         $.ajax({
           type: "POST",
-          url: "/resend-otp",
+          url: "/resend-email-otp",
           success: function (response) {
             console.log("Response from server:", response);
 

@@ -6,6 +6,7 @@ const Address = require("../../models/addressSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const { now } = require("mongoose");
 
 // home
 
@@ -483,7 +484,114 @@ const editEmail = async (req, res) => {
   try {
     console.log("edit email ", req.body);
     const { editEmailId, email } = req.body;
-  } catch (error) {}
+    const otp = genarateOtp();
+    console.log("OTP for changing email : ", otp);
+    const emailSend = await sendVerificationEmail(email, otp);
+    req.session.emailOtp = {
+      code: otp,
+      createdAt: Date.now(),
+    };
+    req.session.emailToApply = email;
+    res.render("verify-email-otp");
+  } catch (error) {
+    console.log("Error from edit email catch", error);
+  }
+};
+
+//verify change email otp
+
+const verifyEmailOtp = async (req, res) => {
+  try {
+    const now = Date.now();
+    const expired = now - req.session.emailOtp.createdAt;
+    if (expired > 60000) {
+      delete req.session.emailOtp;
+    }
+    const { otp } = req.body;
+    if (
+      !req.session ||
+      !req.session.emailOtp ||
+      !req.session.user ||
+      !req.session.emailToApply
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Session expired or invalid" });
+    }
+    console.log("typed email change otp", otp);
+    console.log("Session signup OTP:", req.session.emailOtp.code);
+
+    if (String(otp) !== String(req.session.emailOtp.code)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid OTP, Please try again" });
+    }
+
+    const userId = req.session.user;
+    const emailToApply = req.session.emailToApply;
+    const user = await User.findById(userId);
+    console.log("hi");
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    if (user.email === emailToApply) {
+      return res.status(400).json({
+        success: false,
+        message: "This is already your current email",
+      });
+    }
+    console.log("hihi");
+
+    const changeEmail = await User.updateOne(
+      { _id: userId },
+      { $set: { email: emailToApply } }
+    );
+    console.log("hi2");
+
+    // Clear session OTP and email
+    delete req.session.emailOtp;
+    delete req.session.emailToApply;
+    console.log("hi3");
+
+    res.json({ success: true, redirectUrl: "/userProfile" });
+    console.log("end");
+  } catch (error) {
+    console.error("Error Verifying OTP", error);
+    res.status(500).json({ success: false, message: "An error occurred" });
+  }
+};
+
+const resendEmailOtp = async (req, res) => {
+  try {
+    const email = req.session.emailToApply;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found" });
+    }
+
+    const otp = genarateOtp();
+
+    req.session.emailOtp = {
+      code: otp,
+      createdAt: Date.now(),
+    };
+
+    const emailSend = sendVerificationEmail(email, otp);
+    if (emailSend) {
+      console.log("Resend OTP For Changing Email : ", otp);
+      res
+        .status(200)
+        .json({ success: true, message: "Resend otp successfull" });
+    } else {
+      res.status(500).json({ success: false, message: "Failed to resend otp" });
+    }
+  } catch (error) {
+    console.error("Error in sending otp", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
 //adress
@@ -646,6 +754,14 @@ const deleteAddress = async (req, res) => {
     console.log("error in delete address console", error);
   }
 };
+
+//change Password
+
+const changePasswordPage = async (req, res) => {
+  try {
+    res.render("changePassword");
+  } catch (error) {}
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -663,10 +779,13 @@ module.exports = {
   userProfilePage,
   editPersonalInfo,
   editEmail,
+  verifyEmailOtp,
+  resendEmailOtp,
   addressPage,
   addAddressPage,
   addAddress,
   editAddressPage,
   editAddress,
   deleteAddress,
+  changePasswordPage,
 };
