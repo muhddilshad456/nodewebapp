@@ -627,7 +627,9 @@ const addressPage = async (req, res) => {
 const addAddressPage = async (req, res) => {
   try {
     res.render("addAddress");
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from address page : ", error);
+  }
 };
 
 const addAddress = async (req, res) => {
@@ -760,7 +762,45 @@ const deleteAddress = async (req, res) => {
 const changePasswordPage = async (req, res) => {
   try {
     res.render("changePassword");
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from change passsword page ", error);
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+      return res.status(404).json({ message: "password is not match" });
+    }
+    if (currentPassword == newPassword) {
+      return res.status(200).json({
+        success: false,
+        message:
+          "Your new password must be different from your current password.",
+      });
+    }
+    const userId = req.session.user;
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatch) {
+      return res.status(200).json({
+        success: false,
+        message: "The current password you entered is incorrect.",
+      });
+    }
+    const hashedPassword = await securePassword(newPassword);
+    await User.updateOne(
+      { _id: userId },
+      { $set: { password: hashedPassword } }
+    );
+    return res.json({ success: true, redirectUrl: "/userProfile" });
+  } catch (error) {
+    console.log("error from change passsword  ", error);
+  }
 };
 module.exports = {
   loadHome,
@@ -788,4 +828,5 @@ module.exports = {
   editAddress,
   deleteAddress,
   changePasswordPage,
+  changePassword,
 };

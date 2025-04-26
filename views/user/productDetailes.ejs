@@ -1,102 +1,4 @@
 <%- include("../../views/partials/user/header") %>
-
-<div class="container my-5">
-  <div class="row">
-    <div class="col-md-6">
-      <img
-        src="<%= products.productImage[0] %>"
-        alt="Samsung Watch6"
-        class="main-img product-img"
-        onclick="zoomImage(this)"
-      />
-      <div class="gallery" id="gallery">
-        <img
-          src="<%= products.productImage[1] %>"
-          alt="Watch Image 2"
-          class="product-img"
-          onclick="zoomImage(this)"
-        />
-        <img
-          src="<%= products.productImage[2] %>"
-          alt="Watch Image 3"
-          class="product-img"
-          onclick="zoomImage(this)"
-        />
-      </div>
-    </div>
-    <div class="col-md-6 highlight">
-      <h2 class="text-warning"><%= products.productName %></h2>
-      <p class="display-6 text-success">
-        ₹<%= products.productAmount %>
-        <!-- <span class="text-decoration-line-through text-muted">₹30,000</span>
-        <span class="badge bg-danger">-20% off</span> -->
-      </p>
-      <p class="coupon">Coupon Applied: Save ₹2,000!</p>
-      <div class="mb-3">
-        <span class="badge bg-secondary">Graphite</span>
-        <span class="badge bg-secondary">Silver</span>
-        <span class="badge bg-secondary">Gold</span>
-      </div>
-      <table class="spec-table">
-        <tr>
-          <td><%= products.productDescription %></td>
-        </tr>
-
-        <tr>
-          <td>Quantity</td>
-          <td><%= quantity %></td>
-        </tr>
-      </table>
-      <!-- <p class="out-of-stock">Out of Stock</p> -->
-      <button class="btn-custom mt-3" disabled>Add to Cart</button>
-      <button class="btn-custom ms-2 mt-3" disabled>Add to Wishlist</button>
-    </div>
-  </div>
-  <div class="row mt-5">
-    <!-- <div class="col-md-6">
-      <p class="text-info">
-        With one full charge, the watch lasts up to 40 hours.
-      </p>
-      <img
-        src="https://via.placeholder.com/200x200"
-        alt="Battery Life"
-        class="product-img"
-      />
-    </div> -->
-    <!-- <div class="col-md-6 highlight">
-      <h4 class="text-primary">Dimensions</h4>
-      <p>Width: 40.4 mm</p>
-      <p>Height: 38.8 mm</p>
-      <p>Thickness: 9 mm</p>
-      <p>Weight: 26.7 mm</p>
-    </div> -->
-  </div>
-  <div class="row mt-5 rating-section">
-    <h4 class="text-primary">Rating & Reviews</h4>
-    <div class="star-rating mb-2">★★★★☆ (4.5/5)</div>
-    <p class="text-muted">
-      If you like this product, you might also like some related items.
-    </p>
-    <div class="row">
-      <% recomendedProduct.forEach(product=> { %>
-      <div class="col-md-3">
-        <div class="card">
-          <img
-            src="<%=product.productImage[0] %>"
-            alt="Empower Watch"
-            class="card-img"
-          />
-          <p class="text-center">
-            <%=product.productName %><br />₹<%=product.productAmount %>
-          </p>
-        </div>
-      </div>
-      <% }) %>
-    </div>
-  </div>
-</div>
-
-<%- include("../../views/partials/user/footer") %>
 <style>
   .product-img {
     max-width: 100%;
@@ -109,7 +11,7 @@
     transform: scale(1.2);
   }
   .spec-table {
-    width: 100%;
+    width: 70%;
   }
   .spec-table td {
     padding: 5px;
@@ -165,8 +67,145 @@
     color: green;
     font-weight: bold;
   }
+  .quantity-box {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid #4caf50;
+    padding: 0px 7px;
+    border-radius: 5px;
+  }
+
+  .quantity-box button {
+    background: none;
+    border: none;
+    font-size: 15px;
+    color: #4caf50;
+    cursor: pointer;
+    margin: 0 5px;
+  }
+
+  .quantity-box button:first-child {
+    color: #4caf50;
+  }
+
+  .quantity-box button:last-child {
+    color: gray;
+  }
+
+  .quantity-box span {
+    font-size: 20px;
+    min-width: 10px;
+    text-align: center;
+    color: #222;
+  }
 </style>
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-6">
+      <img
+        src="<%= products.productImage[0] %>"
+        alt="Samsung Watch6"
+        class="main-img product-img"
+        onclick="zoomImage(this)"
+      />
+      <div class="gallery" id="gallery">
+        <img
+          src="<%= products.productImage[1] %>"
+          alt="Watch Image 2"
+          class="product-img"
+          onclick="zoomImage(this)"
+        />
+        <img
+          src="<%= products.productImage[2] %>"
+          alt="Watch Image 3"
+          class="product-img"
+          onclick="zoomImage(this)"
+        />
+      </div>
+    </div>
+    <div class="col-md-6 highlight">
+      <h2 class="text-warning"><%= products.productName %></h2>
+      <p class="display-6 text-success">
+        ₹<%= products.productAmount %>
+        <!-- <span class="text-decoration-line-through text-muted">₹30,000</span>
+        <span class="badge bg-danger">-20% off</span> -->
+      </p>
+      <p class="coupon">Coupon Applied: Save ₹2,000!</p>
+      <h5>stock : <%= quantity %></h5>
+      <div class="mb-3">
+        <span class="badge bg-secondary">Graphite</span>
+        <span class="badge bg-secondary">Silver</span>
+        <span class="badge bg-secondary">Gold</span>
+      </div>
+      <table class="spec-table">
+        <tr>
+          <td><%= products.productDescription %></td>
+        </tr>
+        <tr>
+          <td>Quantity</td>
+          <td>
+            <div class="quantity-box">
+              <button type="button" onclick="decreaseQuantity()">-</button>
+              <span id="quantity">1</span>
+              <button type="button" onclick="increaseQuantity()">+</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <!-- <p class="out-of-stock">Out of Stock</p> -->
+      <button
+        class="btn-custom mt-3"
+        onclick="addToCart('<%= products._id%>')"
+        disabled
+      >
+        Add to Cart
+      </button>
+      <button class="btn-custom ms-2 mt-3" disabled>Add to Wishlist</button>
+    </div>
+  </div>
+
+  <div class="row mt-5 rating-section">
+    <h4 class="text-primary">Rating & Reviews</h4>
+    <div class="star-rating mb-2">★★★★☆ (4.5/5)</div>
+    <p class="text-muted">
+      If you like this product, you might also like some related items.
+    </p>
+    <div class="row">
+      <% recomendedProduct.forEach(product=> { %>
+      <div class="col-md-3">
+        <div class="card">
+          <img
+            src="<%=product.productImage[0] %>"
+            alt="Empower Watch"
+            class="card-img"
+          />
+          <p class="text-center">
+            <%=product.productName %><br />₹<%=product.productAmount %>
+          </p>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<%- include("../../views/partials/user/footer") %>
+
 <script>
+  let quantity = 1;
+
+  function decreaseQuantity() {
+    if (quantity > 1) {
+      quantity--;
+      document.getElementById("quantity").innerText = quantity;
+    }
+  }
+
+  function increaseQuantity() {
+    quantity++;
+    document.getElementById("quantity").innerText = quantity;
+  }
+
   let zoomedImg = null;
 
   function zoomImage(img) {
@@ -193,4 +232,27 @@
       zoomedImg = null;
     }
   });
+  // fetch
+  function addToCart(productId) {
+    const productQuantity = document.getElementById("quantity").innerText;
+
+    fetch("/addToCart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId,
+        quantity: productQuantity,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert("product added successfully");
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log("error in adding cart : ", error);
+      });
+  }
 </script>

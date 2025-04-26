@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
+const cartController = require("../controllers/user/cartController");
 const passport = require("passport");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -56,5 +57,8 @@ router.post("/addAddress", userAuth, userController.addAddress);
 router.get("/editAddress/:id", userAuth, userController.editAddressPage);
 router.post("/editAddress", userAuth, userController.editAddress);
 router.get("/deleteAddress/:id", userAuth, userController.deleteAddress);
-router.get("/changePassword", userController.changePasswordPage);
+router.get("/changePassword", userAuth, userController.changePasswordPage);
+router.post("/changePassword", userAuth, userController.changePassword);
+//cart
+router.post("/addToCart", cartController.addToCart);
 module.exports = router;
