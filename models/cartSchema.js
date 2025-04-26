@@ -14,9 +14,9 @@ const cartSchema = new Schema({
         ref: "Product",
         required: true,
       },
-      quandity: {
+      quantity: {
         type: Number,
-        default: true,
+        default: 1,
       },
       price: {
         type: Number,
@@ -24,16 +24,16 @@ const cartSchema = new Schema({
       },
       totalPrice: {
         type: Number,
-        required: true,
+        required: false,
       },
-      status: {
-        type: String,
-        default: "placed",
-      },
-      cancellationReason: {
-        type: String,
-        default: "none",
-      },
+      // status: {
+      //   type: String,
+      //   default: "placed",
+      // },
+      // cancellationReason: {
+      //   type: String,
+      //   default: "none",
+      // },
     },
   ],
 });

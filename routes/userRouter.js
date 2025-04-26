@@ -60,5 +60,5 @@ router.get("/deleteAddress/:id", userAuth, userController.deleteAddress);
 router.get("/changePassword", userAuth, userController.changePasswordPage);
 router.post("/changePassword", userAuth, userController.changePassword);
 //cart
-router.post("/addToCart", cartController.addToCart);
+router.post("/addToCart", userAuth, cartController.addToCart);
 module.exports = router;
