@@ -228,7 +228,7 @@
       zoomedImg = null;
     }
   });
-  // fetch
+  // fetch for add to cart
   function addToCart(productId) {
     const productQuantity = document.getElementById("quantity").innerText;
 
@@ -242,10 +242,11 @@
         quantity: productQuantity,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        window.location.href = "/cart";
+      })
       .then((data) => {
-        alert("product added successfully");
-        console.log(data);
+        alert("item added to cart successfully");
       })
       .catch((error) => {
         console.log("error in adding cart : ", error);

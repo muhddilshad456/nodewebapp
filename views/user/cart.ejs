@@ -1,0 +1,285 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+  body {
+    background-color: #f8f9fa;
+    font-family: "Poppins", sans-serif;
+  }
+  .cart-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 15px;
+  }
+  .cart-header {
+    font-size: 2.5rem;
+    color: #4a2c0f;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .cart-logo {
+    width: 60px;
+    margin-bottom: 10px;
+  }
+  .cart-table {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  .cart-table th {
+    background-color: #212529;
+    color: #fff;
+    font-weight: 500;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  .cart-item td {
+    vertical-align: middle;
+    padding: 20px;
+  }
+  .cart-item img {
+    width: 80px;
+    height: auto;
+    border-radius: 5px;
+    margin-right: 15px;
+  }
+  .cart-item p {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+  }
+  .quantity-control .btn {
+    background-color: #e9ecef;
+    border: none;
+    padding: 5px 10px;
+  }
+  .quantity-control input {
+    width: 50px;
+    border: none;
+    background-color: #f1f3f5;
+    text-align: center;
+  }
+  .delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+  }
+  .delete-btn:hover {
+    background-color: #c82333;
+  }
+  .cart-totals {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-top: 30px;
+  }
+  .cart-totals h4 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .cart-totals p,
+  .cart-totals h5 {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .cart-totals h5 {
+    font-weight: 600;
+    color: #212529;
+  }
+  .coupon-input {
+    border-radius: 20px 0 0 20px;
+    border: 1px solid #ced4da;
+  }
+  .coupon-btn {
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 0 20px 20px 0;
+    transition: background-color 0.3s ease;
+  }
+  .coupon-btn:hover {
+    background-color: #0b5ed7;
+  }
+  .checkout-btn {
+    background-color: #212529;
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+  .checkout-btn:hover {
+    background-color: #343a40;
+  }
+</style>
+
+<body>
+  <div class="cart-container">
+    <div class="text-center mb-4">
+      <h1 class="cart-header">MY CART</h1>
+    </div>
+
+    <table class="table cart-table mb-0">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cart.items.forEach((item)=>{ %>
+        <tr class="cart-item">
+          <td>
+            <div class="d-flex align-items-center">
+              <img
+                src="<%=item.productId.productImage[0] %>"
+                alt="Titan Edge Ceramic Quartz"
+              />
+              <p></p>
+            </div>
+          </td>
+          <td>₹<%=item.price %></td>
+          <td>
+            <div class="input-group quantity-control w-50">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="decreaseQuantity('<%= item._id %>')"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                class="form-control text-center"
+                id="quantity-<%= item._id %>"
+                value="<%=item.quantity %>"
+                readonly
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="increaseQuantity('<%= item._id %>')"
+              >
+                +
+              </button>
+            </div>
+          </td>
+          <td>₹<%=item.totalPrice %></td>
+          <td>
+            <button class="delete-btn" data-id="<%= item.productId._id %>">
+              Delete
+            </button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div class="cart-totals">
+      <h4>CART TOTALS</h4>
+      <p>Subtotal: ₹5,445</p>
+      <p>Delivery: ₹0.00</p>
+      <p>Discount: ₹0.00</p>
+      <hr />
+      <h5>TOTAL: ₹5,445</h5>
+      <div class="input-group mt-3">
+        <input
+          type="text"
+          class="form-control coupon-input"
+          placeholder="Coupon Code"
+        />
+        <button class="coupon-btn">Apply Coupon</button>
+      </div>
+    </div>
+
+    <button class="btn checkout-btn mt-4">Proceed to Checkout</button>
+  </div>
+</body>
+<script>
+  // fetch for delete from cart
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const productId = this.getAttribute("data-id");
+      deleteFromCart(productId);
+    });
+  });
+  function deleteFromCart(productId) {
+    console.log("button clicked");
+    fetch("/deleteCartItem", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId,
+      }),
+    })
+      .then((response) => {
+        alert("product deleted successfully");
+        window.location.href = "/cart";
+      })
+      .catch((error) => {
+        console.log("error in deleting cart", error);
+      });
+  }
+
+  // fetch for quandtity adjustment
+
+  function decreaseQuantity(itemId) {
+    console.log("button click -");
+    const quantityInput = document.querySelector(`#quantity-${itemId}`);
+    let quantity = parseInt(quantityInput.value);
+
+    if (quantity > 1) {
+      quantity -= 1;
+      quantityInput.value = quantity;
+      updateQuantity(itemId, quantity);
+    }
+  }
+
+  function increaseQuantity(itemId) {
+    console.log("button click +");
+    const quantityInput = document.querySelector(`#quantity-${itemId}`);
+    let quantity = parseInt(quantityInput.value);
+
+    quantity += 1;
+    quantityInput.value = quantity;
+    updateQuantity(itemId, quantity);
+  }
+
+  function updateQuantity(itemId, quantity) {
+    fetch("/updateCartQuantity", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId,
+        quantity,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Quantity updated successfully");
+      })
+      .catch((error) => {
+        console.log("Error in updating cart");
+      });
+  }
+</script>
+<%- include("../../views/partials/user/footer") %>

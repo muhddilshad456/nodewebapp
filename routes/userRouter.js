@@ -61,4 +61,7 @@ router.get("/changePassword", userAuth, userController.changePasswordPage);
 router.post("/changePassword", userAuth, userController.changePassword);
 //cart
 router.post("/addToCart", userAuth, cartController.addToCart);
+router.get("/cart", userAuth, cartController.cartPage);
+router.post("/deleteCartItem", userAuth, cartController.deleteCartItem);
+router.post("/updateCartQuantity", cartController.updateCartQuantity);
 module.exports = router;

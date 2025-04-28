@@ -11,12 +11,10 @@ const { now } = require("mongoose");
 
 const addToCart = async (req, res) => {
   try {
-    console.log("data of add to cart : ", req.body);
     const { productId, quantity } = req.body;
     const quantityNum = Number(quantity);
     const userId = req.session.user;
     const product = await Product.findById(productId);
-    console.log("product to add to cart : ", product);
     if (!product) {
       return res.status(404).json({ message: "product not found" });
     }
@@ -66,6 +64,58 @@ const addToCart = async (req, res) => {
   }
 };
 
+const cartPage = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+    res.render("cart", { cart });
+  } catch (error) {
+    console.log("error from cart page rendering");
+  }
+};
+
+//delete product cart
+
+const deleteCartItem = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const userId = req.session.user;
+    if (!userId) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    await Cart.updateOne({ userId }, { $pull: { items: { productId } } });
+    res.json({ message: "item deleted successfully" });
+  } catch (error) {
+    console.log("error in delete cart item : ", error);
+    res.status(500).json({ message: "Server error while deleting cart item" });
+  }
+};
+
+const updateCartQuantity = async (req, res) => {
+  try {
+    console.log("adjust quantity : ", req.body);
+    const { itemId, quantity } = req.body;
+    const userId = req.session.user;
+    const cart = await Cart.findOne({ userId });
+    const cartItem = cart.items.find((i) => i._id.toString() === itemId);
+    const newPrice = quantity * cartItem.price;
+    await Cart.updateOne(
+      { "items._id": itemId },
+      {
+        $set: {
+          "items.$.quantity": quantity,
+          "items.$.totalPrice": newPrice,
+        },
+      }
+    );
+  } catch (error) {
+    console.log("error from update cart quantity : ", error);
+  }
+};
 module.exports = {
   addToCart,
+  cartPage,
+  deleteCartItem,
+  updateCartQuantity,
 };

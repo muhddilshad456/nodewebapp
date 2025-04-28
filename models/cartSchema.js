@@ -7,6 +7,10 @@ const cartSchema = new Schema({
     ref: "User",
     required: true,
   },
+  cartTotal: {
+    type: Number,
+    default: 0,
+  },
   items: [
     {
       productId: {
