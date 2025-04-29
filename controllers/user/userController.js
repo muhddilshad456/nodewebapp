@@ -7,6 +7,7 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { now } = require("mongoose");
+const { block } = require("sharp");
 
 // home
 
@@ -82,12 +83,16 @@ const signup = async (req, res) => {
   try {
     const { name, phone, email, password, confirmpassword } = req.body;
     if (password !== confirmpassword) {
-      return res.render("signup", { message: "Password not match" });
+      return res
+        .status(400)
+        .render("signup", { message: "Password not match" });
     }
 
     const findUser = await User.findOne({ email });
     if (findUser) {
-      return res.render("signup", { message: "User already exists" });
+      return res
+        .status(409)
+        .render("signup", { message: "User already exists" });
     }
     const otp = genarateOtp();
     const emailSend = await sendVerificationEmail(email, otp);
@@ -95,7 +100,10 @@ const signup = async (req, res) => {
       return res.json("email-error");
     }
 
-    req.session.userOtp = otp;
+    req.session.userOtp = {
+      otp,
+      createdAt: Date.now(),
+    };
     req.session.userData = { name, phone, email, password };
 
     res.render("verify-otp");
@@ -124,7 +132,7 @@ const verifyOtp = async (req, res) => {
     console.log(req.body);
     const { otp } = req.body;
     console.log("typed otp", otp);
-    console.log("Session signup OTP:", req.session.userOtp);
+    console.log("Session signup OTP:", req.session.userOtp.otp);
     console.log("Session forgot password OTP:", req.session.userfOtp);
 
     if (req.session.userEmail) {
@@ -147,7 +155,14 @@ const verifyOtp = async (req, res) => {
         delete req.session.userfOtp;
       });
     } else if (req.session.userData) {
-      if (otp != req.session.userOtp) {
+      const now = Date.now();
+      const expired = now - req.session.userOtp.createdAt;
+      if (expired > 60000) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Otp time out" });
+      }
+      if (otp != req.session.userOtp.otp) {
         return res
           .status(400)
           .json({ success: false, message: "Invalid OTP, Please try again" });
@@ -195,7 +210,10 @@ const resendOtp = async (req, res) => {
     }
 
     const otp = genarateOtp();
-    req.session.userOtp = otp;
+    req.session.userOtp = {
+      otp,
+      createdAt: Date.now(),
+    };
 
     const emailSend = sendVerificationEmail(email, otp);
     if (emailSend) {
@@ -217,7 +235,12 @@ const resendOtp = async (req, res) => {
 const loadLogin = async (req, res) => {
   try {
     if (!req.session.user) {
-      return res.render("login");
+      const message = req.query.message;
+      let displayMessage = "";
+      if (message === "blocked") {
+        displayMessage = "Your account has been blocked";
+      }
+      return res.render("login", { message: displayMessage });
     } else {
       res.redirect("/");
     }

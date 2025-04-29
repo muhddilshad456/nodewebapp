@@ -287,16 +287,20 @@ const productBlock = async (req, res) => {
   try {
     let id = req.query.id;
     await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
-    res.redirect("/admin/products");
-  } catch (error) {}
+    res.redirect("/admin/productList");
+  } catch (error) {
+    console.log("error from product block : ", error);
+  }
 };
 
 const productUnblock = async (req, res) => {
   try {
     let id = req.query.id;
     await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
-    res.redirect("/admin/products");
-  } catch (error) {}
+    res.redirect("/admin/productList");
+  } catch (error) {
+    console.log("error from product unblock : ", error);
+  }
 };
 
 module.exports = {

@@ -42,7 +42,13 @@ const costumerInfo = async (req, res) => {
 const customerBlock = async (req, res) => {
   try {
     let id = req.query.id;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
     await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
+    delete req.session.user;
     res.redirect("/admin/users");
   } catch (error) {
     console.log("error in costumer block");

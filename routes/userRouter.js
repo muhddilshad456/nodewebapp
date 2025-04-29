@@ -27,8 +27,11 @@ router.get(
 );
 router.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/signup" }),
+  passport.authenticate("google", {
+    failureRedirect: "/login?message=blocked",
+  }),
   (req, res) => {
+    req.session.user = req.user._id;
     res.redirect("/");
   }
 );

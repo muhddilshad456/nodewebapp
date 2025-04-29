@@ -18,6 +18,9 @@ passport.use(
         });
 
         if (user) {
+          if (user.isBlocked) {
+            return done(null, false, { message: "user is blocked" });
+          }
           return done(null, user);
         } else {
           user = new User({

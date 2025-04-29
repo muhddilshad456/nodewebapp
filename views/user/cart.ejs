@@ -179,7 +179,7 @@
               </button>
             </div>
           </td>
-          <td>₹<%=item.totalPrice %></td>
+          <td id="price-<%= item._id %>">₹<%=item.totalPrice %></td>
           <td>
             <button class="delete-btn" data-id="<%= item.productId._id %>">
               Delete
@@ -192,11 +192,11 @@
 
     <div class="cart-totals">
       <h4>CART TOTALS</h4>
-      <p>Subtotal: ₹5,445</p>
+      <p id="subTotal">Subtotal: ₹<%= cart.cartTotal %></p>
       <p>Delivery: ₹0.00</p>
       <p>Discount: ₹0.00</p>
       <hr />
-      <h5>TOTAL: ₹5,445</h5>
+      <h5>TOTAL: ₹<%= cart.cartTotal %></h5>
       <div class="input-group mt-3">
         <input
           type="text"
@@ -275,10 +275,16 @@
     })
       .then((response) => response.json())
       .then((data) => {
+        document.getElementById(
+          `price-${itemId}`
+        ).textContent = `₹${data.newPrice}`;
+        document.getElementById(
+          "subTotal"
+        ).textContent = `Subtotal: ₹${data.cartTotal}`;
         console.log("Quantity updated successfully");
       })
       .catch((error) => {
-        console.log("Error in updating cart");
+        console.log("Error in updating cart", error);
       });
   }
 </script>

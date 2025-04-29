@@ -63,12 +63,16 @@ const addToCart = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
+// cart page rendering
 const cartPage = async (req, res) => {
   try {
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate("items.productId");
-
+    cart.cartTotal = cart.items.reduce(
+      (total, item) => total + item.totalPrice,
+      0
+    );
+    await cart.save();
     res.render("cart", { cart });
   } catch (error) {
     console.log("error from cart page rendering");
@@ -91,7 +95,7 @@ const deleteCartItem = async (req, res) => {
     res.status(500).json({ message: "Server error while deleting cart item" });
   }
 };
-
+// cart updation
 const updateCartQuantity = async (req, res) => {
   try {
     console.log("adjust quantity : ", req.body);
@@ -99,16 +103,17 @@ const updateCartQuantity = async (req, res) => {
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId });
     const cartItem = cart.items.find((i) => i._id.toString() === itemId);
+    if (!cartItem) return res.status(404).json({ error: "Item not found" });
     const newPrice = quantity * cartItem.price;
-    await Cart.updateOne(
-      { "items._id": itemId },
-      {
-        $set: {
-          "items.$.quantity": quantity,
-          "items.$.totalPrice": newPrice,
-        },
-      }
+    cartItem.quantity = quantity;
+    cartItem.totalPrice = newPrice;
+    const cartTotal = cart.items.reduce(
+      (total, item) => total + item.totalPrice,
+      0
     );
+    cart.cartTotal = cartTotal;
+    await cart.save();
+    res.json({ message: "cart updated successfully", newPrice, cartTotal });
   } catch (error) {
     console.log("error from update cart quantity : ", error);
   }

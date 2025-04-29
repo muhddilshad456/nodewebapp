@@ -15,11 +15,13 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const findAdmin = await User.findOne({ isAdmin: 1, email: email });
     if (!findAdmin) {
-      return res.render("admin-login", { message: "Admin not found" });
+      return res
+        .status(404)
+        .render("admin-login", { message: "Admin not found" });
     }
     const passwordMatch = await bcrypt.compare(password, findAdmin.password);
     if (!passwordMatch) {
-      res.render("admin-login", { message: "Incorrect password" });
+      res.status(401).render("admin-login", { message: "Incorrect password" });
     }
     req.session.admin = findAdmin._id;
     res.redirect("/admin");
