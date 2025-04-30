@@ -103,7 +103,13 @@
                 />
               </div>
             </div>
+            <span
+              id="errMsg"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
+
           <!-- Form Fields -->
           <div class="col-md-8">
             <div class="mb-4">
@@ -130,6 +136,11 @@
               <label for="brand" class="form-label">Brand:</label>
               <select class="form-select" id="brand" name="brand">
                 <option value="" selected disabled>Select a brand</option>
+                <% for (let i = 0; i < brand.length; i++) { %>
+                <option value="<%= brand[i]._id %>">
+                  <%= brand[i].name %>
+                </option>
+                <% } %>
               </select>
             </div>
             <div class="mb-4">
@@ -161,6 +172,8 @@
                 name="stockCount"
               />
             </div>
+
+            <br />
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-dark">Add Product</button>
               <button type="button" class="btn btn-secondary">Cancel</button>
@@ -224,30 +237,53 @@
         const productAmount = document
           .getElementById("productAmount")
           .value.trim();
+        const category = document.getElementById("category").value.trim();
         const stockCount = document.getElementById("stockCount").value.trim();
+        const img1 = document.getElementById("image1").files.length;
+        const img2 = document.getElementById("image2").files.length;
+        const img3 = document.getElementById("image3").files.length;
+        const errMsg = document.getElementById("errMsg");
 
-        if (!productName) {
-          alert("Name field cannot be empty");
+        if (img1 === 0 || img2 === 0 || img3 === 0) {
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Must add 3 images";
+          return;
+        }
+        if (!productName || !productDescription) {
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Fill the name";
           return;
         }
         if (!/^[a-zA-Z\s]+$/.test(productName)) {
-          alert("Name must contain only alphabets and spaces.");
-          return;
-        }
-        if (!productDescription) {
-          alert("Description field cannot be empty");
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid name";
           return;
         }
         if (!/^[a-zA-Z\s]+$/.test(productDescription)) {
-          alert("Description must contain only alphabets and spaces.");
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid description";
+          return;
+        }
+        if (!category) {
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Please select a category";
           return;
         }
         if (!productAmount || isNaN(productAmount)) {
-          alert("Please enter a valid amount.");
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid amount";
           return;
         }
         if (!stockCount || isNaN(stockCount)) {
-          alert("Please enter a valid stock count.");
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid stock";
           return;
         }
         document.getElementById("addProductsForm").submit();
@@ -264,6 +300,17 @@
             console.error("No file selected");
             return;
           }
+          const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+          if (!allowedTypes.includes(file.type)) {
+            errMsg.style.display = "block";
+            errMsg.style.color = "red";
+            errMsg.innerHTML = "Only image files (jpg, png, gif) are allowed.";
+            this.value = "";
+            return;
+          } else {
+            console.log("File is valid:", file.name);
+          }
+
           const reader = new FileReader();
           reader.onload = function (e) {
             console.log("FileReader loaded image");

@@ -140,6 +140,11 @@
               id="brandName"
               placeholder="Enter brand name"
             />
+            <span
+              id="nameErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
           <div class="mb-3">
             <label for="brandDescription" class="form-label">Description</label>
@@ -150,6 +155,11 @@
               placeholder="Enter brand description"
               rows="3"
             ></textarea>
+            <span
+              id="descriptionErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
         </form>
       </div>
@@ -165,7 +175,7 @@
   </div>
 </div>
 
-<!-- edit category modal -->
+<!-- edit brand modal -->
 
 <div
   class="modal fade"
@@ -196,6 +206,11 @@
               id="editBrandName"
               name="editName"
             />
+            <span
+              id="editNameErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
           <div class="mb-3">
             <label for="brandDescription" class="form-label">Description</label>
@@ -205,6 +220,11 @@
               name="editDescription"
               rows="3"
             ></textarea>
+            <span
+              id="editDescriptionErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
         </form>
       </div>
@@ -228,7 +248,7 @@
     window.location.href = "/admin/brand";
   }
 </script>
-<!-- add category validation -->
+<!-- add brand validation -->
 <script>
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -237,23 +257,33 @@
     const brandDescription = document
       .getElementById("brandDescription")
       .value.trim();
+    const nameErr = document.getElementById("nameErr");
+    const descriptionErr = document.getElementById("descriptionErr");
 
-    if (!brandName) {
-      alert("Name field cannot be empty");
+    if (!brandName || !/^[a-zA-Z\s]+$/.test(brandName)) {
+      nameErr.style.display = "block";
+      nameErr.style.color = "red";
+      nameErr.style.padding = 0;
+      nameErr.style.border = "none";
+      nameErr.style.background = "none";
+      nameErr.innerHTML = "Enter a valid name";
       return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(brandName)) {
-      alert("Name must contain only alphabets and spaces.");
-      return;
+    } else {
+      nameErr.style.display = "none";
+      nameErr.innerHTML = "";
     }
 
-    if (!brandDescription) {
-      alert("Description field cannot be empty.");
+    if (!brandDescription || !/^[a-zA-Z\s]+$/.test(brandDescription)) {
+      descriptionErr.style.display = "block";
+      descriptionErr.style.color = "red";
+      descriptionErr.style.padding = 0;
+      descriptionErr.style.border = "none";
+      descriptionErr.style.background = "none";
+      descriptionErr.innerHTML = "Enter valid description";
       return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(brandDescription)) {
-      alert("Description must contain only alphabets and spaces.");
-      return;
+    } else {
+      descriptionErr.style.display = "none";
+      descriptionErr.innerHTML = "";
     }
 
     const formData = {
@@ -301,6 +331,8 @@
       .getElementById("editBrandDescription")
       .value.trim();
     const editBrandId = document.getElementById("editBrandId").value.trim();
+    const editNameErr = document.getElementById("editNameErr");
+    const editDescriptionErr = document.getElementById("editDescriptionErr");
 
     //pre filled name
     const originalName =
@@ -309,29 +341,37 @@
         .getAttribute("data-original-name") || "";
 
     // Check if name is unchanged
-    if (editBrandName === originalName) {
-      alert("No changes made to the brand.");
+    // if (editBrandName === originalName) {
+    //   alert("No changes made to the brand.");
+    //   return;
+    // }
+
+    if (!editBrandName || !/^[a-zA-Z\s]+$/.test(editBrandName)) {
+      editNameErr.style.display = "block";
+      editNameErr.style.padding = 0;
+      editNameErr.style.background = "none";
+      editNameErr.style.color = "red";
+      editNameErr.style.border = "none";
+      editNameErr.innerHTML = "enter a valid name";
+
       return;
+    } else {
+      editNameErr.style.display = "none";
+      editNameErr.innerHTML = "";
     }
 
-    if (!editBrandName) {
-      alert("Name field cannot be empty");
+    if (!editBrandDescription || !/^[a-zA-Z\s]+$/.test(editBrandDescription)) {
+      editDescriptionErr.style.display = "block";
+      editDescriptionErr.style.padding = 0;
+      editDescriptionErr.style.border = "none";
+      editDescriptionErr.style.color = "red";
+      editDescriptionErr.style.background = "none";
+      editDescriptionErr.innerHTML = "enter valid description";
       return;
+    } else {
+      editDescriptionErr.style.display = "none";
+      editDescriptionErr.innerHTML = "";
     }
-    if (!/^[a-zA-Z\s]+$/.test(editBrandName)) {
-      alert("Name must contain only alphabets and spaces.");
-      return;
-    }
-
-    if (!editBrandDescription) {
-      alert("Description field cannot be empty.");
-      return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(editBrandDescription)) {
-      alert("Description must contain only alphabets and spaces.");
-      return;
-    }
-
     const data = {
       editName: editBrandName,
       editDescription: editBrandDescription,

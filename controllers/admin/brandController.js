@@ -1,6 +1,6 @@
 const Brand = require("../../models/brandSchema");
 const Category = require("../../models/categorySchema");
-//category info
+//brand info
 const brandInfo = async (req, res) => {
   try {
     let search = req.query.search || "";
@@ -28,12 +28,16 @@ const brandInfo = async (req, res) => {
   }
 };
 
-// add category
+// add brand
 
 const addBrand = async (req, res) => {
   console.log("Incoming body:", req.body);
   const { name, description } = req.body;
   try {
+    if (!name || !description) {
+      console.log("name and description is empty");
+      return res.status(400).json({ message: "name and description is empty" });
+    }
     const existingBrand = await Brand.findOne({ name });
     if (existingBrand) {
       return res.status(400).json({ error: "brand already exists" });
@@ -45,6 +49,7 @@ const addBrand = async (req, res) => {
     await newBrand.save();
     return res.json({ message: "brand added successfully" });
   } catch (error) {
+    console.log("error from add brand catch ", error);
     return res.status(500).json({ error: "internal server error" });
   }
 };

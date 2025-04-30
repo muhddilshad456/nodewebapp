@@ -141,6 +141,11 @@
               placeholder="Enter category name"
             />
           </div>
+          <span
+            id="NameErr"
+            class="alert alert-danger text-center"
+            style="display: none"
+          ></span>
           <div class="mb-3">
             <label for="categoryDescription" class="form-label"
               >Description</label
@@ -152,6 +157,11 @@
               placeholder="Enter category description"
               rows="3"
             ></textarea>
+            <span
+              id="descriptionErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
         </form>
       </div>
@@ -241,23 +251,24 @@
     const categoryDescription = document
       .getElementById("categoryDescription")
       .value.trim();
+    const nameErr = document.getElementById("nameErr");
+    const descriptionErr = document.getElementById("descriptionErr");
 
-    if (!categoryName) {
-      alert("Name field cannot be empty");
-      return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(categoryName)) {
-      alert("Name must contain only alphabets and spaces.");
+    if (!categoryName || !/^[a-zA-Z\s]+$/.test(categoryName)) {
+      alert("Enter a valid name");
       return;
     }
 
-    if (!categoryDescription) {
-      alert("Description field cannot be empty.");
+    if (!categoryDescription || !/^[a-zA-Z\s]+$/.test(categoryDescription)) {
+      descriptionErr.style.display = "block";
+      descriptionErr.style.background = "none";
+      descriptionErr.style.border = 0;
+      descriptionErr.style.color = "red";
+      descriptionErr.innerHTML = "Enter valid description";
       return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(categoryDescription)) {
-      alert("Description must contain only alphabets and spaces.");
-      return;
+    } else {
+      descriptionErr.style.display = "none";
+      descriptionErr.innerHTML = "";
     }
 
     const formData = {

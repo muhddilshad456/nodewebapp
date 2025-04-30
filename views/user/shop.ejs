@@ -15,6 +15,16 @@
               top: 20px;
             "
           >
+          <h4 class="text-dark mb-3 fw-bold">SEARCH</h4>
+              <input
+                type="text"
+                name="search"
+                class="form-control mb-4 rounded-pill border-secondary"
+                placeholder="Search"
+                aria-label="Search"
+                value="<%= search %>"
+              />
+        
           <h4 class="text-dark mb-3 fw-bold">CATEGORIES</h4>
             <select
               class="form-select mb-4 rounded-pill border-secondary"
@@ -78,27 +88,20 @@
                 value="<%= maxPrice || '' %>"
               />
             </div>
-            <button type="submit" class="btn btn-dark rounded-pill w-100">
-              Apply
-            </button>
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="submit" class="btn btn-dark rounded-pill w-100">Apply</button>
+              </div>
+              <div class="col-6">
+                <a href="/shop" class="btn btn-dark rounded-pill w-100">Clear</a>
+              </div>
+            </div>
+            
           </div>
         </form>
       </div>
       <!-- Product Grid -->
       <div class="col-md-9">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div class="input-group w-50">
-            <input
-              type="text"
-              class="form-control rounded-start-pill border-secondary"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-dark rounded-end-pill" type="button">
-              <i class="bi bi-search" style="color: #fff"></i>
-            </button>
-          </div>
-        </div>
         <div class="row g-4">
           <!-- Product Cards -->
           <% for (let i = 0; i < products.length; i++) { %>

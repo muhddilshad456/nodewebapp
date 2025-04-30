@@ -301,7 +301,7 @@ const loadShopPage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
-
+    console.log("query : ", req.query);
     let { search, sort, brandFil, categoryFil, minPrice, maxPrice } = req.query;
 
     if (!minPrice) {
@@ -331,12 +331,13 @@ const loadShopPage = async (req, res) => {
       filter.brand = brandFil;
     }
 
+    if (search && search.trim() !== "") {
+      filter.productName = { $regex: search.trim(), $options: "i" };
+    }
+
     let sortOptions = {};
 
     switch (sort) {
-      case "":
-        sortOptions = { createdAt: -1 };
-        break;
       case "A-Z":
         sortOptions = { productName: 1 };
         break;
@@ -363,11 +364,6 @@ const loadShopPage = async (req, res) => {
 
     const totalPages = Math.ceil(totalProducts / limit);
 
-    // const categoriesWithIds = categories.map((category) => ({
-    //   _id: category._id,
-    //   name: category.name,
-    // }));
-
     res.render("shop", {
       user: userData,
       products,
@@ -381,6 +377,7 @@ const loadShopPage = async (req, res) => {
       sort,
       minPrice,
       maxPrice,
+      search,
     });
   } catch (error) {}
 };
