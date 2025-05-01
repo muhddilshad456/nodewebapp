@@ -300,11 +300,11 @@
             console.error("No file selected");
             return;
           }
-          const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+          const allowedTypes = ["image/jpeg", "image/png"];
           if (!allowedTypes.includes(file.type)) {
             errMsg.style.display = "block";
             errMsg.style.color = "red";
-            errMsg.innerHTML = "Only image files (jpg, png, gif) are allowed.";
+            errMsg.innerHTML = "Only image files (jpg, png) are allowed.";
             this.value = "";
             return;
           } else {

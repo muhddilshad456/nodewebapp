@@ -141,11 +141,11 @@
               placeholder="Enter category name"
             />
           </div>
-          <span
+          <!-- <span
             id="NameErr"
             class="alert alert-danger text-center"
             style="display: none"
-          ></span>
+          ></span> -->
           <div class="mb-3">
             <label for="categoryDescription" class="form-label"
               >Description</label
@@ -219,6 +219,11 @@
               name="editDescription"
               rows="3"
             ></textarea>
+            <span
+              id="msgErr"
+              class="alert alert-danger text-center"
+              style="display: none"
+            ></span>
           </div>
         </form>
       </div>
@@ -251,12 +256,18 @@
     const categoryDescription = document
       .getElementById("categoryDescription")
       .value.trim();
-    const nameErr = document.getElementById("nameErr");
     const descriptionErr = document.getElementById("descriptionErr");
 
     if (!categoryName || !/^[a-zA-Z\s]+$/.test(categoryName)) {
-      alert("Enter a valid name");
+      descriptionErr.style.display = "block";
+      descriptionErr.style.background = "none";
+      descriptionErr.style.border = 0;
+      descriptionErr.style.color = "red";
+      descriptionErr.innerHTML = "Enter valid name";
       return;
+    } else {
+      descriptionErr.style.display = "none";
+      descriptionErr.innerHTML = "";
     }
 
     if (!categoryDescription || !/^[a-zA-Z\s]+$/.test(categoryDescription)) {
@@ -320,6 +331,7 @@
     const editCategoryId = document
       .getElementById("editCategoryId")
       .value.trim();
+    const msgErr = document.getElementById("msgErr");
 
     //pre filled name
     const originalName =
@@ -328,27 +340,36 @@
         .getAttribute("data-original-name") || "";
 
     // Check if name is unchanged
-    if (editCategoryName === originalName) {
-      alert("No changes made to the category.");
+    // if (editCategoryName === originalName) {
+    //   alert("No changes made to the category.");
+    //   return;
+    // }
+
+    if (!editCategoryName || !/^[a-zA-Z\s]+$/.test(editCategoryName)) {
+      msgErr.style.display = "block";
+      msgErr.style.background = "none";
+      msgErr.style.border = 0;
+      msgErr.style.color = "red";
+      msgErr.innerHTML = "Enter valid name";
       return;
+    } else {
+      msgErr.style.display = "none";
+      msgErr.innerHTML = "";
     }
 
-    if (!editCategoryName) {
-      alert("Name field cannot be empty");
+    if (
+      !editCategoryDescription ||
+      !/^[a-zA-Z\s]+$/.test(editCategoryDescription)
+    ) {
+      msgErr.style.display = "block";
+      msgErr.style.background = "none";
+      msgErr.style.border = 0;
+      msgErr.style.color = "red";
+      msgErr.innerHTML = "Enter valid description";
       return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(editCategoryName)) {
-      alert("Name must contain only alphabets and spaces.");
-      return;
-    }
-
-    if (!editCategoryDescription) {
-      alert("Description field cannot be empty.");
-      return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(editCategoryDescription)) {
-      alert("Description must contain only alphabets and spaces.");
-      return;
+    } else {
+      msgErr.style.display = "none";
+      msgErr.innerHTML = "";
     }
 
     const data = {

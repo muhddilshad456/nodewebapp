@@ -14,22 +14,22 @@ router.get("/logout", adminController.adminLogout);
 // dash bord
 router.get("/", adminAuth, adminController.loadDashbord);
 //user managment
-router.get("/users", costumerController.costumerInfo);
-router.get("/blockCustomer", costumerController.customerBlock);
-router.get("/unblockCustomer", costumerController.customerUnblock);
+router.get("/users", adminAuth, costumerController.costumerInfo);
+router.get("/blockCustomer", adminAuth, costumerController.customerBlock);
+router.get("/unblockCustomer", adminAuth, costumerController.customerUnblock);
 //category managment
-router.get("/category", categoryController.categoryInfo);
+router.get("/category", adminAuth, categoryController.categoryInfo);
 router.post("/addCategory", adminAuth, categoryController.addCategory);
-router.get("/blockCategory", categoryController.categoryBlock);
-router.get("/unblockCategory", categoryController.categoryUnblock);
-router.post("/editCategory", categoryController.editCategory);
+router.get("/blockCategory", adminAuth, categoryController.categoryBlock);
+router.get("/unblockCategory", adminAuth, categoryController.categoryUnblock);
+router.post("/editCategory", adminAuth, categoryController.editCategory);
 
 //brand managment
-router.get("/brand", brandController.brandInfo);
-router.post("/addBrand", brandController.addBrand);
-router.get("/blockBrand", brandController.brandBlock);
-router.get("/unblockBrand", brandController.brandUnblock);
-router.post("/editBrand", brandController.editBrand);
+router.get("/brand", adminAuth, brandController.brandInfo);
+router.post("/addBrand", adminAuth, brandController.addBrand);
+router.get("/blockBrand", adminAuth, brandController.brandBlock);
+router.get("/unblockBrand", adminAuth, brandController.brandUnblock);
+router.post("/editBrand", adminAuth, brandController.editBrand);
 
 //product management
 router.get("/productList", adminAuth, productController.listProduct);
@@ -40,7 +40,7 @@ router.post(
   productController.uploadFields,
   productController.addProduct
 );
-router.get("/editProduct/:id", productController.editProductPage);
+router.get("/editProduct/:id", adminAuth, productController.editProductPage);
 router.post(
   "/editProduct",
   adminAuth,
@@ -48,7 +48,7 @@ router.post(
   productController.editProduct
 );
 
-router.get("/blockProducts", productController.productBlock);
-router.get("/unblockProducts", productController.productUnblock);
+router.get("/blockProducts", adminAuth, productController.productBlock);
+router.get("/unblockProducts", adminAuth, productController.productUnblock);
 
 module.exports = router;

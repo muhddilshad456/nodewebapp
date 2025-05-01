@@ -47,10 +47,7 @@ const listProduct = async (req, res) => {
     const limit = 4;
 
     const productData = await Product.find({
-      $or: [
-        { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
-        { brand: { $regex: new RegExp(".*" + search + ".*", "i") } },
-      ],
+      productName: { $regex: new RegExp(".*" + search + ".*", "i") },
     })
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -58,10 +55,7 @@ const listProduct = async (req, res) => {
       .exec();
 
     const count = await Product.find({
-      $or: [
-        { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
-        { brand: { $regex: new RegExp(".*" + search + ".*", "i") } },
-      ],
+      productName: { $regex: new RegExp(".*" + search + ".*", "i") },
     }).countDocuments();
 
     const category = await Category.find({ isListed: true });
@@ -82,10 +76,9 @@ const listProduct = async (req, res) => {
     console.log("error from catch of product listing", error);
   }
 };
-
+//add product
 const addProduct = async (req, res) => {
   try {
-    // Log for debugging
     console.log("Request body:", req.body);
     console.log("Request files:", req.files);
 
@@ -174,7 +167,7 @@ const addProduct = async (req, res) => {
 const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true });
-    const brand = await Brand.find({ isBlocked: false });
+    const brand = await Brand.find({ isListed: true });
 
     res.render("addProducts", {
       cat: category,
@@ -200,7 +193,7 @@ const editProductPage = async (req, res) => {
     }
 
     const category = await Category.find({ isListed: true });
-    const brand = await Brand.find({ isBlocked: false });
+    const brand = await Brand.find({ isListed: true });
 
     res.render("editProduct", {
       cat: category,

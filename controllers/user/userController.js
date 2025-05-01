@@ -125,7 +125,7 @@ const securePassword = async (password) => {
   }
 };
 
-//verify otp
+//verify signup  otp
 
 const verifyOtp = async (req, res) => {
   try {
@@ -133,72 +133,43 @@ const verifyOtp = async (req, res) => {
     const { otp } = req.body;
     console.log("typed otp", otp);
     console.log("Session signup OTP:", req.session.userOtp.otp);
-    console.log("Session forgot password OTP:", req.session.userfOtp);
 
-    if (req.session.userEmail) {
-      if (otp != req.session.userfOtp) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid OTP, Please try again" });
-      }
-
-      const user = await User.findOne({ email: req.session.userEmail });
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
-
-      res.json({ success: true, redirectUrl: "/newpassword" });
-
-      res.on("finish", () => {
-        delete req.session.userfOtp;
-      });
-    } else if (req.session.userData) {
-      const now = Date.now();
-      const expired = now - req.session.userOtp.createdAt;
-      if (expired > 60000) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Otp time out" });
-      }
-      if (otp != req.session.userOtp.otp) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid OTP, Please try again" });
-      }
-
-      const user = req.session.userData;
-      const passwordHash = await securePassword(user.password);
-
-      const saveUserData = new User({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: passwordHash,
-      });
-      await saveUserData.save();
-      req.session.user = saveUserData._id;
-
-      res.json({ success: true, redirectUrl: "/" });
-
-      res.on("finish", () => {
-        delete req.session.userOtp;
-        delete req.session.userData;
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Session expired or invalid request",
-      });
+    const now = Date.now();
+    const expired = now - req.session.userOtp.createdAt;
+    if (expired > 60000) {
+      return res.status(400).json({ success: false, message: "Otp time out" });
     }
+    if (otp != req.session.userOtp.otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid OTP, Please try again" });
+    }
+
+    const user = req.session.userData;
+    const passwordHash = await securePassword(user.password);
+
+    const saveUserData = new User({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      password: passwordHash,
+    });
+    await saveUserData.save();
+    req.session.user = saveUserData._id;
+
+    res.json({ success: true, redirectUrl: "/" });
+
+    res.on("finish", () => {
+      delete req.session.userOtp;
+      delete req.session.userData;
+    });
   } catch (error) {
     console.error("Error Verifying OTP", error);
     res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
 
-//resend otp
+//sign up resend otp
 
 const resendOtp = async (req, res) => {
   try {
@@ -215,6 +186,7 @@ const resendOtp = async (req, res) => {
       createdAt: Date.now(),
     };
 
+    // sending email
     const emailSend = sendVerificationEmail(email, otp);
     if (emailSend) {
       console.log("Resend OTP : ", otp);
@@ -225,7 +197,76 @@ const resendOtp = async (req, res) => {
       res.status(500).json({ success: false, message: "Failed to resend otp" });
     }
   } catch (error) {
-    console.error("Error in sending otp", error);
+    console.error("Error in resending otp", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+// forgott password verify otp
+const fgVerifyOtp = async (req, res) => {
+  console.log("===========");
+  try {
+    console.log("typed otp for forgott password", req.body);
+    const { otp } = req.body;
+    console.log("Session forgot password OTP:", req.session.userfOtp);
+    console.log("time:", req.session.userfOtp.createdAt);
+    const now = Date.now();
+    const expired = now - req.session.userfOtp.createdAt;
+    if (expired > 60000) {
+      return res.status(400).json({ success: false, message: "Otp time out" });
+    }
+
+    if (otp != req.session.userfOtp.otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid OTP, Please try again" });
+    }
+
+    const user = await User.findOne({ email: req.session.userEmail });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, redirectUrl: "/newpassword" });
+
+    res.on("finish", () => {
+      delete req.session.userfOtp;
+      delete req.session.userEmail;
+    });
+  } catch (error) {
+    console.log("error from forgot password opt verify : ", error);
+  }
+};
+// forgott password resend otp
+const fgResendOtp = async (req, res) => {
+  try {
+    const resendEmail = req.session.userEmail;
+    if (!resendEmail) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found" });
+    }
+
+    const otp = genarateOtp();
+
+    req.session.userfOtp = {
+      otp,
+      createdAt: Date.now(),
+    };
+
+    // sending email
+    const emailSend = sendVerificationEmail(resendEmail, otp);
+    if (emailSend) {
+      console.log("Resend OTP For Forgott Password : ", otp);
+      res
+        .status(200)
+        .json({ success: true, message: "Resend otp successfull" });
+    } else {
+      res.status(500).json({ success: false, message: "Failed to resend otp" });
+    }
+  } catch (error) {
+    console.error("Error in resending forgott password otp", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -303,7 +344,8 @@ const loadShopPage = async (req, res) => {
     const skip = (page - 1) * limit;
     console.log("query : ", req.query);
     let { search, sort, brandFil, categoryFil, minPrice, maxPrice } = req.query;
-
+    console.log("brand ids : ", brandIds);
+    console.log("category ids : ", categoryIds);
     if (!minPrice) {
       minPrice = 0;
     }
@@ -316,18 +358,18 @@ const loadShopPage = async (req, res) => {
       isBlocked: false,
       stockCount: { $gt: 0 },
       category: { $in: categoryIds },
-      // brand: { $in: brandIds },
+      brand: { $in: brandIds },
       $and: [
         { productAmount: { $gte: minPrice } },
         { productAmount: { $lte: maxPrice } },
       ],
     };
 
-    if (categoryFil) {
+    if (categoryFil && categoryFil !== "") {
       filter.category = categoryFil;
     }
 
-    if (brandFil) {
+    if (brandFil && brandFil !== "") {
       filter.brand = brandFil;
     }
 
@@ -364,6 +406,9 @@ const loadShopPage = async (req, res) => {
 
     const totalPages = Math.ceil(totalProducts / limit);
 
+    console.log("brands : ", brands);
+    console.log("brand fill : ", brandFil);
+
     res.render("shop", {
       user: userData,
       products,
@@ -379,7 +424,9 @@ const loadShopPage = async (req, res) => {
       maxPrice,
       search,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from shop rendering page : ", error);
+  }
 };
 
 //forget password
@@ -409,7 +456,10 @@ const forgetPassword = async (req, res) => {
     }
 
     const otp = genarateOtp();
-    req.session.userfOtp = otp;
+    req.session.userfOtp = {
+      otp,
+      createdAt: Date.now(),
+    };
     req.session.userEmail = email;
 
     const emailSent = await sendVerificationEmail(email, otp);
@@ -417,9 +467,9 @@ const forgetPassword = async (req, res) => {
       return res.status(500).send("Failed to send OTP. Please try again.");
     }
 
-    console.log("OTP for forget password:", otp);
+    console.log("OTP for forget password :", otp);
 
-    res.render("verify-otp");
+    res.render("fg-verify-otp");
   } catch (error) {
     console.error("Error in forgetPassword:", error);
   }
@@ -832,6 +882,8 @@ module.exports = {
   login,
   logout,
   loadShopPage,
+  fgVerifyOtp,
+  fgResendOtp,
   forgetPassword,
   forgetPasswordPage,
   newPasswordPage,

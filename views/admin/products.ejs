@@ -43,7 +43,7 @@
           <th scope="col">ID</th>
           <th scope="col">Product Image</th>
           <th scope="col">Product Name</th>
-          <th scope="col">Brand</th>
+          <th scope="col">Category</th>
           <th scope="col">Piece</th>
           <th scope="col">Amount</th>
           <th scope="col">Last Updated</th>
@@ -57,21 +57,21 @@
           <td><%= data[i].id %></td>
           <td>
             <img
-              src="<%= data[i].imageUrl %>"
+              src="<%= data[i].productImage[0] %>"
               alt="<%= data[i].dataName %>"
               style="width: 50px; height: auto"
             />
           </td>
           <td><%= data[i].productName %></td>
-          <td><%= data[i].brand %></td>
+          <td><%= data[i].category ? data[i].category.description : "" %></td>
           <td><%= data[i].stockCount %></td>
           <td><%= data[i].productAmount %></td>
           <td><%= data[i].lastUpdated %></td>
           <td>
-            <% if (data[i].status) { %>
-            <span class="text-success">✔ <%= data[i].status %></span>
-            <% } else { %>
+            <% if (data[i].isBlocked) { %>
             <span class="text-danger">✘</span>
+            <% } else { %>
+            <span class="text-success">✔ <%= data[i].status %></span>
             <% } %>
           </td>
           <td>

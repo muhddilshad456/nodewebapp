@@ -33,6 +33,8 @@ const adminAuth = (req, res, next) => {
         console.log("Error in adminAuth middleware");
         res.status(500).send("Internal server error");
       });
+  } else {
+    res.redirect("/admin/login");
   }
 };
 

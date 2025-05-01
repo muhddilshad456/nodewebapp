@@ -107,6 +107,11 @@
                 />
               </div>
             </div>
+            <span
+            id="errMsg"
+            class="alert alert-danger text-center"
+            style="display: none"
+          ></span>
           </div>
           <!-- Form Fields -->
           <div class="col-md-8">
@@ -135,7 +140,15 @@
             <div class="mb-4">
               <label for="brand" class="form-label">Brand:</label>
               <select class="form-select" id="brand" name="brand">
-                <option value="" selected disabled>Select a brand</option>
+                <option value="" disabled>Select a brand</option>
+                <% for (let i = 0; i < brand.length; i++) { %>
+                    <option
+                    value="<%= brand[i]._id %>"
+                    <%= product.brand && product.brand._id && String(product.brand._id) === String(brand[i]._id) ? 'selected' : '' %>
+                  >
+                    <%= brand[i].name %>
+                  </option>
+                <% } %>
               </select>
             </div>
             <div class="mb-4">
@@ -238,30 +251,42 @@
           .getElementById("productAmount")
           .value.trim();
         const stockCount = document.getElementById("stockCount").value.trim();
+        const img1 = document.getElementById("image1").files.length;
+        const img2 = document.getElementById("image2").files.length;
+        const img3 = document.getElementById("image3").files.length;
+        const errMsg = document.getElementById("errMsg");
 
-        if (!productName) {
-          alert("Name field cannot be empty");
+        // if (img1 === 0 || img2 === 0 || img3 === 0) {
+        // errMsg.style.display = "block";
+        // errMsg.style.color = "red";
+        // errMsg.innerHTML = "Must add 3 images";
+        // return;
+        // }
+
+        if (!productName || !/^[a-zA-Z\s]+$/.test(productName)) {
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid name";
           return;
         }
-        if (!/^[a-zA-Z\s]+$/.test(productName)) {
-          alert("Name must contain only alphabets and spaces.");
-          return;
-        }
-        if (!productDescription) {
-          alert("Description field cannot be empty");
-          return;
-        }
-        if (!/^[a-zA-Z\s]+$/.test(productDescription)) {
-          alert("Description must contain only alphabets and spaces.");
+       
+        if (!productDescription || !/^[a-zA-Z\s]+$/.test(productDescription)) {
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid description";
           return;
         }
         if (!productAmount || isNaN(productAmount)) {
-          alert("Please enter a valid amount.");
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid amount";
           return;
         }
         if (!stockCount || isNaN(stockCount)) {
-          alert("Please enter a valid stock count.");
-          return;
+          errMsg.style.display = "block";
+          errMsg.style.color = "red";
+          errMsg.innerHTML = "Enter a valid stock count";
+          return
         }
         document.getElementById("editProductsForm").submit();
       }
@@ -276,6 +301,16 @@
           if (!file) {
             console.error("No file selected");
             return;
+          }
+          const allowedTypes = ["image/jpeg", "image/png"];
+          if (!allowedTypes.includes(file.type)) {
+            errMsg.style.display = "block";
+            errMsg.style.color = "red";
+            errMsg.innerHTML = "Only image files (jpg, png) are allowed.";
+            this.value = "";
+            return;
+          } else {
+            console.log("File is valid:", file.name);
           }
           const reader = new FileReader();
           reader.onload = function (e) {
