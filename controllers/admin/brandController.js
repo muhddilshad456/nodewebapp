@@ -9,7 +9,7 @@ const brandInfo = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const brandData = await Brand.find({
-      name: { $regex: ".*" + search + ".*" },
+      name: { $regex: ".*" + search + ".*", $options: "i" },
     })
       .sort({ createdAt: -1 })
       .skip(skip)

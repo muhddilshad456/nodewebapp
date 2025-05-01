@@ -31,7 +31,6 @@
     <table class="table table-custom">
       <thead>
         <tr>
-          <th>USER IMAGE</th>
           <th>USER NAME</th>
           <th>EMAIL</th>
           <th>PHONE</th>
@@ -42,13 +41,6 @@
       <tbody>
         <% for (let i = 0; i < data.length; i++) { %>
         <tr>
-          <td>
-            <img
-              src="https://via.placeholder.com/40"
-              alt="User"
-              class="rounded-circle img-fluid"
-            />
-          </td>
           <td><%= data[i].name %></td>
           <td><%= data[i].email %></td>
           <td><%= data[i].phone %></td>

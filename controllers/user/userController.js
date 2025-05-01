@@ -203,12 +203,10 @@ const resendOtp = async (req, res) => {
 };
 // forgott password verify otp
 const fgVerifyOtp = async (req, res) => {
-  console.log("===========");
   try {
     console.log("typed otp for forgott password", req.body);
     const { otp } = req.body;
     console.log("Session forgot password OTP:", req.session.userfOtp);
-    console.log("time:", req.session.userfOtp.createdAt);
     const now = Date.now();
     const expired = now - req.session.userfOtp.createdAt;
     if (expired > 60000) {

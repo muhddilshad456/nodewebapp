@@ -47,7 +47,6 @@
           <th scope="col">Piece</th>
           <th scope="col">Amount</th>
           <th scope="col">Last Updated</th>
-          <th scope="col">Status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -63,17 +62,11 @@
             />
           </td>
           <td><%= data[i].productName %></td>
-          <td><%= data[i].category ? data[i].category.description : "" %></td>
+          <td><%= data[i].category ? data[i].category.name : "" %></td>
           <td><%= data[i].stockCount %></td>
           <td><%= data[i].productAmount %></td>
-          <td><%= data[i].lastUpdated %></td>
-          <td>
-            <% if (data[i].isBlocked) { %>
-            <span class="text-danger">✘</span>
-            <% } else { %>
-            <span class="text-success">✔ <%= data[i].status %></span>
-            <% } %>
-          </td>
+          <td><%= data[i].updatedAt.toLocaleDateString("en-CA") %></td>
+
           <td>
             <div class="d-flex">
               <a
