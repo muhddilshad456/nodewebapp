@@ -251,18 +251,8 @@
           .getElementById("productAmount")
           .value.trim();
         const stockCount = document.getElementById("stockCount").value.trim();
-        const img1 = document.getElementById("image1").files.length;
-        const img2 = document.getElementById("image2").files.length;
-        const img3 = document.getElementById("image3").files.length;
         const errMsg = document.getElementById("errMsg");
-
-        // if (img1 === 0 || img2 === 0 || img3 === 0) {
-        // errMsg.style.display = "block";
-        // errMsg.style.color = "red";
-        // errMsg.innerHTML = "Must add 3 images";
-        // return;
-        // }
-
+        
         if (!productName || !/^[a-zA-Z\s]+$/.test(productName)) {
           errMsg.style.display = "block";
           errMsg.style.color = "red";

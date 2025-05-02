@@ -15,7 +15,8 @@ const addToCart = async (req, res) => {
     const quantityNum = Number(quantity);
     const userId = req.session.user;
     const product = await Product.findById(productId);
-    if (!product) {
+
+    if (!product || product.isBlocked) {
       return res.status(404).json({ message: "product not found" });
     }
 

@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
 const cartController = require("../controllers/user/cartController");
+const checkoutController = require("../controllers/user/checkoutController");
 const passport = require("passport");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -53,8 +54,8 @@ router.post("/newpassword", userController.newPassword);
 // user profile
 router.get("/userProfile", userAuth, userController.userProfilePage);
 router.post("/editEmail", userAuth, userController.editEmail);
-router.post("/verify-email-otp", userController.verifyEmailOtp);
-router.post("/resend-email-otp", userController.resendEmailOtp);
+router.post("/verify-email-otp", userAuth, userController.verifyEmailOtp);
+router.post("/resend-email-otp", userAuth, userController.resendEmailOtp);
 router.post("/editPersonalInfo", userAuth, userController.editPersonalInfo);
 router.get("/address", userAuth, userController.addressPage);
 router.get("/addAddress", userAuth, userController.addAddressPage);
@@ -68,5 +69,7 @@ router.post("/changePassword", userAuth, userController.changePassword);
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get("/cart", userAuth, cartController.cartPage);
 router.post("/deleteCartItem", userAuth, cartController.deleteCartItem);
-router.post("/updateCartQuantity", cartController.updateCartQuantity);
+router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
+// check out
+router.get("/checkout", checkoutController.checkoutPage);
 module.exports = router;

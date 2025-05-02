@@ -58,10 +58,7 @@ const editCategory = async (req, res) => {
         .json({ error: "ID, name, and description are required" });
     }
 
-    const existingCategory = await Category.findOne({
-      editName,
-      _id: { $ne: editId },
-    });
+    const existingCategory = await Category.findOne({ name: editName });
     if (existingCategory) {
       return res.status(400).json({ error: "category name already exists" });
     }

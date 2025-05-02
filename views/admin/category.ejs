@@ -296,22 +296,34 @@
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.error || "Network response was not ok");
         }
-        return response.json();
+        return data;
       })
       .then((data) => {
-        alert("Category added successfully");
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("addCategoryModal")
-        );
-        modal.hide();
-        location.reload();
+        Swal.fire({
+          icon: "success",
+          title: "Category added successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("addCategoryModal")
+          );
+          modal.hide();
+          location.reload();
+        });
       })
       .catch((error) => {
-        alert("Error adding category: " + error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Add Category",
+          text: error.message || "An unknown error occurred",
+          confirmButtonText: "OK",
+        });
       });
 
     return false;
@@ -385,22 +397,34 @@
       },
       body: JSON.stringify(data),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.error || "Network response was not ok");
         }
-        return response.json();
+        return data;
       })
       .then((data) => {
-        alert("Category edited successfully");
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("editCategoryModal")
-        );
-        modal.hide();
-        location.reload();
+        Swal.fire({
+          icon: "success",
+          title: "Category edited successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("editCategoryModal")
+          );
+          modal.hide();
+          location.reload();
+        });
       })
       .catch((error) => {
-        alert("Error editing category: " + error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to edit Category",
+          text: error.message || "An unknown error occurred",
+          confirmButtonText: "OK",
+        });
       });
   }
 </script>

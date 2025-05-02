@@ -66,8 +66,7 @@ const editBrand = async (req, res) => {
     }
 
     const existingBrand = await Brand.findOne({
-      editName,
-      _id: { $ne: editId },
+      name: editName,
     });
     if (existingBrand) {
       return res.status(400).json({ error: "brand name already exists" });

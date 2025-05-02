@@ -125,13 +125,13 @@
     </div>
     <div class="col-md-6 highlight">
       <h2 class="text-warning"><%= products.productName %></h2>
-      <p class="display-6 text-success">
-        ₹<%= products.productAmount %>
-        <!-- <span class="text-decoration-line-through text-muted">₹30,000</span>
-        <span class="badge bg-danger">-20% off</span> -->
-      </p>
+      <p class="display-6 text-success">₹<%= products.productAmount %></p>
       <p class="coupon">Coupon Applied: Save ₹2,000!</p>
+      <% if(quantity==0){ %>
+      <h5 style="color: red">Out of stock</h5>
+      <% }else{ %>
       <h5>stock : <%= quantity %></h5>
+      <% } %>
       <div class="mb-3">
         <span class="badge bg-secondary">Graphite</span>
         <span class="badge bg-secondary">Silver</span>
@@ -152,7 +152,7 @@
           </td>
         </tr>
       </table>
-      <!-- <p class="out-of-stock">Out of Stock</p> -->
+
       <button class="btn-custom mt-3" onclick="addToCart('<%= products._id%>')">
         Add to Cart
       </button>
@@ -242,14 +242,18 @@
         quantity: productQuantity,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.message || "Failed to add to cart");
+          return;
+        }
+        alert("Item added to cart successfully");
         window.location.href = "/cart";
-      })
-      .then((data) => {
-        alert("item added to cart successfully");
       })
       .catch((error) => {
         console.log("error in adding cart : ", error);
+        alert("Something went wrong. Please try again.");
       });
   }
 </script>

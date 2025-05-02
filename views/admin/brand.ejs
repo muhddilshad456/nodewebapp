@@ -300,11 +300,12 @@
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.error || "Network response was not ok");
         }
-        return response.json();
+        return data;
       })
       .then((data) => {
         alert("Brand added successfully");
@@ -385,22 +386,35 @@
       },
       body: JSON.stringify(data),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.error || "Network response was not ok");
         }
-        return response.json();
+        return data;
       })
       .then((data) => {
-        alert("Brand edited successfully");
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("editBrandModal")
-        );
-        modal.hide();
-        location.reload();
+        Swal.fire({
+          icon: "success",
+          title: "Brand Editted Successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("editBrandModal")
+          );
+          modal.hide();
+          location.reload();
+        });
       })
+
       .catch((error) => {
-        alert("Error editing brand: " + error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Edit Brand",
+          text: error.message || "An unknown error occurred",
+          confirmButtonText: "OK",
+        });
       });
   }
 </script>
