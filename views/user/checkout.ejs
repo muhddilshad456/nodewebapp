@@ -4,146 +4,191 @@
   body {
     font-family: "Poppins", sans-serif;
     background-color: #f8f9fa;
+    margin: 0;
   }
-  /* Navbar */
-  .navbar {
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 1rem 0;
-  }
-  .navbar-brand img {
-    width: 40px;
-  }
-  .navbar-nav .nav-link {
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s ease;
-  }
-  .navbar-nav .nav-link:hover {
-    color: #007bff;
+
+  /* Checkout Container */
+  .checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 15px;
   }
   /* Checkout Heading */
-  .header-text {
+  .checkout-header {
     font-size: 2.5rem;
-    font-weight: 700;
-    color: #000;
+    color: #4a2c0f;
     text-align: center;
-    margin: 2rem 0;
-    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 600;
     letter-spacing: 1px;
   }
   /* Section Titles */
   .section-title {
-    font-weight: 600;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     color: #333;
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 20px;
   }
   /* Address Section */
-  .address-list {
-    list-style: none;
-    padding: 0;
-  }
-  .address-item {
+  .address-section {
     background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 20px;
   }
-  .address-item:hover {
-    border-color: #007bff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-  .address-item input[type="radio"] {
-    margin-right: 0.5rem;
-  }
-  .address-item label {
-    cursor: pointer;
+  .address-select {
     width: 100%;
+    background-color: #f1f3f5;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
     color: #333;
     font-weight: 500;
+    transition: border-color 0.3s ease;
+  }
+  .address-select:hover,
+  .address-select:focus {
+    border-color: #0d6efd;
+    outline: none;
   }
   .address-highlight {
     color: #ff4500;
     font-weight: 600;
   }
   .delivery-info {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 1rem;
+    color: #555;
+    font-size: 1rem;
+    margin-top: 10px;
   }
-  .cart-details {
+  /* Payment Section */
+  .payment-section {
     background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+  }
+  .payment-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+  }
+  .payment-item {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+  }
+  .payment-item:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  .payment-item input[type="radio"] {
+    display: none;
+  }
+  .payment-item input[type="radio"]:checked + label {
+    background-color: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+  }
+  .payment-item label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+    border-radius: 20px;
+  }
+  .payment-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+  }
+  /* Order Summary Section */
+  .order-summary {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
   }
   .cart-item {
     display: flex;
     align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
     border-bottom: 1px solid #eee;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+  }
+  .cart-product {
+    display: flex;
+    flex-direction: column;
   }
   .cart-item img {
-    width: 70px;
+    width: 80px;
     border-radius: 5px;
-    margin-right: 1rem;
+    margin-right: 15px;
   }
   .cart-item span {
     font-weight: 500;
     color: #333;
-  }
-  .cart-total h6 {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 1rem;
+    font-size: 1rem;
   }
   .cart-total p {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
-    color: #666;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1rem;
   }
   .cart-total p strong {
-    color: #333;
-  }
-  .btn-continue {
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 25px;
-    padding: 0.75rem;
+    color: #212529;
     font-weight: 600;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease;
   }
-  .btn-continue:hover {
-    background-color: #0056b3;
-  }
-  .footer {
-    background-color: #1a1a1a;
+  /* Continue Button */
+  .checkout-btn {
+    background-color: #212529;
     color: #fff;
-    padding: 3rem 0;
-    margin-top: 3rem;
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+  }
+  .checkout-btn:hover {
+    background-color: #343a40;
+  }
+  /* Footer */
+  .footer {
+    background-color: #212529;
+    color: #fff;
+    padding: 30px 0;
+    margin-top: 30px;
   }
   .footer h6 {
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
     text-transform: uppercase;
+    font-size: 1rem;
   }
   .footer p,
   .footer a {
     color: #ccc;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 10px;
   }
   .footer a:hover {
-    color: #007bff;
+    color: #0d6efd;
   }
   .footer .input-group {
     max-width: 300px;
@@ -152,77 +197,186 @@
     background-color: #333;
     border: none;
     color: #fff;
+    font-size: 1rem;
   }
   .footer .input-group button {
-    background-color: #007bff;
+    background-color: #0d6efd;
     border: none;
+    font-size: 1rem;
   }
   .footer .qr-code img {
     width: 80px;
-    margin-right: 0.5rem;
+    margin-right: 10px;
+  }
+  /* Responsive Design */
+  @media (max-width: 767px) {
+    .address-section,
+    .payment-section,
+    .order-summary {
+      margin-bottom: 20px;
+    }
   }
 </style>
 <body>
   <!-- Checkout Heading -->
-  <div class="container-fluid">
-    <div class="header-text">Checkout</div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container my-5">
-    <div class="row">
-      <!-- Left Section: Select Address -->
-      <div class="col-md-8">
-        <h5 class="section-title">Select Address</h5>
-        <form>
-          <ul class="address-list">
-            <li class="address-item">
-              <label>
-                <input type="radio" name="address" value="address1" checked />
-                <span class="address-highlight">Nijes Tp</span><br />
-                Kozhisseri Malappuram Kerala
-              </label>
-            </li>
-            <li class="address-item">
-              <label>
-                <input type="radio" name="address" value="address2" />
-                Shamveel P<br />
-                Kallikavu Malappuram Kerala
-              </label>
-            </li>
-            <li class="address-item">
-              <label>
-                <input type="radio" name="address" value="address3" />
-                Shafeeh Kp<br />
-                Payyoli Kozhikode Kerala
-              </label>
-            </li>
-          </ul>
-        </form>
-        <p class="delivery-info">
-          Estimated Delivery Date<br />Monday, 13 12:00 - 16:00
-        </p>
+  <div class="checkout-container">
+    <form id="placeOrder">
+      <div class="text-center mb-4">
+        <h1 class="checkout-header">CHECKOUT</h1>
       </div>
-
-      <!-- Right Section: Confirm Details -->
-      <div class="col-md-4">
-        <h5 class="section-title">Confirm Details</h5>
-        <div class="cart-details">
-          <div class="cart-item">
-            <img src="item-image.jpg" alt="Item" />
-            <span>Item</span>
+      <div class="row">
+        <!-- Left Column: Address and Payment Sections -->
+        <div class="col-md-6">
+          <!-- Address Section -->
+          <div class="address-section">
+            <h4 class="section-title">Delivery Address</h4>
+            <% if(address.address.length==0){ %>
+            <h4 style="color: cadetblue">No address found</h4>
+            <% }else{ %>
+            <select class="address-select" name="address" id="address">
+              <% address.address.forEach((data)=>{ %>
+              <option value="<%= data._id %>">
+                <%= data.name %> - <%= data.city %>,<%= data.streetAddress
+                %>,<%= data.postcode %>,<%= data.state %>,<%= data.phone %>,<%=
+                data.altPhone %>
+              </option>
+              <% }) %>
+            </select>
+            <% } %>
+            <p class="delivery-info">
+              Estimated Delivery: Monday, 13 12:00 - 16:00
+            </p>
           </div>
-          <div class="cart-total">
-            <h6>Cart Total</h6>
-            <p><span>Subtotal</span> <span>₹34,495</span></p>
-            <p><span>Delivery</span> <span>₹0.00</span></p>
-            <p><span>Discount</span> <span>₹0.00</span></p>
-            <p><strong>Total</strong> <strong>₹34,495</strong></p>
+
+          <!-- Payment Section -->
+          <div class="payment-section">
+            <h4 class="section-title">Payment Method</h4>
+            <ul class="payment-list">
+              <li class="payment-item">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="card"
+                  id="card"
+                  checked
+                />
+                <label for="card">
+                  <img
+                    src="https://img.icons8.com/color/24/000000/visa.png"
+                    class="payment-icon"
+                    alt="Card"
+                  />
+                  Card
+                </label>
+              </li>
+              <li class="payment-item">
+                <input type="radio" name="payment" value="upi" id="upi" />
+                <label for="upi">
+                  <img
+                    src="https://img.icons8.com/color/24/000000/google-pay.png"
+                    class="payment-icon"
+                    alt="UPI"
+                  />
+                  UPI
+                </label>
+              </li>
+              <li class="payment-item">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="netbanking"
+                  id="netbanking"
+                />
+                <label for="netbanking">
+                  <img
+                    src="https://img.icons8.com/color/24/000000/bank.png"
+                    class="payment-icon"
+                    alt="Net Banking"
+                  />
+                  Banking
+                </label>
+              </li>
+              <li class="payment-item">
+                <input type="radio" name="payment" value="cod" id="cod" />
+                <label for="cod">
+                  <img
+                    src="https://img.icons8.com/color/24/000000/cash.png"
+                    class="payment-icon"
+                    alt="Cash"
+                  />
+                  COD
+                </label>
+              </li>
+            </ul>
           </div>
         </div>
-        <button class="btn btn-continue mt-3 w-100">Continue</button>
+
+        <!-- Right Column: Order Summary -->
+        <div class="col-md-6">
+          <div class="order-summary">
+            <h4 class="section-title">Order Summary</h4>
+            <div class="cart-item">
+              <% cart.items.forEach((item)=>{ %>
+              <div class="cart-product">
+                <img src="<%= item.productId.productImage[0] %>" alt="Item" />
+                <span><%= item.productId.productName %></span>
+              </div>
+              <% }) %>
+            </div>
+            <div class="cart-total">
+              <p>
+                <span>Subtotal</span>
+                <span>₹<%= cart ? cart.cartTotal : 0 %></span>
+              </p>
+              <p><span>Delivery</span> <span>₹0.00</span></p>
+              <p><span>Discount</span> <span>₹0.00</span></p>
+              <p>
+                <strong>Total</strong>
+                <strong>₹<%= cart ? cart.cartTotal : 0 %></strong>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <button class="btn checkout-btn">Continue</button>
+    </form>
   </div>
-  <%-include("../../views/partials/user/footer") %>
 </body>
+<script>
+  document
+    .getElementById("placeOrder")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const address = document.getElementById("address").value;
+      const payment = document.querySelector(
+        "input[name='payment']:checked"
+      ).value;
+
+      try {
+        const response = await fetch("/placeOrder", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            addressId: address,
+            payment,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert("Order placed successfully");
+          window.location.href = "/orderSuccess";
+        } else {
+          alert("error", data.message);
+        }
+      } catch (error) {
+        alert("Something went wrong. Please try again.");
+        console.error("Fetch error:", error);
+      }
+    });
+</script>
+<%- include("../../views/partials/user/footer") %>

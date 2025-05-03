@@ -68,15 +68,23 @@ const addToCart = async (req, res) => {
 const cartPage = async (req, res) => {
   try {
     const userId = req.session.user;
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-    cart.cartTotal = cart.items.reduce(
-      (total, item) => total + item.totalPrice,
-      0
-    );
-    await cart.save();
+    let cart = await Cart.findOne({ userId }).populate("items.productId");
+    if (!cart) {
+      cart = {
+        items: [],
+        cartTotal: 0,
+      };
+    } else {
+      cart.cartTotal = cart.items.reduce(
+        (total, item) => total + item.totalPrice,
+        0
+      );
+      await cart.save();
+    }
+
     res.render("cart", { cart });
   } catch (error) {
-    console.log("error from cart page rendering");
+    console.log("error from cart page rendering", error);
   }
 };
 

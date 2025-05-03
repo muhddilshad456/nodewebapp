@@ -71,5 +71,8 @@ router.get("/cart", userAuth, cartController.cartPage);
 router.post("/deleteCartItem", userAuth, cartController.deleteCartItem);
 router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
 // check out
-router.get("/checkout", checkoutController.checkoutPage);
+router.get("/checkout", userAuth, checkoutController.checkoutPage);
+router.post("/placeOrder", checkoutController.placeOrder);
+// order success page
+router.get("/orderSuccess", checkoutController.orderSuccessPage);
 module.exports = router;

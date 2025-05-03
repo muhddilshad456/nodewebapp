@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Shcema } = mongoose;
+const { Schema } = mongoose;
 const { v4: uuidv4 } = require("uuid");
 
 const orderSchema = new Schema({
@@ -10,8 +10,8 @@ const orderSchema = new Schema({
   },
   orderedItems: [
     {
-      product: {
-        type: Schema.Types.objectId,
+      productId: {
+        type: Schema.Types.ObjectId,
         ref: "Product",
         required: true,
       },
@@ -19,30 +19,48 @@ const orderSchema = new Schema({
         type: Number,
         required: true,
       },
-      type: Number,
-      default: 0,
+      price: {
+        type: Number,
+        required: true,
+      },
+      totalPrice: {
+        type: Number,
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ["Placed", "Delivered", "Returned", "Cancelled"],
+        default: "Placed",
+      },
+      returnReason: {
+        type: String,
+        default: "",
+      },
+      returnRequestedAt: {
+        type: Date,
+      },
     },
   ],
-  totalPrice: {
+  totalAmount: {
     type: Number,
     required: true,
   },
-  discount: {
-    type: Number,
-    default: 0,
-  },
-  finalAmound: {
-    type: Number,
-    required: true,
-  },
+  // discount: {
+  //   type: Number,
+  //   default: 0,
+  // },
+  // finalAmound: {
+  //   type: Number,
+  //   required: true,
+  // },
   address: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Address",
     required: true,
   },
-  invoiceDate: {
-    type: Date,
-  },
+  // invoiceDate: {
+  //   type: Date,
+  // },
   status: {
     type: String,
     required: true,
@@ -61,10 +79,10 @@ const orderSchema = new Schema({
     default: Date.now,
     required: true,
   },
-  couppenApplied: {
-    type: Boolean,
-    default: false,
-  },
+  // couppenApplied: {
+  //   type: Boolean,
+  //   default: false,
+  // },
 });
 
 const Order = mongoose.model("Order", orderSchema);

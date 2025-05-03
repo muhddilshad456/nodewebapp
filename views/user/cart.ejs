@@ -196,7 +196,7 @@
       <p>Delivery: ₹0.00</p>
       <p>Discount: ₹0.00</p>
       <hr />
-      <h5>TOTAL: ₹<%= cart.cartTotal %></h5>
+      <h5 id="cartTotal">TOTAL: ₹<%= cart.cartTotal %></h5>
       <div class="input-group mt-3">
         <input
           type="text"
@@ -281,6 +281,9 @@
         document.getElementById(
           "subTotal"
         ).textContent = `Subtotal: ₹${data.cartTotal}`;
+        document.getElementById(
+          "cartTotal"
+        ).textContent = `TOTAL:₹${data.cartTotal}`;
         console.log("Quantity updated successfully");
       })
       .catch((error) => {
