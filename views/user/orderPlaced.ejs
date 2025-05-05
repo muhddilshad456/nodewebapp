@@ -186,6 +186,42 @@
           border-width: 4px;
         }
       }
+
+      .order-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-family: "Poppins", sans-serif;
+      }
+      .order-table th,
+      .order-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      .order-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+      }
+      .order-table td {
+        color: #555;
+      }
+      .order-table img {
+        width: 50px;
+        height: auto;
+        border-radius: 5px;
+      }
+      @media (max-width: 767px) {
+        .order-table th,
+        .order-table td {
+          padding: 8px;
+          font-size: 0.9rem;
+        }
+        .order-table img {
+          width: 40px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -205,16 +241,47 @@
           <div class="order-details">
             <h4 class="section-title">Order Details</h4>
             <div class="order-item">
-              <img src="item-image.jpg" alt="Titan Edge Ceramic Quartz" />
-              <span>Titan Edge Ceramic Quartz (Qty: 1)</span>
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% order.orderedItems.forEach((item) => { %>
+                  <tr>
+                    <td>
+                      <img
+                        src="<%= item.productId.productImage[0] %>"
+                        alt="<%= item.productId.productName %>"
+                      />
+                    </td>
+                    <td><%= item.productId.productName %></td>
+                    <td><%= item.quantity %></td>
+                    <td>₹<%= item.totalPrice %></td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
             </div>
             <div class="order-total">
-              <p><span>Subtotal</span> <span>₹34,495</span></p>
+              <p>
+                <span>Subtotal</span> <span>₹<%= order.totalAmount %></span>
+              </p>
               <p><span>Delivery</span> <span>₹0.00</span></p>
               <p><span>Discount</span> <span>₹0.00</span></p>
-              <p><strong>Total</strong> <strong>₹34,495</strong></p>
-              <p><strong>Order ID</strong> <span>ORD123456789</span></p>
-              <p><strong>Order Date</strong> <span>May 3, 2025</span></p>
+              <p>
+                <strong>Total</strong>
+                <strong>₹<%= order.totalAmount %></strong>
+              </p>
+              <p><strong>Order ID</strong> <span><%= order.orderId %></span></p>
+              <p>
+                <strong>Order Date</strong>
+                <span><%= order.createdOn.toISOString().slice(0, 10); %></span>
+              </p>
               <p>
                 <strong>Estimated Delivery</strong>
                 <span>Monday, 13 12:00 - 16:00</span>
@@ -227,15 +294,24 @@
         <div class="col-md-6">
           <div class="address-details">
             <h4 class="section-title">Delivery Address</h4>
-            <p><strong>Name</strong> <span>Nijes Tp</span></p>
+            <p>
+              <strong>Name</strong>
+              <span><%=address.name %></span>
+            </p>
             <p>
               <strong>Address</strong>
-              <span>Kozhisseri, Malappuram, Kerala, 676501</span>
+              <span>
+                <%= address.streetAddress %>, <%= address.appartment %>, <%=
+                address.postcode %>, <%= address.city %>,<%= address.state
+                %>,<%= address.phone %>
+              </span>
             </p>
           </div>
           <div class="payment-details">
             <h4 class="section-title">Payment Method</h4>
-            <p><strong>Method</strong> <span>Card</span></p>
+            <p>
+              <strong>Method</strong> <span><%= order.paymentMethod %></span>
+            </p>
           </div>
         </div>
       </div>

@@ -72,7 +72,7 @@ router.post("/deleteCartItem", userAuth, cartController.deleteCartItem);
 router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
 // check out
 router.get("/checkout", userAuth, checkoutController.checkoutPage);
-router.post("/placeOrder", checkoutController.placeOrder);
+router.post("/placeOrder", userAuth, checkoutController.placeOrder);
 // order success page
-router.get("/orderSuccess", checkoutController.orderSuccessPage);
+router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
 module.exports = router;

@@ -29,7 +29,7 @@ const orderSchema = new Schema({
       },
       status: {
         type: String,
-        enum: ["Placed", "Delivered", "Returned", "Cancelled"],
+        enum: ["Delivered", "Returned", "Cancelled"],
         default: "Placed",
       },
       returnReason: {
@@ -65,19 +65,24 @@ const orderSchema = new Schema({
     type: String,
     required: true,
     enum: [
-      "pending",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-      "return requist",
-      "returned",
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+      "Return requist",
+      "Returned",
     ],
   },
   createdOn: {
     type: Date,
     default: Date.now,
     required: true,
+  },
+  paymentMethod: {
+    type: String,
+    required: true,
+    enum: ["card", "upi", "netbanking", "cod"],
   },
   // couppenApplied: {
   //   type: Boolean,
