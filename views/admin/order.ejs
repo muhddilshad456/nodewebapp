@@ -1,0 +1,268 @@
+<%- include("../../views/partials/admin/header") %>
+<style>
+  body {
+    background-color: #1a1a1a;
+    margin: 0;
+  }
+  .sidebar {
+    height: 100vh;
+    background-color: #212529;
+    padding-top: 20px;
+    position: fixed;
+    width: 200px;
+  }
+  .main-content {
+    margin-left: 200px;
+    padding: 20px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    margin-top: 0;
+    padding-top: 80px;
+  }
+  .table-actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .filter-sort-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .filter-form,
+  .sort-form {
+    margin: 0;
+  }
+  .filter-group,
+  .sort-group {
+    display: flex;
+    align-items: center;
+    width: 250px;
+    max-width: 100%;
+    position: relative;
+  }
+  .filter-group select,
+  .sort-group select {
+    height: 38px;
+    font-size: 0.875rem;
+    background-color: #343a40;
+    color: #fff;
+    border: 1px solid #495057;
+    border-radius: 0.25rem;
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+    appearance: none;
+    width: 100%;
+  }
+  .filter-group select:focus,
+  .sort-group select:focus {
+    background-color: #343a40;
+    color: #fff;
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+  }
+  .filter-group::after,
+  .sort-group::after {
+    content: "\25BC";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 0.75rem;
+    pointer-events: none;
+  }
+  .search-form .input-group {
+    width: 300px;
+    max-width: 100%;
+  }
+  h2 {
+    color: #fff;
+  }
+  .table {
+    background-color: #212529;
+    color: #fff;
+    border-collapse: collapse;
+  }
+  .table th {
+    background-color: #343a40;
+    color: #fff;
+    border: none;
+    border-bottom: 1px solid #495057;
+    padding: 10px;
+  }
+  .table td {
+    vertical-align: middle;
+    background-color: #212529;
+    color: #fff;
+    border: none;
+    border-bottom: 0.5px solid #343a40;
+    padding: 10px;
+  }
+  .table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .table-responsive {
+    position: relative;
+    overflow: visible;
+  }
+  .dropdown {
+    position: relative;
+  }
+  .dropdown-menu {
+    background-color: #343a40;
+    z-index: 1050;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0;
+  }
+  .dropdown-item {
+    color: #fff;
+  }
+  .dropdown-item:hover {
+    background-color: #495057;
+    color: #fff;
+  }
+  .status-delivered {
+    color: #28a745;
+  }
+  .status-cancelled {
+    color: #dc3545;
+  }
+  .status-on-delivery {
+    color: #ffc107;
+  }
+  .action-delete {
+    color: #dc3545;
+  }
+  .pagination .page-link {
+    background-color: #343a40;
+    color: #fff;
+    border: 1px solid #495057;
+  }
+  .pagination .page-item.active .page-link {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: #fff;
+  }
+  .pagination .page-link:hover {
+    background-color: #495057;
+    color: #fff;
+  }
+</style>
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Orders Table -->
+  <h2>Orders</h2>
+  <!-- Table Actions (Search, Filter, Sort) -->
+  <div class="table-actions-container">
+    <!-- Filter and Sort Container -->
+    <form action="/admin/orders" method="get" id="filterSortForm" class="filter-form">
+    <div class="filter-sort-container">
+        <div class="filter-group">
+          <select
+            name="filter"
+            id="status"
+            class="form-control"
+            onchange="document.getElementById('filterSortForm').submit()"
+          >
+          <option value="">Filter by Status</option>
+          <option value="Delivered" <%= filter === 'Delivered' ? 'selected' : '' %>>DELIVERED</option>
+          <option value="Cancelled" <%= filter === 'Cancelled' ? 'selected' : '' %>>CANCELLED</option>
+          <option value="Pending" <%= filter === 'Pending' ? 'selected' : '' %>>ON DELIVERY</option>
+          </select>
+        </div>
+      <!-- Sort Form -->
+        <div class="sort-group">
+          <select
+            name="sort"
+            id="sort"
+            class="form-control"
+            onchange="document.getElementById('filterSortForm').submit()"
+          >
+          <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
+          <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+          </select>
+        </div>
+    </div>
+</form>
+
+    <!-- Search Form -->
+    <div class="search-form">
+      <form action="/admin/orders">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            name="search"
+            id="searchInput"
+            placeholder="Search for User Name"
+            aria-label="Search"
+          />
+          <button class="btn btn-dark" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            onclick="clearSearch()"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>USER NAME</th>
+          <th>ORDER ID</th>
+          <th>ADDRESS</th>
+          <th>AMOUNT</th>
+          <th>ORDER DATE</th>
+          <th>STATUS</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.forEach((item)=>{ %>
+        <tr>
+          <td><%= item.address.name %></td>
+          <td><%= item.orderId %></td>
+          <td><%= item.address.streetAddress %>,<%= item.address.city %></td>
+          <td>₹<%= item.totalAmount %></td>
+          <td><%= item.createdOn.toISOString().slice(0, 10); %></td>
+          <td><%= item.status %></td>
+          <td><a href="/admin/orderDetailes"><i class="bi bi-pencil action-pencil"></i></a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-start">
+    <nav aria-label="Page navigation" class="ms-auto">
+      <ul class="pagination">
+        <% for(let i=1;i<=totalPages;i++){ %>
+        <li class="page-item <%=(i===currentPage) ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+</div>
+<script>
+    function clearSearch() {
+      const searchInput = document.getElementById("searchInput");
+      searchInput.value = "";
+      window.location.href = "/admin/orders";
+    }
+  </script>
+<%- include("../../views/partials/admin/footer") %>

@@ -49,7 +49,7 @@ const placeOrder = async (req, res) => {
       { userId, "address._id": addressId },
       { "address.$": 1 }
     );
-    let address = result?.address?.[0]?._id;
+    let address = result?.address?.[0];
 
     if (!address) {
       return res
@@ -97,19 +97,9 @@ const orderSuccessPage = async (req, res) => {
     if (!order) {
       return res.status(404).send("Order not found.");
     }
-    const addressDoc = await Address.findOne(
-      { userId, "address._id": order.address },
-      { "address.$": 1 }
-    );
-    const address = addressDoc?.address?.[0];
-
-    if (!address) {
-      return res.status(404).send("Address not found.");
-    }
 
     res.render("orderPlaced", {
       order,
-      address,
     });
   } catch (error) {
     console.error("Error rendering order success page:", error);

@@ -296,14 +296,14 @@
             <h4 class="section-title">Delivery Address</h4>
             <p>
               <strong>Name</strong>
-              <span><%=address.name %></span>
+              <span><%=order.address.name %></span>
             </p>
             <p>
               <strong>Address</strong>
               <span>
-                <%= address.streetAddress %>, <%= address.appartment %>, <%=
-                address.postcode %>, <%= address.city %>,<%= address.state
-                %>,<%= address.phone %>
+                <%= order.address.streetAddress %>, <%= order.address.appartment
+                %>, <%= order.address.postcode %>, <%= order.address.city %>,<%=
+                order.address.state %>,<%= order.address.phone %>
               </span>
             </p>
           </div>

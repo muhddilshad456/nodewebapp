@@ -5,6 +5,7 @@ const costumerController = require("../controllers/admin/costumerController");
 const categoryController = require("../controllers/admin/categoryController");
 const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
+const orderController = require("../controllers/admin/orderController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 // login
 router.get("/login", adminController.loadLogin);
@@ -50,5 +51,9 @@ router.post(
 
 router.get("/blockProducts", adminAuth, productController.productBlock);
 router.get("/unblockProducts", adminAuth, productController.productUnblock);
+
+//order managment
+router.get("/orders", adminAuth, orderController.orderPage);
+router.get("/orderDetailes", adminAuth, orderController.orderDetailesPage);
 
 module.exports = router;

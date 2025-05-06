@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Details</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .card-header {
+        background-color: #007bff;
+        color: white;
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+      }
+      .btn-primary:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+      }
+      .btn-verify {
+        background-color: #ffc107;
+        border-color: #ffc107;
+      }
+      .btn-verify:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+      }
+      .table {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .table th {
+        background-color: #e9ecef;
+        font-weight: 500;
+      }
+      h5 {
+        color: #343a40;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container my-5">
+      <!-- Order Details Header -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="mb-0">Order Details</h2>
+        </div>
+        <div class="card-body">
+          <!-- Order ID, Date, and Status -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Order ID:</strong> 0000033-767678</p>
+              <p class="mb-1"><strong>Order Date:</strong> 2025-04-03</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <div class="d-inline-block">
+                <select
+                  class="form-select d-inline-block w-auto me-2"
+                  id="statusSelect"
+                >
+                  <option selected>CANCELLED</option>
+                  <option>PROCESSING</option>
+                  <option>SHIPPED</option>
+                  <option>DELIVERED</option>
+                </select>
+                <button class="btn btn-primary" id="updateStatusBtn" disabled>
+                  Update Status
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Return Reason Verification -->
+          <div class="mb-4">
+            <h5 class="mb-3">Return Reason (if applicable)</h5>
+            <textarea
+              class="form-control mb-3"
+              id="returnReason"
+              rows="3"
+              placeholder="Enter the reason for return (e.g., defective product, wrong item, etc.)"
+            ></textarea>
+            <button class="btn btn-verify" id="verifyReturnBtn">
+              Verify Return Reason
+            </button>
+          </div>
+
+          <!-- Delivery Address and Payment Summary -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5 class="mb-3">Delivery Address</h5>
+              <p class="mb-1">Dilshad Kozhikode</p>
+              <p class="mb-1">Panthareenkevu, 673019</p>
+            </div>
+            <div class="col-md-6">
+              <h5 class="mb-3">Payment Summary</h5>
+              <p class="mb-1"><strong>Subtotal:</strong> Rs.354.00</p>
+              <p class="mb-1"><strong>Shipping:</strong> Rs.0.00</p>
+              <p class="mb-1"><strong>Discount:</strong> Rs.0.00</p>
+              <p class="mb-1"><strong>Total:</strong> Rs.354.00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">Order Items</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Titan</td>
+                <td>354</td>
+                <td>1</td>
+                <td>354</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Payment Records -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">Payment Records</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Payment</th>
+                <th>Tran.ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12/3/2025</td>
+                <td>354</td>
+                <td>COD</td>
+                <td>214343442</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document
+        .getElementById("verifyReturnBtn")
+        .addEventListener("click", function () {
+          const returnReason = document
+            .getElementById("returnReason")
+            .value.trim();
+          const updateStatusBtn = document.getElementById("updateStatusBtn");
+
+          if (returnReason) {
+            updateStatusBtn.disabled = false;
+            alert("Return reason verified successfully!");
+          } else {
+            alert("Please enter a return reason before verifying.");
+          }
+        });
+
+      document
+        .getElementById("updateStatusBtn")
+        .addEventListener("click", function () {
+          const selectedStatus = document.getElementById("statusSelect").value;
+          alert(`Status updated to: ${selectedStatus}`);
+        });
+    </script>
+  </body>
+</html>

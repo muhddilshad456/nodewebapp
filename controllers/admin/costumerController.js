@@ -36,7 +36,9 @@ const costumerInfo = async (req, res) => {
       totalPages,
       currentPage: parseInt(page),
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from costomer info", error);
+  }
 };
 
 const customerBlock = async (req, res) => {
