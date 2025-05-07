@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Details</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts for better typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        font-family: "Roboto", sans-serif;
+        padding: 20px;
+      }
+      .order-details-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .order-header {
+        font-size: 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+      .section-header {
+        font-size: 1.2rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 5px;
+      }
+      .product-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .product-table th,
+      .product-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+      }
+      .product-table th {
+        background-color: #000000;
+        color: #ffffff;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+      }
+      .product-table tr:last-child td {
+        border-bottom: none;
+      }
+      .product-table img {
+        width: 50px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+      }
+      .status-delivered,
+      .status-shipped {
+        background-color: #000000;
+        color: #ffffff;
+        font-size: 0.8rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        display: inline-block;
+      }
+      .order-status {
+        margin-top: 20px;
+      }
+      .order-status .highlighted-status {
+        background-color: #000000;
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 6px 16px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        display: inline-block;
+      }
+      .address-box {
+        background-color: #f8f8f8;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #e0e0e0;
+        margin-top: 20px;
+      }
+      .total-box {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+      }
+      .total-box p {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+      }
+      .total-box .total {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      .btn-cancel {
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        text-transform: uppercase;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      .btn-cancel:hover {
+        background-color: #333333;
+      }
+      .btn-go-back {
+        color: #000000;
+        text-decoration: underline;
+        font-size: 0.9rem;
+      }
+      .btn-go-back:hover {
+        color: #333333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="order-details-container">
+      <h5 class="order-header">Order Details</h5>
+
+      <!-- Order Summary Section (Product Table) -->
+      <div class="order-summary">
+        <h6 class="section-header">Order #41_123456</h6>
+        <div class="table-responsive">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <img src="" alt="Watch" />
+                </td>
+                <td>Classic Chronograph Watch</td>
+                <td>1</td>
+                <td>₹34,485</td>
+                <td><span class="status-delivered">Delivered</span></td>
+                <td>
+                  <button class="btn-cancel">Cancel</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img
+                    src="https://via.placeholder.com/50?text=Bracelet"
+                    alt="Bracelet"
+                  />
+                </td>
+                <td>Leather Bracelet</td>
+                <td>2</td>
+                <td>₹5,000</td>
+                <td><span class="status-delivered">Delivered</span></td>
+                <td>
+                  <button class="btn-cancel">Cancel</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Order Status Section (Single Line, Highlighted) -->
+      <div class="order-status">
+        <h6 class="section-header">Order Status</h6>
+        <span class="highlighted-status">Shipped</span>
+      </div>
+
+      <!-- Address Section -->
+      <div class="address-box">
+        <h6 class="section-header">Address</h6>
+        <p>789 Crescent Rd, Al Qudra, Dubai, 00000, United Arab Emirates</p>
+      </div>
+
+      <!-- Total Amount Section -->
+      <div class="total-box">
+        <h6 class="section-header">Total Amount</h6>
+        <p><strong>Subtotal</strong> ₹39,485</p>
+        <p><strong>Discount</strong> ₹0.00</p>
+        <p class="total"><strong>Total</strong> ₹39,485</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-between mt-3">
+        <a href="#" class="btn-go-back">Go to page</a>
+        <button class="btn-cancel">Cancel Order</button>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

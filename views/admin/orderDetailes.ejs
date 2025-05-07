@@ -53,6 +53,9 @@
         color: #343a40;
         font-weight: 600;
       }
+      .action-select {
+        width: 150px;
+      }
     </style>
   </head>
   <body>
@@ -66,21 +69,26 @@
           <!-- Order ID, Date, and Status -->
           <div class="row mb-4">
             <div class="col-md-6">
-              <p class="mb-1"><strong>Order ID:</strong> 0000033-767678</p>
-              <p class="mb-1"><strong>Order Date:</strong> 2025-04-03</p>
+              <p class="mb-1"><strong>Order ID:</strong><%= order.orderId %></p>
+              <p class="mb-1">
+                <strong>Order Date:</strong><%=
+                order.createdOn.toISOString().slice(0, 10); %>
+              </p>
             </div>
             <div class="col-md-6 text-md-end">
               <div class="d-inline-block">
                 <select
                   class="form-select d-inline-block w-auto me-2"
-                  id="statusSelect"
+                  id="selectStatus"
+                  data-order-id="<%= order._id %>"
+                  <%= order.status==="Delivered" ? "disabled" : "" %>
                 >
-                  <option selected>CANCELLED</option>
-                  <option>PROCESSING</option>
-                  <option>SHIPPED</option>
-                  <option>DELIVERED</option>
+                  <option value="Cancelled" <%= order.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
+                  <option value="Pending" <%= order.status==="Pending" ? "selected" : "" %>>PROCESSING</option>
+                  <option value="Shipped" <%= order.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
+                  <option value="Delivered" <%= order.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
                 </select>
-                <button class="btn btn-primary" id="updateStatusBtn" disabled>
+                <button class="btn btn-primary" id="updateStatusBtn" <%= order.status==="Delivered" ? "disabled" : "" %>>
                   Update Status
                 </button>
               </div>
@@ -94,10 +102,10 @@
               class="form-control mb-3"
               id="returnReason"
               rows="3"
-              placeholder="Enter the reason for return (e.g., defective product, wrong item, etc.)"
+              placeholder="Enter the reason for return/cancellation (e.g., defective product, wrong item, etc.)"
             ></textarea>
             <button class="btn btn-verify" id="verifyReturnBtn">
-              Verify Return Reason
+              Verify Reason
             </button>
           </div>
 
@@ -105,21 +113,30 @@
           <div class="row mb-4">
             <div class="col-md-6">
               <h5 class="mb-3">Delivery Address</h5>
-              <p class="mb-1">Dilshad Kozhikode</p>
-              <p class="mb-1">Panthareenkevu, 673019</p>
+              <p class="mb-1">
+                <%= order.address.name %>,<%= order.address.appartment %>,<%=
+                order.address.streetAddress %>
+              </p>
+              <p class="mb-1">
+                <%= order.address.postcode %>,<%= order.address.city %>
+              </p>
             </div>
             <div class="col-md-6">
               <h5 class="mb-3">Payment Summary</h5>
-              <p class="mb-1"><strong>Subtotal:</strong> Rs.354.00</p>
-              <p class="mb-1"><strong>Shipping:</strong> Rs.0.00</p>
-              <p class="mb-1"><strong>Discount:</strong> Rs.0.00</p>
-              <p class="mb-1"><strong>Total:</strong> Rs.354.00</p>
+              <p class="mb-1">
+                <strong>Subtotal:</strong> ₹.<%= order.totalAmount %>
+              </p>
+              <p class="mb-1"><strong>Shipping:</strong> ₹.0.00</p>
+              <p class="mb-1"><strong>Discount:</strong> ₹.0.00</p>
+              <p class="mb-1">
+                <strong>Total:</strong> ₹.<%= order.totalAmount %>
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Order Items -->
+      <!-- Order Items with Action Dropdown -->
       <div class="card mb-4">
         <div class="card-body">
           <h5 class="mb-3">Order Items</h5>
@@ -127,18 +144,35 @@
             <thead>
               <tr>
                 <th>Product</th>
+                <th>Image</th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Amount</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
+              <% order.orderedItems.forEach((item)=>{ %>
               <tr>
-                <td>Titan</td>
-                <td>354</td>
-                <td>1</td>
-                <td>354</td>
+                <td><%= item.productId.productName %></td>
+                <td><img src="<%= item.productId.productImage[0] %>" alt="" style="width: 80px; height: auto;"></td>
+                <td><%= item.productId.productAmount %></td>
+                <td><%= item.quantity %></td>
+                <td><%= item.totalPrice %></td>
+                <td>
+                  <select
+                    class="form-select action-select"
+                    id="actionSelect"
+                    disabled
+                  >
+                    <option <%= item.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
+                    <option <%= item.status==="Pending" ? "selected" : "" %>>PENDING</option>
+                    <option <%= item.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
+                    <option <%= item.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
+                  </select>
+                </td>
               </tr>
+              <% }) %>
             </tbody>
           </table>
         </div>
@@ -159,9 +193,9 @@
             </thead>
             <tbody>
               <tr>
-                <td>12/3/2025</td>
-                <td>354</td>
-                <td>COD</td>
+                <td><%= order.createdOn.toISOString().slice(0, 10); %></td>
+                <td>₹<%= order.totalAmount %></td>
+                <td><%= order.paymentMethod %></td>
                 <td>214343442</td>
               </tr>
             </tbody>
@@ -170,30 +204,113 @@
       </div>
     </div>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      document
-        .getElementById("verifyReturnBtn")
-        .addEventListener("click", function () {
-          const returnReason = document
-            .getElementById("returnReason")
-            .value.trim();
-          const updateStatusBtn = document.getElementById("updateStatusBtn");
+      // let isReasonVerified = false;
 
-          if (returnReason) {
-            updateStatusBtn.disabled = false;
-            alert("Return reason verified successfully!");
-          } else {
-            alert("Please enter a return reason before verifying.");
-          }
-        });
+      // document
+      //   .getElementById("verifyReturnBtn")
+      //   .addEventListener("click", function () {
+      //     const returnReason = document
+      //       .getElementById("returnReason")
+      //       .value.trim();
+      //     const updateStatusBtn = document.getElementById("updateStatusBtn");
+      //     const actionSelect = document.getElementById("actionSelect");
 
-      document
-        .getElementById("updateStatusBtn")
-        .addEventListener("click", function () {
-          const selectedStatus = document.getElementById("statusSelect").value;
-          alert(`Status updated to: ${selectedStatus}`);
-        });
+      //     if (returnReason) {
+      //       isReasonVerified = true;
+      //       updateStatusBtn.disabled = false;
+      //       actionSelect.disabled = false;
+      //       alert("Reason verified successfully!");
+      //     } else {
+      //       alert("Please enter a reason before verifying.");
+      //     }
+      //   });
+
+      // document
+      //   .getElementById("updateStatusBtn")
+      //   .addEventListener("click", function () {
+      //     const selectedStatus = document.getElementById("statusSelect").value;
+      //     alert(`Status updated to: ${selectedStatus}`);
+      //   });
+
+      // document
+      //   .getElementById("actionSelect")
+      //   .addEventListener("change", function () {
+      //     const action = this.value;
+      //     if (!isReasonVerified) {
+      //       alert("Please verify the reason first.");
+      //       this.value = "";
+      //       return;
+      //     }
+
+      //     if (action === "return") {
+      //       alert("Return processed successfully for item: Titan");
+      //     } else if (action === "cancel") {
+      //       alert("Item cancelled successfully: Titan");
+      //     }
+      //     this.value = ""; 
+      //   });
+
+        // updating status
+        document.addEventListener("DOMContentLoaded",()=>{
+          const select=document.getElementById("selectStatus")
+          const button=document.getElementById("updateStatusBtn")
+          const originalValue=select.value
+          const orderId=select.dataset.orderId
+
+          select.addEventListener("change",()=>{
+            button.disabled=(select.value===originalValue)
+          })
+
+          button.addEventListener("click",async()=>{
+            const newStatus=select.value
+
+            try {
+              const res=await fetch("/admin/orderStatus",{
+                method:"POST",
+                headers:{
+                  "Content-Type":"application/json"
+                },
+                body:JSON.stringify({orderId,status:newStatus})
+              })
+
+              const response=await res.json()
+
+              if(response.success){
+                Swal.fire({
+                icon: "success",
+                title: "Success!",
+                showConfirmButton:false,
+                timer:1500,
+                text: response.message || "Status updated successfully!"
+                });
+
+                if(newStatus==="Delivered"){
+                  select.disabled=true
+                  button.disabled=true
+                }else{
+                  button.disabled=true
+                }
+              }else{
+                Swal.fire({
+              icon: "error",
+              title: "Update Failed",
+              text: response.message || "Failed to update status."
+             });
+              }
+            } catch (error) {
+              console.error(error);
+              Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Something went wrong while updating the status."
+              });
+            }
+          })
+        })
     </script>
   </body>
 </html>

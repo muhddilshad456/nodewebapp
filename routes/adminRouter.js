@@ -54,6 +54,7 @@ router.get("/unblockProducts", adminAuth, productController.productUnblock);
 
 //order managment
 router.get("/orders", adminAuth, orderController.orderPage);
-router.get("/orderDetailes", adminAuth, orderController.orderDetailesPage);
+router.get("/orderDetailes/:id", adminAuth, orderController.orderDetailesPage);
+router.post("/orderStatus", adminAuth, orderController.orderStatus);
 
 module.exports = router;

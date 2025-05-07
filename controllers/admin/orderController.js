@@ -3,15 +3,10 @@ const Order = require("../../models/orderSchema");
 // order page
 const orderPage = async (req, res) => {
   try {
-    console.log("hihi");
     const search = req.query.search || "";
     const filter = req.query.filter || "";
     const sort = req.query.sort || "newest";
     const page = parseInt(req.query.page) || 1;
-    console.log("search query", search);
-    console.log("filter query", filter);
-    console.log("sort query", sort);
-    console.log("page query", page);
 
     let sortOption = {};
     if (sort === "newest") {
@@ -59,13 +54,46 @@ const orderPage = async (req, res) => {
 
 const orderDetailesPage = async (req, res) => {
   try {
-    res.render("orderDetailes");
+    const orderId = req.params.id;
+    const order = await Order.findOne({ _id: orderId }).populate(
+      "orderedItems.productId"
+    );
+    res.render("orderDetailes", {
+      order,
+    });
   } catch (error) {
     console.log("error from order detailes page", error);
+  }
+};
+
+// updating order status
+
+const orderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
+
+    if (!orderId || !status) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
+    const result = await Order.updateOne({ _id: orderId }, { status });
+    if (result.modifiedCount === 1) {
+      return res.json({
+        success: true,
+        message: "Status updated successfully",
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found or no change made" });
+    }
+  } catch (error) {
+    console.log("error from order status updating ", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 module.exports = {
   orderPage,
   orderDetailesPage,
+  orderStatus,
 };

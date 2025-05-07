@@ -61,14 +61,15 @@ const placeOrder = async (req, res) => {
       quantity: item.quantity,
       price: item.price,
       totalPrice: item.totalPrice,
-      status: "Delivered",
+      status: "Pending",
     }));
     const newOrder = new Order({
       orderedItems,
       totalAmount: cart.cartTotal,
       address,
+      userId,
       paymentMethod: payment,
-      status: "Delivered",
+      status: "Pending",
     });
     await newOrder.save();
     res.json({

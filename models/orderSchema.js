@@ -8,6 +8,11 @@ const orderSchema = new Schema({
     default: () => uuidv4(),
     required: true,
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   orderedItems: [
     {
       productId: {
@@ -29,7 +34,15 @@ const orderSchema = new Schema({
       },
       status: {
         type: String,
-        enum: ["Delivered", "Returned", "Cancelled"],
+        enum: [
+          "Pending",
+          "Processing",
+          "Shipped",
+          "Delivered",
+          "Cancelled",
+          "Return requist",
+          "Returned",
+        ],
         default: "Placed",
       },
       returnReason: {

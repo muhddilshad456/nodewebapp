@@ -3,6 +3,7 @@ const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
+const Order = require("../../models/orderSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -870,6 +871,30 @@ const changePassword = async (req, res) => {
     console.log("error from change passsword  ", error);
   }
 };
+// order listing
+const orderListPage = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const order = await Order.findOne({ userId });
+    res.render("orderListing", { order });
+  } catch (error) {
+    console.log("error from order listing page ", error);
+  }
+};
+
+// order detailes
+const userOrderDetailes = async (req, res) => {
+  try {
+    console.log("profile user order id : ", req.params.id);
+    const orderId = req.params.id;
+    const order = await Order.findOne({ _id: orderId }).populate(
+      "orderedItems.productId"
+    );
+    res.render("userOrderDetailes", { order });
+  } catch (error) {
+    console.log("error from user detailes page", error);
+  }
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -899,4 +924,6 @@ module.exports = {
   deleteAddress,
   changePasswordPage,
   changePassword,
+  orderListPage,
+  userOrderDetailes,
 };

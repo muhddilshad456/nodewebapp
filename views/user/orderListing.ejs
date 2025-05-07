@@ -1,0 +1,186 @@
+<%- include("../../views/partials/user/profileHeader") %>
+
+<style>
+  body {
+    background-color: #f5f5f5;
+    color: #333;
+    font-family: "Roboto", sans-serif;
+  }
+  .navbar {
+    background-color: #1a1a1a;
+    padding: 15px 0;
+  }
+  .navbar-brand img {
+    width: 40px;
+    filter: grayscale(100%);
+  }
+  .navbar-brand h1 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 0;
+  }
+  .navbar-nav .nav-link {
+    color: #ddd !important;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-left: 10px;
+  }
+  .navbar-nav .nav-link:hover {
+    color: #fff !important;
+  }
+  .sidebar {
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    min-height: calc(100vh - 70px); /* Adjust for navbar height */
+    padding: 40px 20px;
+    color: #ddd;
+    border-right: 1px solid #444;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  .sidebar h4 {
+    font-size: 1.3rem;
+    font-weight: 500;
+    padding-left: 15px;
+    text-transform: uppercase;
+    color: #fff;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+  }
+  .sidebar a {
+    color: #ccc;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+  .sidebar a:hover {
+    color: #fff;
+    background-color: #444;
+    transform: translateX(5px);
+  }
+  .sidebar a::before {
+    content: "•";
+    margin-right: 10px;
+    color: #888;
+  }
+  .sidebar a:hover::before {
+    color: #fff;
+  }
+  .main-content {
+    padding: 30px;
+    background-color: #ffffff;
+    min-height: calc(100vh - 70px); /* Adjust for navbar height */
+  }
+  .order-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .order-table th,
+  .order-table td {
+    vertical-align: middle;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .order-table th {
+    background-color: #000000;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  .order-table tr {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+  .order-table tr:hover {
+    background-color: #f5f5f5;
+  }
+  .status-delivered {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 0.8rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+  .table-responsive {
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  h5.text-uppercase {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 10px;
+  }
+  img.product-img {
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #e0e0e0;
+  }
+  .btn-details {
+    background-color: #c7c7c7;
+    color: #000000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+  .btn-details:hover {
+    background-color: #333333;
+    color: #ffffff;
+  }
+</style>
+
+<!-- Orders Table -->
+<div class="col-md-9 main-content">
+  <h5 class="mb-3 text-uppercase">My Orders</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered order-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Total Price</th>
+          <th>Ordered Date</th>
+          <th>Status</th>
+          <th>Payment Type</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= order.orderId %></td>
+          <td>₹<%= order.totalAmount %></td>
+          <td><%= order.createdOn.toISOString().slice(0, 10); %></td>
+          <td><span class="status-delivered"><%= order.status %></span></td>
+          <td><%= order.paymentMethod%></td>
+          <td>
+            <a href="/userOrderDetailes/<%= order._id %>" class="btn-details">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include("../../views/partials/user/profileFooter") %>

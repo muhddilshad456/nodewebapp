@@ -65,6 +65,12 @@ router.post("/editAddress", userAuth, userController.editAddress);
 router.get("/deleteAddress/:id", userAuth, userController.deleteAddress);
 router.get("/changePassword", userAuth, userController.changePasswordPage);
 router.post("/changePassword", userAuth, userController.changePassword);
+router.get("/orderList", userAuth, userController.orderListPage);
+router.get(
+  "/userOrderDetailes/:id",
+  userAuth,
+  userController.userOrderDetailes
+);
 //cart
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get("/cart", userAuth, cartController.cartPage);
