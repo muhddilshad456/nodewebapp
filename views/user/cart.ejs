@@ -168,6 +168,7 @@
                 class="form-control text-center"
                 id="quantity-<%= item._id %>"
                 value="<%=item.quantity %>"
+                data-stock="<%= item.productId.stockCount %>"
                 readonly
               />
               <button
@@ -255,11 +256,20 @@
   function increaseQuantity(itemId) {
     console.log("button click +");
     const quantityInput = document.querySelector(`#quantity-${itemId}`);
+    const maxCount = parseInt(quantityInput.dataset.stock);
     let quantity = parseInt(quantityInput.value);
 
-    quantity += 1;
-    quantityInput.value = quantity;
-    updateQuantity(itemId, quantity);
+    if (quantity < maxCount) {
+      quantity += 1;
+      quantityInput.value = quantity;
+      updateQuantity(itemId, quantity);
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Stock Limit Reached",
+        text: `Only ${maxCount} items in stock.`,
+      });
+    }
   }
 
   function updateQuantity(itemId, quantity) {
@@ -291,4 +301,5 @@
       });
   }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <%- include("../../views/partials/user/footer") %>

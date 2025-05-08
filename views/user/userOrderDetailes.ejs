@@ -148,13 +148,14 @@
 
       <!-- Order Summary Section (Product Table) -->
       <div class="order-summary">
-        <h6 class="section-header">Order #41_123456</h6>
+        <h6 class="section-header"><%= order.orderId %></h6>
         <div class="table-responsive">
           <table class="product-table">
             <thead>
               <tr>
                 <th>Image</th>
                 <th>Name</th>
+                <th>Price</th>
                 <th>Quantity</th>
                 <th>Total Price</th>
                 <th>Status</th>
@@ -162,33 +163,42 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <img src="" alt="Watch" />
-                </td>
-                <td>Classic Chronograph Watch</td>
-                <td>1</td>
-                <td>₹34,485</td>
-                <td><span class="status-delivered">Delivered</span></td>
-                <td>
-                  <button class="btn-cancel">Cancel</button>
-                </td>
-              </tr>
+              <% order.orderedItems.forEach((item)=>{ %>
               <tr>
                 <td>
                   <img
-                    src="https://via.placeholder.com/50?text=Bracelet"
-                    alt="Bracelet"
+                    src="<%= item.productId.productImage[0] %>"
+                    alt="Watch"
                   />
                 </td>
-                <td>Leather Bracelet</td>
-                <td>2</td>
-                <td>₹5,000</td>
-                <td><span class="status-delivered">Delivered</span></td>
+                <td><%= item.productId.productName %></td>
+                <td><%= item.productId.productAmount %></td>
+                <td><%= item.quantity %></td>
+                <td>₹<%= item.totalPrice %></td>
+                <td><span class="status-delivered"><%= item.status%></span></td>
+
                 <td>
-                  <button class="btn-cancel">Cancel</button>
+                  <% if (item.status === 'Pending' || item.status ===
+                  'Processing' ) { %>
+                  <button
+                    class="btn-cancel"
+                    data-order-id="<%= order.orderId %>"
+                  >
+                    Cancel
+                  </button>
+                  <% } else if (item.status === 'Delivered') { %>
+                  <button
+                    class="btn-cancel"
+                    data-order-id="<%= order.orderId %>"
+                  >
+                    Return
+                  </button>
+                  <% } else { %>
+                  <span class="text-muted">Not Available</span>
+                  <% } %>
                 </td>
               </tr>
+              <% }) %>
             </tbody>
           </table>
         </div>
@@ -197,32 +207,155 @@
       <!-- Order Status Section (Single Line, Highlighted) -->
       <div class="order-status">
         <h6 class="section-header">Order Status</h6>
-        <span class="highlighted-status">Shipped</span>
+        <span class="highlighted-status"><%= order.status %></span>
       </div>
 
       <!-- Address Section -->
       <div class="address-box">
         <h6 class="section-header">Address</h6>
-        <p>789 Crescent Rd, Al Qudra, Dubai, 00000, United Arab Emirates</p>
+        <p><%= order.address.name %></p>
+        <p>
+          <%= order.address.streetAddress %>, <%= order.address.appartment %>,
+          <%= order.address.postcode %>, <%= order.address.city %>,<%=
+          order.address.state %>,<%= order.address.phone %>
+        </p>
       </div>
 
       <!-- Total Amount Section -->
       <div class="total-box">
         <h6 class="section-header">Total Amount</h6>
-        <p><strong>Subtotal</strong> ₹39,485</p>
+        <p><strong>Subtotal</strong> ₹<%= order.totalAmount %></p>
         <p><strong>Discount</strong> ₹0.00</p>
-        <p class="total"><strong>Total</strong> ₹39,485</p>
+        <p class="total"><strong>Total</strong> ₹<%= order.totalAmount %></p>
       </div>
 
       <!-- Action Buttons -->
       <div class="d-flex justify-content-between mt-3">
         <a href="#" class="btn-go-back">Go to page</a>
-        <button class="btn-cancel">Cancel Order</button>
+        <% if (order.status === 'Pending' || order.status === 'Processing' ) {
+        %>
+        <button class="btn-cancel-order btn-cancel">Cancel Order</button>
+        <% } else if (order.status === 'Delivered') { %>
+        <button class="btn-return-order btn-cancel">Return</button>
+        <% } else { %>
+        <span class="text-muted">Not Available</span>
+        <% } %>
       </div>
     </div>
 
+    <!-- Return Reason Modal -->
+    <div
+      class="modal fade"
+      id="returnReasonModal"
+      tabindex="-1"
+      aria-labelledby="returnReasonModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="returnReasonModalLabel">
+              Return Product
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <textarea
+              id="returnReasonText"
+              class="form-control"
+              placeholder="Enter return reason..."
+              rows="4"
+            ></textarea>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="confirmReturnBtn"
+              class="btn-confirmReturn btn btn-dark"
+            >
+              Confirm Return
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Bootstrap 5 JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // open reson modal
+      document
+        .querySelector(".btn-return-order")
+        ?.addEventListener("click", () => {
+          const returnModal = new bootstrap.Modal(
+            document.getElementById("returnReasonModal")
+          );
+          returnModal.show();
+        });
+
+      // check reson is typed or not
+
+      document
+        .querySelector(".btn-confirmReturn")
+        ?.addEventListener("click", async () => {
+          const reson = document
+            .getElementById("returnReasonText")
+            .value.trim();
+          if (!reson) {
+            return Swal.fire(
+              "Error",
+              "Please enter a reason for the return.",
+              "error"
+            );
+          }
+
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to return this order.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, return it!",
+          });
+
+          if (result.isConfirmed) {
+            const orderId = "<%= order._id %>";
+
+            fetch("/returnReq", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ reson, orderId }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    title: "Submited",
+                    text: "Return request submited",
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false,
+                  }).then(() => location.reload());
+                } else {
+                  Swal.fire(data.message || "Something went wrong.", "error");
+                }
+              });
+          }
+        });
+    </script>
   </body>
 </html>

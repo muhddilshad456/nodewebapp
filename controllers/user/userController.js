@@ -875,8 +875,8 @@ const changePassword = async (req, res) => {
 const orderListPage = async (req, res) => {
   try {
     const userId = req.session.user;
-    const order = await Order.findOne({ userId });
-    res.render("orderListing", { order });
+    const order = await Order.find({ userId });
+    res.render("orderListing", { orders: order });
   } catch (error) {
     console.log("error from order listing page ", error);
   }
@@ -885,14 +885,49 @@ const orderListPage = async (req, res) => {
 // order detailes
 const userOrderDetailes = async (req, res) => {
   try {
-    console.log("profile user order id : ", req.params.id);
     const orderId = req.params.id;
+    if (!orderId) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order id not found" });
+    }
     const order = await Order.findOne({ _id: orderId }).populate(
       "orderedItems.productId"
     );
     res.render("userOrderDetailes", { order });
   } catch (error) {
     console.log("error from user detailes page", error);
+  }
+};
+
+//return req from user
+
+const returnReq = async (req, res) => {
+  try {
+    console.log("ret req :", req.body);
+    const { reson, orderId } = req.body;
+    const result = await Order.updateOne(
+      { _id: orderId },
+      { status: "Return requisted", returnReason: reson }
+    );
+
+    if (result.modifiedCount === 1) {
+      return res.json({
+        success: true,
+        message: "Return request submitted successfully!",
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found or already updated.",
+      });
+    }
+  } catch (error) {
+    console.log("error from return request", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
   }
 };
 module.exports = {
@@ -926,4 +961,5 @@ module.exports = {
   changePassword,
   orderListPage,
   userOrderDetailes,
+  returnReq,
 };

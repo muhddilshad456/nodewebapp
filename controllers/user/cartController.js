@@ -16,6 +16,10 @@ const addToCart = async (req, res) => {
     const userId = req.session.user;
     const product = await Product.findById(productId);
 
+    if (quantity > product.stockCount || product.stockCount === 0) {
+      return res.status(409).json({ message: "No stock available" });
+    }
+
     if (!product || product.isBlocked) {
       return res.status(404).json({ message: "product not found" });
     }
@@ -44,6 +48,9 @@ const addToCart = async (req, res) => {
       return item.productId.toString() === productId;
     });
     if (existingProduct) {
+      if (existingProduct.quantity + quantityNum > product.stockCount) {
+        return res.status(409).json({ message: "No stock available" });
+      }
       existingProduct.quantity += quantityNum;
       existingProduct.totalPrice =
         existingProduct.quantity * product.productAmount;
@@ -107,15 +114,23 @@ const deleteCartItem = async (req, res) => {
 // cart updation
 const updateCartQuantity = async (req, res) => {
   try {
-    console.log("adjust quantity : ", req.body);
     const { itemId, quantity } = req.body;
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId });
     const cartItem = cart.items.find((i) => i._id.toString() === itemId);
     if (!cartItem) return res.status(404).json({ error: "Item not found" });
-    const newPrice = quantity * cartItem.price;
+    const product = await Product.findOne({ _id: cartItem.productId });
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    if (quantity > product.stockCount) {
+      return res.status(409).json({ message: "No stock available" });
+    }
+
     cartItem.quantity = quantity;
+    const newPrice = quantity * cartItem.price;
     cartItem.totalPrice = newPrice;
+
     const cartTotal = cart.items.reduce(
       (total, item) => total + item.totalPrice,
       0

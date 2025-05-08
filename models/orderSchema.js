@@ -89,9 +89,13 @@ const orderSchema = new Schema({
       "Shipped",
       "Delivered",
       "Cancelled",
-      "Return requist",
+      "Return requisted",
       "Returned",
     ],
+  },
+  returnReason: {
+    type: String,
+    default: "",
   },
   createdOn: {
     type: Date,

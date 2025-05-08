@@ -92,8 +92,34 @@ const orderStatus = async (req, res) => {
   }
 };
 
+// confirm return
+const confirmReturn = async (req, res) => {
+  try {
+    console.log("confirmReturn", req.body);
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
+    result = await Order.updateOne({ _id: orderId }, { status: "Returned" });
+
+    if (result.modifiedCount === 1) {
+      return res.json({
+        success: true,
+        message: "Status updated successfully",
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found or no change made" });
+    }
+  } catch (error) {
+    console.log("error from confirming return ", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 module.exports = {
   orderPage,
   orderDetailesPage,
   orderStatus,
+  confirmReturn,
 };

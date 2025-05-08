@@ -71,6 +71,7 @@ router.get(
   userAuth,
   userController.userOrderDetailes
 );
+router.post("/returnReq", userAuth, userController.returnReq);
 //cart
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get("/cart", userAuth, cartController.cartPage);

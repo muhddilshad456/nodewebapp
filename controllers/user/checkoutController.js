@@ -63,6 +63,25 @@ const placeOrder = async (req, res) => {
       totalPrice: item.totalPrice,
       status: "Pending",
     }));
+
+    for (const item of cart.items) {
+      const product = await Product.findOne({ _id: item.productId });
+      if (!product) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found." });
+      }
+
+      if (item.quantity > product.stockCount) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock for ${product.productName}`,
+        });
+      }
+      product.stockCount -= item.quantity;
+      await product.save();
+    }
+
     const newOrder = new Order({
       orderedItems,
       totalAmount: cart.cartTotal,

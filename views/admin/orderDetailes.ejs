@@ -76,38 +76,46 @@
               </p>
             </div>
             <div class="col-md-6 text-md-end">
+              <% if(order.status==="Returned"){ %>
+                <button class="btn btn-secondary" disabled>Returned</button>
+                <% }else{ %>
               <div class="d-inline-block">
                 <select
                   class="form-select d-inline-block w-auto me-2"
                   id="selectStatus"
                   data-order-id="<%= order._id %>"
-                  <%= order.status==="Delivered" ? "disabled" : "" %>
+                  <%= (order.status === "Delivered" || order.status === "Return requisted") ? "disabled" : "" %>
                 >
-                  <option value="Cancelled" <%= order.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
-                  <option value="Pending" <%= order.status==="Pending" ? "selected" : "" %>>PROCESSING</option>
+                  
+                  <option value="Pending" <%= order.status==="Pending" ? "selected" : "" %>>PENDING</option>
+                  <option value="Processing" <%= order.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
                   <option value="Shipped" <%= order.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
-                  <option value="Delivered" <%= order.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
+                  <option value="Cancelled" <%= order.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
+                  <option value="Delivered" <%= (order.status === "Delivered" || order.status === "Return requisted") ? "selected" : "" %>>DELIVERED</option>
                 </select>
-                <button class="btn btn-primary" id="updateStatusBtn" <%= order.status==="Delivered" ? "disabled" : "" %>>
+                <button class="btn btn-primary" id="updateStatusBtn" <%= (order.status === "Delivered" || order.status === "Return requisted") ? "disabled" : "" %>>
                   Update Status
                 </button>
               </div>
+              <% } %>
             </div>
           </div>
 
           <!-- Return Reason Verification -->
+           <% if(order.status==="Return requisted"){ %>
           <div class="mb-4">
-            <h5 class="mb-3">Return Reason (if applicable)</h5>
+            <h5 class="mb-3">Return Reason</h5>
             <textarea
               class="form-control mb-3"
               id="returnReason"
               rows="3"
-              placeholder="Enter the reason for return/cancellation (e.g., defective product, wrong item, etc.)"
-            ></textarea>
+              readonly
+            ><%= order.returnReason %></textarea>
             <button class="btn btn-verify" id="verifyReturnBtn">
               Verify Reason
             </button>
           </div>
+          <% } %>
 
           <!-- Delivery Address and Payment Summary -->
           <div class="row mb-4">
@@ -167,6 +175,7 @@
                   >
                     <option <%= item.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
                     <option <%= item.status==="Pending" ? "selected" : "" %>>PENDING</option>
+                    <option <%= item.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
                     <option <%= item.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
                     <option <%= item.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
                   </select>
@@ -208,54 +217,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      // let isReasonVerified = false;
+      
 
-      // document
-      //   .getElementById("verifyReturnBtn")
-      //   .addEventListener("click", function () {
-      //     const returnReason = document
-      //       .getElementById("returnReason")
-      //       .value.trim();
-      //     const updateStatusBtn = document.getElementById("updateStatusBtn");
-      //     const actionSelect = document.getElementById("actionSelect");
-
-      //     if (returnReason) {
-      //       isReasonVerified = true;
-      //       updateStatusBtn.disabled = false;
-      //       actionSelect.disabled = false;
-      //       alert("Reason verified successfully!");
-      //     } else {
-      //       alert("Please enter a reason before verifying.");
-      //     }
-      //   });
-
-      // document
-      //   .getElementById("updateStatusBtn")
-      //   .addEventListener("click", function () {
-      //     const selectedStatus = document.getElementById("statusSelect").value;
-      //     alert(`Status updated to: ${selectedStatus}`);
-      //   });
-
-      // document
-      //   .getElementById("actionSelect")
-      //   .addEventListener("change", function () {
-      //     const action = this.value;
-      //     if (!isReasonVerified) {
-      //       alert("Please verify the reason first.");
-      //       this.value = "";
-      //       return;
-      //     }
-
-      //     if (action === "return") {
-      //       alert("Return processed successfully for item: Titan");
-      //     } else if (action === "cancel") {
-      //       alert("Item cancelled successfully: Titan");
-      //     }
-      //     this.value = ""; 
-      //   });
-
-        // updating status
+        
         document.addEventListener("DOMContentLoaded",()=>{
+          // updating status
           const select=document.getElementById("selectStatus")
           const button=document.getElementById("updateStatusBtn")
           const originalValue=select.value
@@ -310,7 +276,62 @@
               });
             }
           })
+
+          // accept return 
+          const verifyBtn=document.getElementById("verifyReturnBtn")
+
+          if(verifyBtn){
+            verifyBtn.addEventListener("click",async()=>{
+              const confirm=await Swal.fire({
+               title: "Are you sure?",
+               text: "Do you want to mark this order as Returned?",
+               icon: "warning",
+               showCancelButton: true,
+               confirmButtonColor: "#28a745",
+               cancelButtonColor: "#d33",
+               confirmButtonText: "Yes, confirm"
+              })
+
+              if(confirm.isConfirmed){
+                try {
+                  const res=await fetch("/admin/confirmReturn",{
+                    method:"POST",
+                    headers:{
+                      "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({orderId:"<%= order._id%>"})
+                  })
+
+                  const result=await res.json()
+
+                  if(result.success){
+                    Swal.fire({
+                     icon: "success",
+                     title: "Updated!",
+                     text: result.message || "Order marked as Returned.",
+                     timer: 1500,
+                     showConfirmButton: false
+                    }).then(()=>window.location.reload())
+                  }else{
+                    Swal.fire({
+                      icon: "error",
+                      title: "Failed",
+                      text: result.message || "Could not update order status."
+                    })
+                  }
+                } catch (error) {
+                  console.error(error);
+                   Swal.fire({
+                     icon: "error",
+                     title: "Error",
+                     text: "Something went wrong."
+                  });
+                }
+              }
+            })
+          }
         })
+
     </script>
   </body>
 </html>
