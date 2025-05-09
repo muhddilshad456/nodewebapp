@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { now } = require("mongoose");
 const { block } = require("sharp");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
 
 // home
 
@@ -875,7 +877,11 @@ const changePassword = async (req, res) => {
 const orderListPage = async (req, res) => {
   try {
     const userId = req.session.user;
-    const order = await Order.find({ userId });
+    const search = req.query.search || "";
+    const order = await Order.find({
+      userId,
+      orderId: { $regex: ".*" + search + ".*", $options: "i" },
+    });
     res.render("orderListing", { orders: order });
   } catch (error) {
     console.log("error from order listing page ", error);
@@ -897,6 +903,51 @@ const userOrderDetailes = async (req, res) => {
     res.render("userOrderDetailes", { order });
   } catch (error) {
     console.log("error from user detailes page", error);
+  }
+};
+
+// cancel order
+
+const cancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Order ID is required." });
+    }
+
+    const order = await Order.findOne({ _id: orderId });
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found." });
+    }
+    if (order.status !== "Pending" && order.status !== "Processing") {
+      return res.status(400).json({
+        success: false,
+        message: "Only pending or processing orders can be cancelled.",
+      });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    for (const item of order.orderedItems) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        product.stockCount += item.quantity;
+        await product.save();
+      }
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "Order cancelled successfully." });
+  } catch (error) {
+    console.log("error from cancel order ", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 };
 
@@ -928,6 +979,58 @@ const returnReq = async (req, res) => {
       success: false,
       message: "Something went wrong. Please try again.",
     });
+  }
+};
+
+// download invoice
+
+const invoiceDownload = async (req, res) => {
+  try {
+    console.log("order id of invoice download", req.params.id);
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId)
+      .populate("orderedItems.productId")
+      .populate("userId");
+    if (!order || order.status !== "Delivered") {
+      return res.status(404).send("Invoice not available for this order.");
+    }
+
+    const doc = new PDFDocument();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Desposition",
+      `attachment;filename=invoice-${order.orderId}.pdf`
+    );
+    doc.pipe(res);
+
+    doc.fontSize(24).text("WATCHSY", { align: "center" });
+    doc.moveDown();
+
+    doc.fontSize(18).text("INVOICE", { align: "center" });
+    doc.moveDown();
+
+    doc.fontSize(12).text(`Order Id : ${order.orderId}`);
+    doc.text(`Customer: ${order.userId.name}`);
+    doc.text(`Date: ${order.createdOn.toDateString()}`);
+    doc.moveDown();
+
+    doc.text("Items", { underline: true });
+    order.orderedItems.forEach((item, index) => {
+      doc.text(
+        `${index + 1}. ${item.productId.productName} - Quantity: ${
+          item.quantity
+        } - Price: $${item.productId.productAmount}`
+      );
+    });
+
+    doc.moveDown();
+    doc.text(`Total : ${order.totalAmount}`);
+
+    doc.end();
+  } catch (error) {
+    console.error("error from dowload invoice", error);
   }
 };
 module.exports = {
@@ -962,4 +1065,6 @@ module.exports = {
   orderListPage,
   userOrderDetailes,
   returnReq,
+  cancelOrder,
+  invoiceDownload,
 };

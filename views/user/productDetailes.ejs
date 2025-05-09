@@ -186,7 +186,7 @@
 </div>
 
 <%- include("../../views/partials/user/footer") %>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   let quantity = 1;
 
@@ -242,18 +242,31 @@
         quantity: productQuantity,
       }),
     })
-      .then(async (response) => {
-        const data = await response.json();
-        if (!response.ok) {
-          alert(data.message || "Failed to add to cart");
-          return;
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: data.message || "Item added to cart successfully",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => (window.location.href = "/cart"));
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "failed to add item to cart",
+          });
         }
-        alert("Item added to cart successfully");
-        window.location.href = "/cart";
       })
       .catch((error) => {
         console.log("error in adding cart : ", error);
-        alert("Something went wrong. Please try again.");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "something went wrong",
+        });
       });
   }
 </script>

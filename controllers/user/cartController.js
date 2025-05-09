@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { now } = require("mongoose");
 
+// add to cart
 const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
@@ -17,11 +18,15 @@ const addToCart = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (quantity > product.stockCount || product.stockCount === 0) {
-      return res.status(409).json({ message: "No stock available" });
+      return res
+        .status(409)
+        .json({ success: false, message: "No stock available" });
     }
 
     if (!product || product.isBlocked) {
-      return res.status(404).json({ message: "product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "product not found" });
     }
 
     const totalPrice = product.productAmount * quantityNum;
@@ -41,7 +46,10 @@ const addToCart = async (req, res) => {
         ],
       });
       await cart.save();
-      return res.json({ message: "product added to cart successfully" });
+      return res.json({
+        success: true,
+        message: "product added to cart successfully",
+      });
     }
     // check produ in cart exist or not
     const existingProduct = cart.items.find((item) => {
@@ -49,13 +57,18 @@ const addToCart = async (req, res) => {
     });
     if (existingProduct) {
       if (existingProduct.quantity + quantityNum > product.stockCount) {
-        return res.status(409).json({ message: "No stock available" });
+        return res
+          .status(409)
+          .json({ success: false, message: "No stock available" });
       }
       existingProduct.quantity += quantityNum;
       existingProduct.totalPrice =
         existingProduct.quantity * product.productAmount;
       await cart.save();
-      return res.json({ message: "item add to cart successfully" });
+      return res.json({
+        success: true,
+        message: "item add to cart successfully",
+      });
     } else {
       cart.items.push({
         productId: product._id,
@@ -64,11 +77,14 @@ const addToCart = async (req, res) => {
         totalPrice,
       });
       await cart.save();
-      return res.json({ message: "item added to cart successfully" });
+      return res.json({
+        success: true,
+        message: "item added to cart successfully",
+      });
     }
   } catch (error) {
     console.log("error from add to cart ", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 // cart page rendering
@@ -102,13 +118,20 @@ const deleteCartItem = async (req, res) => {
     const { productId } = req.body;
     const userId = req.session.user;
     if (!userId) {
-      return res.status(404).json({ message: "user not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "user not found" });
     }
     await Cart.updateOne({ userId }, { $pull: { items: { productId } } });
-    res.json({ message: "item deleted successfully" });
+    res.json({ success: true, message: "item deleted successfully" });
   } catch (error) {
     console.log("error in delete cart item : ", error);
-    res.status(500).json({ message: "Server error while deleting cart item" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error while deleting cart item",
+      });
   }
 };
 // cart updation

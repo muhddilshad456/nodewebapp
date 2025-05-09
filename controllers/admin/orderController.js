@@ -1,4 +1,5 @@
 const Order = require("../../models/orderSchema");
+const Product = require("../../models/productSchema");
 
 // order page
 const orderPage = async (req, res) => {
@@ -95,12 +96,29 @@ const orderStatus = async (req, res) => {
 // confirm return
 const confirmReturn = async (req, res) => {
   try {
-    console.log("confirmReturn", req.body);
     const { orderId } = req.body;
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
+
+    const order = await Order.findOne({ _id: orderId });
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+
     result = await Order.updateOne({ _id: orderId }, { status: "Returned" });
+
+    for (const item of order.orderedItems) {
+      const product = await Product.findOne({ _id: item.productId });
+      if (!product) {
+        console.warn(`Product with ID ${item.productId} not found.`);
+        continue;
+      }
+      product.stockCount += item.quantity;
+      await product.save();
+    }
 
     if (result.modifiedCount === 1) {
       return res.json({
@@ -113,7 +131,7 @@ const confirmReturn = async (req, res) => {
         .json({ success: false, message: "Order not found or no change made" });
     }
   } catch (error) {
-    console.log("error from confirming return ", error);
+    console.error("error from confirming return ", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };

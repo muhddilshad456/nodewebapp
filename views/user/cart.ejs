@@ -212,7 +212,7 @@
   </div>
 </body>
 <script>
-  // fetch for delete from cart
+  // fetch for delete item from cart
   document.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
       const productId = this.getAttribute("data-id");
@@ -230,12 +230,31 @@
         productId,
       }),
     })
-      .then((response) => {
-        alert("product deleted successfully");
-        window.location.href = "/cart";
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: data.message || "Item deleted successfully",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => location.reload());
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "Feiled to deleted item",
+          });
+        }
       })
       .catch((error) => {
         console.log("error in deleting cart", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Feiled to deleted item",
+        });
       });
   }
 

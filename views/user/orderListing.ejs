@@ -153,6 +153,23 @@
 <!-- Orders Table -->
 <div class="col-md-9 main-content">
   <h5 class="mb-3 text-uppercase">My Orders</h5>
+  <form
+    method="GET"
+    action="/orderList"
+    class="d-flex justify-content-end mb-3"
+  >
+    <input
+      type="text"
+      name="search"
+      id="searchInput"
+      value="<%= typeof search !== 'undefined' ? search : '' %>"
+      placeholder="Search Order ID..."
+      class="form-control w-25"
+    />
+    <button type="submit" class="btn btn-dark ms-2">Search</button>
+    <button onclick="clearSearch()" class="btn btn-secondary">Clear</button>
+  </form>
+
   <div class="table-responsive">
     <table class="table table-bordered order-table">
       <thead>
@@ -184,5 +201,12 @@
     </table>
   </div>
 </div>
+<script>
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/orderList";
+  }
+</script>
 
 <%- include("../../views/partials/user/profileFooter") %>

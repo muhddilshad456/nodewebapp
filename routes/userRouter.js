@@ -71,7 +71,9 @@ router.get(
   userAuth,
   userController.userOrderDetailes
 );
+router.post("/cancelOrder", userAuth, userController.cancelOrder);
 router.post("/returnReq", userAuth, userController.returnReq);
+router.get("/invoice/:id", userAuth, userController.invoiceDownload);
 //cart
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get("/cart", userAuth, cartController.cartPage);
