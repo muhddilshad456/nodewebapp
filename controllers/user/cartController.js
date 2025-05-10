@@ -126,12 +126,10 @@ const deleteCartItem = async (req, res) => {
     res.json({ success: true, message: "item deleted successfully" });
   } catch (error) {
     console.log("error in delete cart item : ", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while deleting cart item",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting cart item",
+    });
   }
 };
 // cart updation

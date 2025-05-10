@@ -22,7 +22,6 @@ const loadHome = async (req, res) => {
     let productData = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
-      stockCount: { $gt: 0 },
     });
     // sort product
     productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
@@ -357,7 +356,7 @@ const loadShopPage = async (req, res) => {
 
     let filter = {
       isBlocked: false,
-      stockCount: { $gt: 0 },
+
       category: { $in: categoryIds },
       brand: { $in: brandIds },
       $and: [
@@ -916,8 +915,9 @@ const cancelOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Order ID is required." });
     }
-
+    console.log("order id", orderId);
     const order = await Order.findOne({ _id: orderId });
+    console.log("order: ", order);
     if (!order) {
       return res
         .status(404)
@@ -931,6 +931,11 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = "Cancelled";
+
+    for (const item of order.orderedItems) {
+      item.status = "Cancelled";
+    }
+
     await order.save();
 
     for (const item of order.orderedItems) {
@@ -955,24 +960,28 @@ const cancelOrder = async (req, res) => {
 
 const returnReq = async (req, res) => {
   try {
-    console.log("ret req :", req.body);
     const { reson, orderId } = req.body;
-    const result = await Order.updateOne(
-      { _id: orderId },
-      { status: "Return requisted", returnReason: reson }
-    );
 
-    if (result.modifiedCount === 1) {
-      return res.json({
-        success: true,
-        message: "Return request submitted successfully!",
-      });
-    } else {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found or already updated.",
+        message: "Order not found.",
       });
     }
+
+    order.status = "Return requisted";
+    order.returnReason = reson;
+
+    for (const item of order.orderedItems) {
+      item.status = "Return requisted";
+    }
+    await order.save();
+    return res.json({
+      success: true,
+      message: "Return requested successfully",
+    });
   } catch (error) {
     console.log("error from return request", error);
     return res.status(500).json({
@@ -1033,6 +1042,79 @@ const invoiceDownload = async (req, res) => {
     console.error("error from dowload invoice", error);
   }
 };
+
+//cancel single item
+const cancelSingleItem = async (req, res) => {
+  try {
+    console.log("s item cancel", req.body);
+    const { orderId, itemId } = req.body;
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+    const item = order.orderedItems.find((i) => i._id.toString() === itemId);
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Item not found in order" });
+    }
+    if (item.status === "Cancelled") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Item already cancelled" });
+    }
+    item.status = "Cancelled";
+    await order.save();
+    return res.json({ success: true, message: "Item cancelled successfully" });
+  } catch (error) {
+    console.error("error from cancelSingleItem", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while cancelling the item.",
+    });
+  }
+};
+
+// return single product
+
+const returnReqSingleItem = async (req, res) => {
+  try {
+    const { orderId, itemId, reason } = req.body;
+    if (!orderId || !itemId || !reason) {
+      return res
+        .status(400)
+        .json({ success: false, message: "data not reached" });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
+    const item = order.orderedItems.find((i) => i._id.toString() === itemId);
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: "item for updation not found" });
+    }
+    item.status = "Return requisted";
+    item.returnReason = reason;
+    await order.save();
+
+    return res.json({
+      success: true,
+      message: "Return request submitted successfully",
+    });
+  } catch (error) {
+    console.error("error from returnReqSingleItem", error);
+
+    return res
+      .status(500)
+      .json({ success: false, message: "something went wrong" });
+  }
+};
 module.exports = {
   loadHome,
   loadSignup,
@@ -1067,4 +1149,6 @@ module.exports = {
   returnReq,
   cancelOrder,
   invoiceDownload,
+  cancelSingleItem,
+  returnReqSingleItem,
 };

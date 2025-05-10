@@ -76,7 +76,9 @@
               </p>
             </div>
             <div class="col-md-6 text-md-end">
-              <% if(order.status==="Returned"){ %>
+              <% if(order.status==="Cancelled"){ %>
+                <button class="btn btn-secondary" disabled>Cancelled</button>
+              <% }else if(order.status==="Returned"){ %>
                 <button class="btn btn-secondary" disabled>Returned</button>
                 <% }else{ %>
               <div class="d-inline-block">
@@ -90,10 +92,9 @@
                   <option value="Pending" <%= order.status==="Pending" ? "selected" : "" %>>PENDING</option>
                   <option value="Processing" <%= order.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
                   <option value="Shipped" <%= order.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
-                  <option value="Cancelled" <%= order.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
                   <option value="Delivered" <%= (order.status === "Delivered" || order.status === "Return requisted") ? "selected" : "" %>>DELIVERED</option>
                 </select>
-                <button class="btn btn-primary" id="updateStatusBtn" <%= (order.status === "Delivered" || order.status === "Return requisted") ? "disabled" : "" %>>
+                <button class="btn btn-primary" id="updateStatusBtn" <%= ( order.status === "Delivered" || order.status === "Return requisted") ? "disabled" : "" %>>
                   Update Status
                 </button>
               </div>

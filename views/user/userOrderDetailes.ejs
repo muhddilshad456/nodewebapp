@@ -190,15 +190,15 @@
                   <% if (item.status === 'Pending' || item.status ===
                   'Processing' ) { %>
                   <button
-                    class="btn-cancel"
-                    data-order-id="<%= order.orderId %>"
+                    class="btn-singleItem-cancel btn btn-dark"
+                    data-item-id="<%= item._id %>"
                   >
                     Cancel
                   </button>
                   <% } else if (item.status === 'Delivered') { %>
                   <button
-                    class="btn-cancel"
-                    data-order-id="<%= order.orderId %>"
+                    class="btn-single-returnReq btn btn-dark"
+                    data-item-id="<%= item._id %>"
                   >
                     Return
                   </button>
@@ -315,6 +315,47 @@
         </div>
       </div>
     </div>
+    <!-- Single Product Return Reason Modal -->
+    <div
+      class="modal fade"
+      id="singleProductReturnReason"
+      tabindex="-1"
+      aria-labelledby="returnReasonModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="singleItemReturnReqForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="returnReasonModalLabel">
+                Return Reason
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="itemId" id="modalItemId" />
+              <div class="mb-3">
+                <label for="returnReason" class="form-label">Reason</label>
+                <textarea
+                  class="form-control"
+                  id="returnReason"
+                  name="reason"
+                ></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-dark">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap 5 JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
@@ -420,6 +461,137 @@
                 icon: "error",
               });
             }
+          }
+        });
+
+      // single product cancel
+
+      document.querySelectorAll(".btn-singleItem-cancel")?.forEach((button) => {
+        button.addEventListener("click", async () => {
+          const orderId = "<%= order._id %>";
+          const itemId = button.dataset.itemId;
+
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to cancel this item?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, cancel it!",
+          });
+
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch("/cancelSingleItem", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId, itemId }),
+              });
+              const data = await response.json();
+              if (data.success) {
+                Swal.fire({
+                  title: "Success",
+                  text: data.message || "Item cancell successfully",
+                  icon: "success",
+                  showCancelButton: false,
+                  timer: 1500,
+                }).then(() => location.reload());
+              } else {
+                Swal.fire({
+                  title: "Failed",
+                  text: data.message || "Failed to cancel item",
+                  icon: "error",
+                });
+              }
+            } catch (error) {
+              console.log("something went wrong", error);
+              Swal.fire({
+                title: "Failed",
+                text: error.message || "something went wrong",
+                icon: "error",
+              });
+            }
+          }
+        });
+      });
+
+      // single product return request
+
+      let selectedItemId = null;
+
+      document.querySelectorAll(".btn-single-returnReq")?.forEach((button) => {
+        button.addEventListener("click", function () {
+          selectedItemId = this.getAttribute("data-item-id");
+          document.getElementById("modalItemId").value = selectedItemId;
+
+          const showModal = new bootstrap.Modal(
+            document.getElementById("singleProductReturnReason")
+          );
+          showModal.show();
+        });
+      });
+
+      document
+        .getElementById("singleItemReturnReqForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const reason = document.getElementById("returnReason").value.trim();
+          const itemId = document.getElementById("modalItemId").value;
+          const orderId = "<%= order._id%>";
+
+          if (!reason) {
+            return Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: "Please fill the reason",
+            });
+          }
+
+          const result = await Swal.fire({
+            icon: "warning",
+            title: "confirm return",
+            text: "Are you sure you want to return this item?",
+            showCancelButton: true,
+            confirmButtonText: "Yes return it",
+          });
+
+          if (result.isConfirmed) {
+            fetch("/singleItemReturnReq", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ orderId, itemId, reason }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: data.message || "Return request send successfully",
+                    showConfirmButton: false,
+                    timer: 1500,
+                  }).then(() => location.reload());
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: data.message || "failed to send request",
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error("error from single item return req", error);
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: "Something went wrong. Please try again later.",
+                });
+              });
           }
         });
     </script>

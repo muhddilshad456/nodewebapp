@@ -76,17 +76,14 @@ const orderStatus = async (req, res) => {
     if (!orderId || !status) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
-    const result = await Order.updateOne({ _id: orderId }, { status });
-    if (result.modifiedCount === 1) {
-      return res.json({
-        success: true,
-        message: "Status updated successfully",
-      });
-    } else {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found or no change made" });
+
+    const order = await Order.findById(orderId);
+
+    order.status = status;
+    for (const item of order.orderedItems) {
+      item.status = status;
     }
+    await order.save();
   } catch (error) {
     console.log("error from order status updating ", error);
     return res.status(500).json({ success: false, message: "Server error" });
@@ -108,7 +105,13 @@ const confirmReturn = async (req, res) => {
         .json({ success: false, message: "order not found" });
     }
 
-    result = await Order.updateOne({ _id: orderId }, { status: "Returned" });
+    order.status = "Returned";
+
+    for (const item of order.orderedItems) {
+      item.status = "Returned";
+    }
+
+    await order.save();
 
     for (const item of order.orderedItems) {
       const product = await Product.findOne({ _id: item.productId });
@@ -118,17 +121,6 @@ const confirmReturn = async (req, res) => {
       }
       product.stockCount += item.quantity;
       await product.save();
-    }
-
-    if (result.modifiedCount === 1) {
-      return res.json({
-        success: true,
-        message: "Status updated successfully",
-      });
-    } else {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found or no change made" });
     }
   } catch (error) {
     console.error("error from confirming return ", error);
