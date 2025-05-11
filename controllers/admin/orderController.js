@@ -78,12 +78,17 @@ const orderStatus = async (req, res) => {
     }
 
     const order = await Order.findById(orderId);
-
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "order not found" });
+    }
     order.status = status;
     for (const item of order.orderedItems) {
       item.status = status;
     }
     await order.save();
+    res.json({ success: true, message: "Status updated" });
   } catch (error) {
     console.log("error from order status updating ", error);
     return res.status(500).json({ success: false, message: "Server error" });
@@ -127,9 +132,52 @@ const confirmReturn = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+// accept single item return
+const acceptSingleItemReturn = async (req, res) => {
+  try {
+    const { itemId, orderId } = req.body;
+    if (!itemId || !orderId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing itemId or orderId" });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+    const item = order.orderedItems.find((i) => i._id.toString() === itemId);
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Item not found in order" });
+    }
+
+    item.status = "Returned";
+    await order.save();
+    res.json({ success: true, message: "Order returned successfully" });
+  } catch (error) {
+    console.log("error from acceptSingleItemReturn", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// update single item status
+
+const updateSingleItemStatus = async (req, res) => {
+  try {
+    console.log("updateSingleItemStatus", req.body);
+  } catch (error) {
+    console.log("error from updateSingleItemStatus", error);
+  }
+};
 module.exports = {
   orderPage,
   orderDetailesPage,
   orderStatus,
   confirmReturn,
+  acceptSingleItemReturn,
+  updateSingleItemStatus,
 };

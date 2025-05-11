@@ -19,6 +19,7 @@
         </div>
       </div>
     </div>
+    <% if(!user.googleId){ %>
     <a
       class="btn btn-dark"
       data-bs-toggle="modal"
@@ -29,6 +30,7 @@
       onclick="openPersonalInfoEditModal(this)"
       >Edit Personal Info</a
     >
+    <% } %>
   </div>
 
   <!-- Email Section -->
@@ -42,6 +44,7 @@
         </div>
       </div>
     </div>
+    <% if(!user.googleId){ %>
     <a
       class="btn btn-dark"
       data-bs-toggle="modal"
@@ -51,6 +54,7 @@
       onclick="openEmailEditModal(this)"
       >Edit Email</a
     >
+    <% } %>
   </div>
 </div>
 <!-- edit personalInfo modal -->

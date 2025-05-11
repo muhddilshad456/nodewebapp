@@ -243,6 +243,18 @@
               <% }) %>
             </select>
             <% } %>
+            <!-- add edit button -->
+            <div style="margin-top: 10px; display: flex; gap: 10px">
+              <a href="/address" class="btn btn-sm btn-primary">Add Address</a>
+              <a
+                href="/address"
+                id="editAddressBtn"
+                class="btn btn-sm btn-secondary"
+              >
+                Edit Selected
+              </a>
+            </div>
+
             <p class="delivery-info">
               Estimated Delivery: Monday, 13 12:00 - 16:00
             </p>
@@ -339,20 +351,39 @@
         </div>
       </div>
 
-      <button class="btn checkout-btn">Continue</button>
+      <button class="btn checkout-btn" type="submit">Continue</button>
     </form>
   </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   document
     .getElementById("placeOrder")
     .addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const address = document.getElementById("address").value;
+      const address = document.getElementById("address")?.value;
       const payment = document.querySelector(
         "input[name='payment']:checked"
-      ).value;
+      )?.value;
+
+      if (!address) {
+        Swal.fire({
+          icon: "warning",
+          title: "Address Required",
+          text: "Please select or enter a delivery address.",
+        });
+        return;
+      }
+
+      if (!payment) {
+        Swal.fire({
+          icon: "warning",
+          title: "Payment Method Required",
+          text: "Please select a payment method.",
+        });
+        return;
+      }
 
       try {
         const response = await fetch("/placeOrder", {

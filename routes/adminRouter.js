@@ -57,5 +57,15 @@ router.get("/orders", adminAuth, orderController.orderPage);
 router.get("/orderDetailes/:id", adminAuth, orderController.orderDetailesPage);
 router.post("/orderStatus", adminAuth, orderController.orderStatus);
 router.post("/confirmReturn", adminAuth, orderController.confirmReturn);
+router.post(
+  "/acceptSingleItemReturn",
+  adminAuth,
+  orderController.acceptSingleItemReturn
+);
+router.post(
+  "/updateSingleItemStatus",
+  adminAuth,
+  orderController.updateSingleItemStatus
+);
 
 module.exports = router;

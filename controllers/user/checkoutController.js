@@ -10,6 +10,9 @@ const { now } = require("mongoose");
 const checkoutPage = async (req, res) => {
   try {
     const userId = req.session.user;
+    if (!userId) {
+      return console.log("userId not available");
+    }
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     let address = await Address.findOne({ userId });
     if (!address) {
@@ -31,6 +34,7 @@ const placeOrder = async (req, res) => {
   try {
     const { addressId, payment } = req.body;
     const userId = req.session.user;
+    console.log("userId", userId);
     if (!addressId || !payment || !userId) {
       return res
         .status(400)

@@ -1049,7 +1049,7 @@ const cancelSingleItem = async (req, res) => {
     console.log("s item cancel", req.body);
     const { orderId, itemId } = req.body;
     const order = await Order.findById(orderId);
-    if (!order) {
+    if (!order || order.orderedItems.length === 0) {
       return res
         .status(404)
         .json({ success: false, message: "Order not found" });
@@ -1066,6 +1066,10 @@ const cancelSingleItem = async (req, res) => {
         .json({ success: false, message: "Item already cancelled" });
     }
     item.status = "Cancelled";
+
+    if (order.orderedItems.every((item) => item.status === "Cancelled")) {
+      order.status = "Cancelled";
+    }
     await order.save();
     return res.json({ success: true, message: "Item cancelled successfully" });
   } catch (error) {

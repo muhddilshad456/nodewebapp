@@ -157,6 +157,7 @@
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Amount</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -169,17 +170,45 @@
                 <td><%= item.quantity %></td>
                 <td><%= item.totalPrice %></td>
                 <td>
+                <!-- Status Button -->
+                <button disabled class="btn btn-secondary mb-2">
+                <%= item.status %>
+                </button>
+
+                <% if (item.status === "Return requisted") { %>
+                <!-- Return Reason and Accept Button -->
+                <div class="d-flex flex-column gap-2">
+                <input
+                type="text"
+                class="form-control"
+                value="<%= item.returnReason %>"
+                disabled
+                />
+                <button data-item-id="<%= item._id %>" 
+                  class="btn-accept-singleReturn btn btn-dark" >
+                  Accept
+                </button>
+                </div>
+                <% } %>
+                </td>
+
+                <td>
                   <select
                     class="form-select action-select"
                     id="actionSelect"
-                    disabled
+                    data-id="<%= item._id %>"
+                    data-current="<%= item.status %>"
+                    onchange="updateSingleItemStatus(this)"
+                    <%= (item.status==="Returned" || item.status ==="Cancelled") ? "disabled" : "" %>
                   >
-                    <option <%= item.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
-                    <option <%= item.status==="Pending" ? "selected" : "" %>>PENDING</option>
-                    <option <%= item.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
-                    <option <%= item.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
-                    <option <%= item.status==="Cancelled" ? "selected" : "" %>>CANCELLED</option>
+                    <option value="Delivered" <%= item.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
+                    <option value="Pending" <%= item.status==="Pending" ? "selected" : "" %>>PENDING</option>
+                    <option value="Processing" <%= item.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
+                    <option value="Shipped" <%= item.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
                   </select>
+                  <% if(!(item.status==="Returned" || item.status ==="Cancelled")){ %>
+                  <button class="btn btn-primary">Update</button>
+                  <% } %>
                 </td>
               </tr>
               <% }) %>
@@ -253,7 +282,7 @@
                 showConfirmButton:false,
                 timer:1500,
                 text: response.message || "Status updated successfully!"
-                });
+                }).then(()=>location.reload())
 
                 if(newStatus==="Delivered"){
                   select.disabled=true
@@ -331,7 +360,104 @@
               }
             })
           }
+
+          // accept single return 
+
+          document.querySelectorAll(".btn-accept-singleReturn").forEach(button=>{
+            button.addEventListener("click",async function(e){
+              e.preventDefault()
+              const itemId=this.getAttribute("data-item-id")
+              const orderId="<%= order._id %>"
+
+              fetch("/admin/acceptSingleItemReturn",{
+                method:"POST",
+                headers:{
+                  "Content-Type":"application/json"
+                },
+                body:JSON.stringify({itemId,orderId})
+              }).then(response=>response.json())
+              .then((data)=>{
+                if(data.success){
+                  Swal.fire({
+                    icon:"success",
+                    title:"Success",
+                    text:data.message|| "Return item successfull",
+                    showConfirmButton:false,
+                    timer:1500
+                  }).then(()=>location.reload())
+                }else{
+                  Swal.fire({
+                    icon:"error",
+                    title:"failed",
+                    text:data.message|| "Failed to return item",
+                  })
+                }
+              }).catch((error)=>{
+                  Swal.fire({
+                    icon:"error",
+                    title:"failed",
+                    text:error.message|| "something went wrong",
+                  })
+              })
+            })
+          })
         })
+        
+        //update single item status
+
+        async function updateSingleItemStatus(selectItem){
+          const itemId=selectItem.dataset.id
+          const current=selectItem.dataset.current
+          const newStatus=selectItem.value
+          const orderId="<%= order._id %>"
+
+          const confirmed = await Swal.fire({
+          title: 'Are you sure?',
+          text: `Change status to "${newStatus}"?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, update it',
+          cancelButtonText: 'Cancel'
+         });
+
+         if(!confirmed.isConfirmed){
+          selectItem.value=selectItem.dataset.current
+          return
+         }
+
+         fetch("/updateSingleItemStatus",{
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({itemId,newStatus,orderId})
+         }).then(response=>response.json())
+         .then((data)=>{
+          if(data.success){
+            Swal.fire({
+              icon:"success",
+              title:"Success",
+              text:data.message || "Status updated successfully",
+              showConfirmButton:false,
+              timer:1500
+            }).then(()=>location.reload())
+          }else{
+            Swal.fire({
+              icon:"error",
+              title:"Failed",
+              text:data.message || "Failed to update status",
+            })
+            selectItem.value = selectItem.dataset.current;
+          }
+         }).catch((error)=>{
+           Swal.fire({
+              icon:"error",
+              title:"Failed",
+              text:error.message || "Something went wrong",
+            })
+            selectItem.value = selectItem.dataset.current;
+         })
+        }
 
     </script>
   </body>
