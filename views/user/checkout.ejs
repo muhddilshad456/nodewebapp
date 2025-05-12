@@ -399,10 +399,13 @@
 
         const data = await response.json();
         if (response.ok) {
-          alert("Order placed successfully");
           window.location.href = data.redirectUrl;
         } else {
-          alert(data.message || "Something went wrong");
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "Unable to proceed",
+          });
         }
       } catch (error) {
         alert("Something went wrong. Please try again.");

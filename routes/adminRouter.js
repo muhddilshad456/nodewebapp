@@ -62,10 +62,5 @@ router.post(
   adminAuth,
   orderController.acceptSingleItemReturn
 );
-router.post(
-  "/updateSingleItemStatus",
-  adminAuth,
-  orderController.updateSingleItemStatus
-);
 
 module.exports = router;

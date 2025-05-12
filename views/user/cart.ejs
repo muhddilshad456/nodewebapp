@@ -208,10 +208,27 @@
       </div>
     </div>
 
-    <a href="/checkout" class="btn checkout-btn mt-4">Proceed to Checkout</a>
+    <a href="/checkout" class="btn checkout-btn mt-4" id="checkoutBtn"
+      >Proceed to Checkout</a
+    >
   </div>
 </body>
 <script>
+  // check cart empty or not
+  const checkoutBtn = document.getElementById("checkoutBtn");
+
+  const cartSize = Number("<%= cart.items.length %>");
+
+  checkoutBtn.addEventListener("click", function (e) {
+    if (cartSize === 0) {
+      e.preventDefault();
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Cart is empty",
+      });
+    }
+  });
   // fetch for delete item from cart
   document.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", function () {

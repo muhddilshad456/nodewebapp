@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const session = require("express-session");
+const flash = require("connect-flash");
 const path = require("path");
 const passport = require("./config/passport");
 const env = require("dotenv").config();
@@ -23,6 +24,14 @@ app.use(
     },
   })
 );
+
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -95,6 +95,11 @@ const placeOrder = async (req, res) => {
       status: "Pending",
     });
     await newOrder.save();
+
+    cart.cartTotal = 0;
+    cart.items = [];
+
+    await cart.save();
     res.json({
       success: true,
       redirectUrl: `/orderSuccess?orderId=${newOrder._id}`,

@@ -41,6 +41,9 @@ const loadHome = async (req, res) => {
 
 const loadSignup = async (req, res) => {
   try {
+    if (req.session.user) {
+      return res.redirect("/");
+    }
     return res.render("signup");
   } catch (error) {
     console.log("Signup page render error");
@@ -297,19 +300,21 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const findUser = await User.findOne({ isAdmin: 0, email: email });
     if (!findUser) {
-      return res.render("login", { message: "User not found" });
+      return res.status(404).render("login", { message: "User not found" });
     }
     if (findUser.isBlocked) {
-      return res.render("login", { message: "Blocked by admin" });
+      return res.status(404).render("login", { message: "Blocked by admin" });
     }
     const passwordMatch = await bcrypt.compare(password, findUser.password);
     if (!passwordMatch) {
-      return res.render("login", { message: "Incorrect password" });
+      return res.status(404).render("login", { message: "Incorrect password" });
     }
 
     req.session.user = findUser._id;
     res.redirect("/");
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from login", error);
+  }
 };
 
 //logout
@@ -527,7 +532,9 @@ const userProfilePage = async (req, res) => {
     res.render("userProfile", {
       user: userData,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log("error from user profile page ", error);
+  }
 };
 
 //edit profile
@@ -831,6 +838,11 @@ const deleteAddress = async (req, res) => {
 
 const changePasswordPage = async (req, res) => {
   try {
+    const userId = req.session.user;
+    const user = await User.findById(userId);
+    if (user.googleId) {
+      return res.render("googlePasswordErrorPage");
+    }
     res.render("changePassword");
   } catch (error) {
     console.log("error from change passsword page ", error);
@@ -1046,7 +1058,6 @@ const invoiceDownload = async (req, res) => {
 //cancel single item
 const cancelSingleItem = async (req, res) => {
   try {
-    console.log("s item cancel", req.body);
     const { orderId, itemId } = req.body;
     const order = await Order.findById(orderId);
     if (!order || order.orderedItems.length === 0) {
@@ -1065,12 +1076,21 @@ const cancelSingleItem = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Item already cancelled" });
     }
+    const product = await Product.findById(item.productId);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
     item.status = "Cancelled";
 
     if (order.orderedItems.every((item) => item.status === "Cancelled")) {
       order.status = "Cancelled";
     }
     await order.save();
+
+    product.stockCount += item.quantity;
+    await product.save();
     return res.json({ success: true, message: "Item cancelled successfully" });
   } catch (error) {
     console.error("error from cancelSingleItem", error);
@@ -1081,7 +1101,7 @@ const cancelSingleItem = async (req, res) => {
   }
 };
 
-// return single product
+// return request for single product
 
 const returnReqSingleItem = async (req, res) => {
   try {
@@ -1105,6 +1125,12 @@ const returnReqSingleItem = async (req, res) => {
     }
     item.status = "Return requisted";
     item.returnReason = reason;
+
+    if (
+      order.orderedItems.every((item) => item.status === "Return requisted")
+    ) {
+      order.status = "Return requisted";
+    }
     await order.save();
 
     return res.json({

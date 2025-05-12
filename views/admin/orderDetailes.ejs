@@ -158,7 +158,7 @@
                 <th>Quantity</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
               </tr>
             </thead>
             <tbody>
@@ -192,24 +192,7 @@
                 <% } %>
                 </td>
 
-                <td>
-                  <select
-                    class="form-select action-select"
-                    id="actionSelect"
-                    data-id="<%= item._id %>"
-                    data-current="<%= item.status %>"
-                    onchange="updateSingleItemStatus(this)"
-                    <%= (item.status==="Returned" || item.status ==="Cancelled") ? "disabled" : "" %>
-                  >
-                    <option value="Delivered" <%= item.status==="Delivered" ? "selected" : "" %>>DELIVERED</option>
-                    <option value="Pending" <%= item.status==="Pending" ? "selected" : "" %>>PENDING</option>
-                    <option value="Processing" <%= item.status==="Processing" ? "selected" : "" %>>PROCESSING</option>
-                    <option value="Shipped" <%= item.status==="Shipped" ? "selected" : "" %>>SHIPPED</option>
-                  </select>
-                  <% if(!(item.status==="Returned" || item.status ==="Cancelled")){ %>
-                  <button class="btn btn-primary">Update</button>
-                  <% } %>
-                </td>
+                
               </tr>
               <% }) %>
             </tbody>

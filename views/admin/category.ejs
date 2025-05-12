@@ -74,20 +74,18 @@
                 EDIT
               </button>
               <%if(!cat[i].isListed){%>
-              <button class="btn btn-success">
-                <a
-                  href="/admin/blockCategory?id=<%=cat[i]._id%>"
-                  class="text-white"
-                  >UNBLOCK</a
-                >
+              <button
+                class="btn btn-success"
+                onclick="confirmToggle('<%= cat[i]._id %>','unblock')"
+              >
+                UNBLOCK
               </button>
               <%}else{%>
-              <button class="btn btn-danger">
-                <a
-                  href="/admin/unblockCategory?id=<%=cat[i]._id%>"
-                  class="text-white"
-                  >BLOCK</a
-                >
+              <button
+                class="btn btn-danger"
+                onclick="confirmToggle('<%= cat[i]._id %>','block')"
+              >
+                BLOCK
               </button>
               <%}%>
             </div>
@@ -245,6 +243,30 @@
     const searchInput = document.getElementById("searchInput");
     searchInput.value = "";
     window.location.href = "/admin/category";
+  }
+
+  // block unblock confirmation
+
+  function confirmToggle(id, action) {
+    const actionText = action === "block" ? "Block" : "Unblock";
+    const actionUrl =
+      action === "block"
+        ? `/admin/unblockCategory?id=${id}`
+        : `/admin/blockCategory?id=${id}`;
+
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure..!",
+      text: `${actionText} this category`,
+      showCancelButton: true,
+      confirmButtonColor: action === "block" ? "#d33" : "#28a745",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: `Yes, ${actionText.toLowerCase()} it!`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = actionUrl;
+      }
+    });
   }
 </script>
 <!-- add category validation -->

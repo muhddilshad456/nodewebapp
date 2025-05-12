@@ -154,9 +154,20 @@ const acceptSingleItemReturn = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Item not found in order" });
     }
+    const product = await Product.findById(item.productId);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "product not found" });
+    }
 
     item.status = "Returned";
+    if (order.orderedItems.every((item) => item.status === "Returned")) {
+      order.status = "Returned";
+    }
     await order.save();
+    product.stockCount += item.quantity;
+    await product.save();
     res.json({ success: true, message: "Order returned successfully" });
   } catch (error) {
     console.log("error from acceptSingleItemReturn", error);
@@ -164,20 +175,10 @@ const acceptSingleItemReturn = async (req, res) => {
   }
 };
 
-// update single item status
-
-const updateSingleItemStatus = async (req, res) => {
-  try {
-    console.log("updateSingleItemStatus", req.body);
-  } catch (error) {
-    console.log("error from updateSingleItemStatus", error);
-  }
-};
 module.exports = {
   orderPage,
   orderDetailesPage,
   orderStatus,
   confirmReturn,
   acceptSingleItemReturn,
-  updateSingleItemStatus,
 };
