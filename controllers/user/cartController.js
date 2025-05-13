@@ -8,6 +8,7 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { now } = require("mongoose");
+const Wishlist = require("../../models/wishlistSchema");
 
 // add to cart
 const addToCart = async (req, res) => {
@@ -16,6 +17,10 @@ const addToCart = async (req, res) => {
     const quantityNum = Number(quantity);
     const userId = req.session.user;
     const product = await Product.findById(productId);
+    const wishlist = await Wishlist.findOne({
+      userId,
+      "products.productId": productId,
+    });
 
     if (quantity > product.stockCount || product.stockCount === 0) {
       return res
@@ -46,6 +51,10 @@ const addToCart = async (req, res) => {
         ],
       });
       await cart.save();
+      if (wishlist) {
+        wishlist.products.pull({ productId });
+        await wishlist.save();
+      }
       return res.json({
         success: true,
         message: "product added to cart successfully",
@@ -65,6 +74,10 @@ const addToCart = async (req, res) => {
       existingProduct.totalPrice =
         existingProduct.quantity * product.productAmount;
       await cart.save();
+      if (wishlist) {
+        wishlist.products.pull({ productId });
+        await wishlist.save();
+      }
       return res.json({
         success: true,
         message: "item add to cart successfully",
@@ -77,6 +90,10 @@ const addToCart = async (req, res) => {
         totalPrice,
       });
       await cart.save();
+      if (wishlist) {
+        wishlist.products.pull({ productId });
+        await wishlist.save();
+      }
       return res.json({
         success: true,
         message: "item added to cart successfully",
@@ -87,6 +104,7 @@ const addToCart = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 // cart page rendering
 const cartPage = async (req, res) => {
   try {

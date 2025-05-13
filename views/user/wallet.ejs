@@ -1,0 +1,164 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  /* Header Styles */
+  .navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+  }
+  .navbar-brand img {
+    width: 40px;
+  }
+  .navbar-nav {
+    flex-direction: row;
+  }
+  .navbar-nav .nav-link {
+    padding: 0 15px;
+    color: #000;
+  }
+  .navbar-nav .nav-link.active {
+    font-weight: bold;
+  }
+  .navbar-nav .nav-link.icon {
+    padding: 0 10px;
+  }
+  /* Wallet Section Styles */
+  .wallet-section {
+    margin-top: 30px;
+  }
+  .wallet-balance {
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wallet-balance h2 {
+    margin: 0;
+    font-size: 2rem;
+  }
+  .wallet-balance .card-details {
+    text-align: right;
+  }
+  .wallet-balance .card-details p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .add-amount {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+  }
+  .add-amount input {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  .add-amount .btn {
+    background-color: #000;
+    color: #fff;
+    border-radius: 5px;
+  }
+  .table thead {
+    background-color: #000;
+    color: #fff;
+  }
+  .table th,
+  .table td {
+    padding: 15px;
+    vertical-align: middle;
+  }
+  /* Footer Styles */
+  .footer {
+    background-color: #000;
+    color: #fff;
+    padding: 30px 0;
+    margin-top: 50px;
+  }
+  .footer h5 {
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .footer p {
+    margin: 5px 0;
+  }
+  .footer a {
+    color: #fff;
+    text-decoration: none;
+  }
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  .footer .input-group .form-control {
+    background-color: #333;
+    border: none;
+    color: #fff;
+  }
+  .footer .input-group .btn {
+    background-color: #333;
+    border: none;
+    color: #fff;
+  }
+  .footer .social-icons a {
+    color: #fff;
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+</style>
+
+<body>
+  <!-- Wallet Section -->
+  <div class="container wallet-section">
+    <h1 class="text-center mb-4">WELCOME TO YOUR WALLET</h1>
+    <div class="wallet-balance">
+      <div>
+        <p>SKINOVA</p>
+        <p>**** **** **** 1234</p>
+        <h2>₹3,495</h2>
+      </div>
+      <div class="card-details">
+        <p>Valid Thru: 12/26</p>
+      </div>
+    </div>
+    <div class="add-amount">
+      <input type="text" class="form-control" placeholder="Enter Amount" />
+      <button class="btn">Add</button>
+    </div>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Type</th>
+          <th scope="col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>₹50</td>
+          <td>Credit</td>
+          <td>2024-08-08</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>₹30</td>
+          <td>Debit</td>
+          <td>2024-08-07</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>₹30</td>
+          <td>Bank Transfer</td>
+          <td>2024-08-06</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+<%- include("../../views/partials/user/footer") %>

@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
+const wishlistController = require("../controllers/user/wishlistController");
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require("../controllers/user/checkoutController");
+const walletController = require("../controllers/user/walletController");
 const passport = require("passport");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -80,6 +82,15 @@ router.post(
   userAuth,
   userController.returnReqSingleItem
 );
+//wishlist
+router.get("/wishlist", userAuth, wishlistController.wishlistPage);
+router.post("/addToWishList", userAuth, wishlistController.addToWishlist);
+router.post(
+  "/removeFromWishlist",
+  userAuth,
+  wishlistController.removeFromWishlist
+);
+
 //cart
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get("/cart", userAuth, cartController.cartPage);
@@ -90,4 +101,6 @@ router.get("/checkout", userAuth, checkoutController.checkoutPage);
 router.post("/placeOrder", userAuth, checkoutController.placeOrder);
 // order success page
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
+// wallet
+router.get("/wallet", userAuth, walletController.walletPage);
 module.exports = router;

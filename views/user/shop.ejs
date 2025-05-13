@@ -1,4 +1,53 @@
 <%- include("../../views/partials/user/header") %>
+<style>
+  .sidebar {
+    border-left: 4px solid #4b6cb7;
+  }
+
+  .sidebar a:hover {
+    color: #4b6cb7 !important;
+  }
+
+  .input-group .form-control {
+    border-right: none;
+  }
+
+  .input-group .btn {
+    border-left: none;
+  }
+
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-card:hover .product-overlay {
+    opacity: 0.8;
+  }
+
+  .product-overlay {
+    z-index: 1;
+  }
+
+  .product-image {
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .form-select {
+    background-color: #fff;
+    border-color: #ced4da;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-select:focus {
+    border-color: #4b6cb7;
+    box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+  }
+</style>
 
 <!-- Main Content -->
 <section class="main-content py-5">
@@ -103,58 +152,71 @@
       <!-- Product Grid -->
       <div class="col-md-9">
         <div class="row g-4">
-          <!-- Product Cards -->
-          <% for (let i = 0; i < products.length; i++) { %>
-          <div class="col-lg-3 col-md-4 col-6">
-            <div
-              class="product-card p-3 bg-white rounded-3 shadow-sm position-relative overflow-hidden"
-              style="transition: all 0.3s ease"
-            >
-              <a
-                href="/productDetailes?id=<%= products[i]._id %>"
-                class="text-decoration-none"
-              >
-                <img
-                  class="product-image img-fluid rounded-2 w-100"
-                  src="<%= products[i].productImage[0] %>"
-                  alt="<%= products[i].productName %>"
-                  style="height: 220px; object-fit: cover"
-                />
-                <div
-                  class="product-overlay bg-dark opacity-0 position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                  style="transition: opacity 0.3s ease"
-                >
-                  <span class="text-white fw-bold">View Details</span>
-                </div>
-              </a>
-              <h5
-                class="product-title text-dark mt-3 fw-semibold"
-                style="
-                  font-size: 1.1rem;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                "
-              >
-                <%= products[i].productName %>
-              </h5>
-              <div class="ratings text-warning mb-2">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half-alt"></i>
-              </div>
-              <div
-                class="product-price text-dark fw-bold"
-                style="font-size: 1.2rem"
-              >
-                ₹<%= products[i].productAmount %>
-              </div>
-            </div>
-          </div>
-          <% } %>
+  <!-- Product Cards -->
+  <% for (let i = 0; i < products.length; i++) { %>
+  <div class="col-lg-3 col-md-4 col-6">
+    <div
+      class="product-card p-3 bg-white rounded-3 shadow-sm position-relative overflow-hidden"
+      style="transition: all 0.3s ease"
+      data-product-id="<%= products[i]._id %>"
+    >
+      <a
+        href="/productDetailes?id=<%= products[i]._id %>"
+        class="text-decoration-none"
+      >
+        <img
+          class="product-image img-fluid rounded-2 w-100"
+          src="<%= products[i].productImage[0] %>"
+          alt="<%= products[i].productName %>"
+          style="height: 220px; object-fit: cover"
+        />
+        <div
+          class="product-overlay bg-dark opacity-0 position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style="transition: opacity 0.3s ease"
+        >
+          <span class="text-white fw-bold">View Details</span>
         </div>
+      </a>
+      
+      <!-- Wishlist Heart Button -->
+      <button
+        class="wishlist-btn btn position-absolute top-0 end-0 m-2 p-2"
+        onclick="toggleWishlist('<%= products[i]._id %>', this)"
+        title="Add to Wishlist"
+        style="z-index: 10;"
+      >
+      <i class="<%= wishlistProductIds.includes(products[i]._id.toString()) ? 'fa-solid fa-heart fs-5 text-danger' : 'fa-regular fa-heart fs-5 text-danger' %>"></i>
+    </button> 
+      <h5
+        class="product-title text-dark mt-3 fw-semibold"
+        style="
+          font-size: 1.1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        "
+      >
+        <%= products[i].productName %>
+      </h5>
+      
+      <div class="ratings text-warning mb-2">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+      </div>
+      
+      <div
+        class="product-price text-dark fw-bold"
+        style="font-size: 1.2rem"
+      >
+        ₹<%= products[i].productAmount %>
+      </div>
+    </div>  
+  </div>
+  <% } %>
+</div>
         <!-- Pagination -->
         <div class="d-flex justify-content-center mt-5">
           <nav>
@@ -172,55 +234,85 @@
   </div>
 </section>
 
-<!-- Footer -->
+<!-- script section -->
+<script>
+  function toggleWishlist(productId,button){
+    const icon=button.querySelector('i')
+
+    if(icon.classList.contains('fa-regular')){
+      icon.classList.remove('fa-regular')
+      icon.classList.add('fa-solid')
+
+      fetch("/addToWishList", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productId }),
+        }).then(response=>response.json())
+        .then(data=>{
+          if(data.success){
+            Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: response.message || "Item added to wishlist successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => (window.location.href = "/shop"));
+          }else{
+            Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: response.message || "Failed to add to wishlist",
+          });
+          }
+        }).catch((error)=>{
+          console.log("error from wishlist fetch", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Something went wrong",
+        });
+        })
+    }else{
+      icon.classList.remove('fa-solid')
+      icon.classList.add('fa-regular')
+
+      fetch("/removeFromWishlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productId }),
+        }).then(response=>response.json())
+        .then(data=>{
+          if(data.success){
+            Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: response.message || "Item removed successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => (window.location.href = "/shop"));
+          }else{
+            Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: response.message || "Failed to remove",
+          });
+          }
+        }).catch((error)=>{
+          console.log("error from wishlist fetch", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Something went wrong",
+        });
+        })
+    }
+  }
+</script>
+
 <%- include("../../views/partials/user/footer") %>
 
-<style>
-  .sidebar {
-    border-left: 4px solid #4b6cb7;
-  }
 
-  .sidebar a:hover {
-    color: #4b6cb7 !important;
-  }
-
-  .input-group .form-control {
-    border-right: none;
-  }
-
-  .input-group .btn {
-    border-left: none;
-  }
-
-  .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  }
-
-  .product-card:hover .product-overlay {
-    opacity: 0.8;
-  }
-
-  .product-overlay {
-    z-index: 1;
-  }
-
-  .product-image {
-    transition: transform 0.3s ease;
-  }
-
-  .product-card:hover .product-image {
-    transform: scale(1.05);
-  }
-
-  .form-select {
-    background-color: #fff;
-    border-color: #ced4da;
-    transition: border-color 0.3s ease;
-  }
-
-  .form-select:focus {
-    border-color: #4b6cb7;
-    box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
-  }
-</style>

@@ -156,7 +156,7 @@
       <button class="btn-custom mt-3" onclick="addToCart('<%= products._id%>')">
         Add to Cart
       </button>
-      <button class="btn-custom ms-2 mt-3" disabled>Add to Wishlist</button>
+      <button class="btn-wishlist btn-custom ms-2 mt-3">Add to Wishlist</button>
     </div>
   </div>
 
@@ -269,4 +269,44 @@
         });
       });
   }
+
+  // wishlist
+
+  document
+    .querySelector(".btn-wishlist")
+    ?.addEventListener("click", async () => {
+      const productId = "<%= products._id %>";
+      try {
+        const result = await fetch("/addToWishList", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productId }),
+        });
+        const response = await result.json();
+        if (response.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: response.message || "Item added to wishlist successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => (window.location.href = "/wishlist"));
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: response.message || "Failed to add to wishlist",
+          });
+        }
+      } catch (error) {
+        console.log("error from wishlist fetch", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Something went wrong",
+        });
+      }
+    });
 </script>

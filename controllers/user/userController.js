@@ -4,6 +4,7 @@ const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
+const Wishlist = require("../../models/wishlistSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -342,15 +343,16 @@ const loadShopPage = async (req, res) => {
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true });
     const brands = await Brand.find({ isListed: true });
+    const wishlist = await Wishlist.findOne({ userId: user });
     const categoryIds = categories.map((category) => category._id);
     const brandIds = brands.map((brand) => brand._id);
+    const wishlistProductIds = wishlist
+      ? wishlist.products.map((item) => item.productId.toString())
+      : [];
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
-    console.log("query : ", req.query);
     let { search, sort, brandFil, categoryFil, minPrice, maxPrice } = req.query;
-    console.log("brand ids : ", brandIds);
-    console.log("category ids : ", categoryIds);
     if (!minPrice) {
       minPrice = 0;
     }
@@ -411,9 +413,6 @@ const loadShopPage = async (req, res) => {
 
     const totalPages = Math.ceil(totalProducts / limit);
 
-    console.log("brands : ", brands);
-    console.log("brand fill : ", brandFil);
-
     res.render("shop", {
       user: userData,
       products,
@@ -428,6 +427,7 @@ const loadShopPage = async (req, res) => {
       minPrice,
       maxPrice,
       search,
+      wishlistProductIds,
     });
   } catch (error) {
     console.log("error from shop rendering page : ", error);
