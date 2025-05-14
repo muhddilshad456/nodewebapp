@@ -1,0 +1,433 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!-- Content -->
+<div class="content">
+  <div
+    class="d-flex justify-content-between align-items-center mb-4"
+    style="padding-top: 20px"
+  >
+    <h2>Offers</h2>
+    <div class="d-flex">
+      <form action="/admin/offer">
+        <div class="input-group me-2" style="width: 300px">
+          <input
+            type="text"
+            class="form-control"
+            name="search"
+            id="searchInput"
+            placeholder="Search for Offers"
+            aria-label="Search"
+          />
+          <button class="btn btn-dark" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+          <button class="btn btn-outline-secondary" type="button">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </form>
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#addOfferModal"
+      >
+        ADD OFFER <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th scope="col">OFFER NAME</th>
+          <th scope="col">TYPE</th>
+          <th scope="col">START DATE</th>
+          <th scope="col">END DATE</th>
+          <th scope="col">DISCOUNT</th>
+          <th scope="col">STATUS</th>
+          <th scope="col">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% offer.forEach(item=>{ %>
+        <tr>
+          <td><%= item.offerName %></td>
+          <td><%= item.offerType %></td>
+          <td><%= item.startDate.toISOString().slice(0, 10) %></td>
+          <td><%= item.endDate.toISOString().slice(0, 10) %></td>
+          <td><%= item.discount %></td>
+          <td><%= item.status %></td>
+
+          <td>
+            <div class="d-flex">
+              <button
+                class="btn btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#editOfferModal"
+              >
+                EDIT
+              </button>
+              <button class="btn btn-danger">BLOCK</button>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item active">
+          <a class="page-link" href="?page=1">1</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page=2">2</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Add Offer Modal -->
+<div
+  class="modal fade"
+  id="addOfferModal"
+  tabindex="-1"
+  aria-labelledby="addOfferModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addOfferModalLabel">Add Offer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="addOfferForm">
+          <div class="mb-3">
+            <label for="offerName" class="form-label">Offer Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="offerName"
+              id="offerName"
+              placeholder="Enter offer name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="offerName" class="form-label">Description</label>
+            <textarea
+              type="text"
+              class="form-control"
+              name="description"
+              id="description"
+              placeholder="Enter description"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="offerType" class="form-label">Offer Type</label>
+            <select class="form-select" name="offerType" id="offerType">
+              <option value="" disabled selected>Select offer type</option>
+              <option value="product">Product</option>
+              <option value="category">Category</option>
+              <option value="brand">Brand</option>
+            </select>
+          </div>
+          <div class="mb-3" id="itemSelectContainer" style="display: none">
+            <label for="itemSelect" class="form-label">Select Item</label>
+            <select class="form-select" name="item" id="itemSelect">
+              <option value="" disabled selected>Select an item</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input
+              type="date"
+              class="form-control"
+              name="startDate"
+              id="startDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="endDate" class="form-label">End Date</label>
+            <input
+              type="date"
+              class="form-control"
+              name="endDate"
+              id="endDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="discount" class="form-label">Discount (%)</label>
+            <input
+              type="number"
+              class="form-control"
+              name="discount"
+              id="discount"
+              placeholder="Enter discount percentage"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Offer Status</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="isActive"
+                id="isActiveTrue"
+                value="Active"
+                checked
+              />
+              <label
+                style="color: black"
+                class="form-check-label"
+                for="isActiveTrue"
+              >
+                Active
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="isActive"
+                id="isActiveFalse"
+                value="Disabled"
+              />
+              <label
+                style="color: black"
+                class="form-check-label"
+                for="isActiveFalse"
+              >
+                Inactive
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <span id="msgSpace"></span>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" form="addOfferForm">
+          Add Offer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Offer Modal -->
+<div
+  class="modal fade"
+  id="editOfferModal"
+  tabindex="-1"
+  aria-labelledby="editOfferModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editOfferModalLabel">Edit Offer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editOfferForm">
+          <input type="hidden" id="editOfferId" name="editId" />
+          <div class="mb-3">
+            <label for="editOfferBrand" class="form-label">Brand</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editOfferBrand"
+              name="editBrand"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editStartDate" class="form-label">Start Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="editStartDate"
+              name="editStartDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editEndDate" class="form-label">End Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="editEndDate"
+              name="editEndDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editMinPrize1" class="form-label">Min Prize 1</label>
+            <input
+              type="number"
+              class="form-control"
+              id="editMinPrize1"
+              name="editMinPrize1"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editMinPrize2" class="form-label">Min Prize 2</label>
+            <input
+              type="number"
+              class="form-control"
+              id="editMinPrize2"
+              name="editMinPrize2"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editDiscount" class="form-label">Discount (%)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="editDiscount"
+              name="editDiscount"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" form="editOfferForm">
+          Edit Offer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- script section -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const offerTypeSelect = document.getElementById("offerType");
+    const itemSelectContainer = document.getElementById("itemSelectContainer");
+    const itemSelect = document.getElementById("itemSelect");
+
+    // Sample data (replace with API calls)
+   const allData = {
+   product:  <%- JSON.stringify(product) %>,
+   category: <%- JSON.stringify(category) %>,
+   brand:    <%- JSON.stringify(brand) %>
+   };
+
+    console.log("allData", allData);
+
+    offerTypeSelect.addEventListener("change", (e) => {
+      const selectedType = e.target.value;
+      itemSelect.innerHTML =
+        '<option value="" disabled selected>Select an item</option>';
+
+      if (selectedType) {
+        itemSelectContainer.style.display = "block";
+
+        const items = allData[selectedType] || [];
+
+        items.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item._id;
+          option.textContent = item.name ? item.name : item.productName;
+          itemSelect.appendChild(option);
+        });
+      } else {
+        itemSelectContainer.style.display = "none";
+      }
+    });
+
+    // Form submission (example)
+    document.getElementById("addOfferForm").addEventListener("submit", async(e) => {
+      e.preventDefault();
+
+      const offerName=document.getElementById("offerName").value
+      const description=document.getElementById("description").value
+      const offerType=document.getElementById("offerType").value
+      const itemSelect=document.getElementById("itemSelect").value
+      const startDate=document.getElementById("startDate").value
+      const endDate=document.getElementById("endDate").value
+      const discount=document.getElementById("discount").value
+      const status=document.querySelector('input[name="isActive"]:checked').value
+      const msgSpace=document.getElementById("msgSpace")
+
+      if (!offerName || !offerType ||!itemSelect||!startDate||!endDate||!discount||!status || !description) {
+      msgSpace.style.display="block"
+      msgSpace.style.color="red"
+      msgSpace.innerHTML="Fill required spaces"
+      return false;
+      }
+      if (new Date(startDate) >= new Date(endDate)) {
+      msgSpace.style.display="block"
+      msgSpace.style.color="red"
+      msgSpace.innerHTML="End date must be after start date."
+      return false;
+      }
+      if (isNaN(discount) || Number(discount) <= 0 || Number(discount) > 100) {
+      msgSpace.style.display="block"
+      msgSpace.style.color="red"
+      msgSpace.innerHTML="Please enter a valid discount."
+      return false;
+      }
+
+      try {
+        const result=await fetch("/admin/addOffer",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            offerName,
+            description,
+            offerType,
+            itemSelect,
+            startDate,
+            endDate,
+            discount,
+            status,
+        })
+      })
+
+      const response=await result.json()
+
+      if(response.success){
+        Swal.fire({
+            icon:"success",
+            title:"Success",
+            text:response.message || "Offer added successfully"
+        }).then(()=>location.reload())
+      }else{
+        Swal.fire({
+            icon:"error",
+            title:"Failed",
+            text:response.message || "Failed to add offer"
+        })
+      }
+      } catch (error) {
+          Swal.fire({
+            icon:"error",
+            title:"Failed",
+            text:error.message || "something went wrong"
+        })
+      }
+    });
+  });
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

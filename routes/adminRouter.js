@@ -6,6 +6,8 @@ const categoryController = require("../controllers/admin/categoryController");
 const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
 const orderController = require("../controllers/admin/orderController");
+const offerController = require("../controllers/admin/offerController");
+const couponController = require("../controllers/admin/couponController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 // login
 router.get("/login", adminController.loadLogin);
@@ -62,5 +64,11 @@ router.post(
   adminAuth,
   orderController.acceptSingleItemReturn
 );
+
+// offer
+router.get("/offer", adminAuth, offerController.offerPage);
+router.post("/addOffer", adminAuth, offerController.addOffer);
+// coupon
+router.get("/coupon", adminAuth, couponController.couponPage);
 
 module.exports = router;
