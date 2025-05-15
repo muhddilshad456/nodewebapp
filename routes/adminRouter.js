@@ -68,6 +68,10 @@ router.post(
 // offer
 router.get("/offer", adminAuth, offerController.offerPage);
 router.post("/addOffer", adminAuth, offerController.addOffer);
+router.post("/editOffer", adminAuth, offerController.editOffer);
+router.post("/disableOffer", adminAuth, offerController.disableOffer);
+router.post("/enableOffer", adminAuth, offerController.enableOffer);
+
 // coupon
 router.get("/coupon", adminAuth, couponController.couponPage);
 

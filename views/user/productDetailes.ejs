@@ -125,7 +125,17 @@
     </div>
     <div class="col-md-6 highlight">
       <h2 class="text-warning"><%= products.productName %></h2>
+      <% if(products.offer){ %>
+      <p class="display-6 text-success">₹<%= products.offerPrice %></p>
+      <p
+        class="display-7 text-success text-muted"
+        style="text-decoration: line-through"
+      >
+        ₹<%= products.productAmount %>
+      </p>
+      <% }else{ %>
       <p class="display-6 text-success">₹<%= products.productAmount %></p>
+      <% } %>
       <p class="coupon">Coupon Applied: Save ₹2,000!</p>
       <% if(quantity==0){ %>
       <h5 style="color: red">Out of stock</h5>

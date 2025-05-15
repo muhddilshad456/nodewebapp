@@ -32,7 +32,7 @@ const offerSchema = new Schema({
   },
   offerType: {
     type: String,
-    enum: ["product", "category"],
+    enum: ["product", "category", "brand"],
     required: true,
   },
   targetId: {

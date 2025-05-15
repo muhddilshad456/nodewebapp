@@ -142,24 +142,27 @@
         </tr>
       </thead>
       <tbody>
-        <% cart.items.forEach((item)=>{ %>
+        <% cart.forEach((item)=>{ %>
         <tr class="cart-item">
           <td>
             <div class="d-flex align-items-center">
               <img
-                src="<%=item.productId.productImage[0] %>"
+                src="<%=item.product.productId.productImage[0] %>"
                 alt="Titan Edge Ceramic Quartz"
               />
               <p></p>
             </div>
           </td>
-          <td>₹<%=item.price %></td>
+          <td>
+            <% if(item.offer){ %>₹<%=item.offerPrice %> <% }else{ %>
+            ₹<%=item.originalPrice %> <% } %>
+          </td>
           <td>
             <div class="input-group quantity-control w-50">
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                onclick="decreaseQuantity('<%= item._id %>')"
+                onclick="decreaseQuantity('<%= item.product._id %>')"
               >
                 -
               </button>
@@ -168,13 +171,13 @@
                 class="form-control text-center"
                 id="quantity-<%= item._id %>"
                 value="<%=item.quantity %>"
-                data-stock="<%= item.productId.stockCount %>"
+                data-stock="<%= item.product.productId.stockCount %>"
                 readonly
               />
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                onclick="increaseQuantity('<%= item._id %>')"
+                onclick="increaseQuantity('<%= item.product._id %>')"
               >
                 +
               </button>
@@ -182,7 +185,10 @@
           </td>
           <td id="price-<%= item._id %>">₹<%=item.totalPrice %></td>
           <td>
-            <button class="delete-btn" data-id="<%= item.productId._id %>">
+            <button
+              class="delete-btn"
+              data-id="<%= item.product.productId._id %>"
+            >
               Delete
             </button>
           </td>
@@ -217,7 +223,7 @@
   // check cart empty or not
   const checkoutBtn = document.getElementById("checkoutBtn");
 
-  const cartSize = Number("<%= cart.items.length %>");
+  const cartSize = Number("<%= cart.product %>");
 
   checkoutBtn.addEventListener("click", function (e) {
     if (cartSize === 0) {

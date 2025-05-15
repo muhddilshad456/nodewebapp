@@ -4,6 +4,7 @@ const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
 const Cart = require("../../models/cartSchema");
+const Offer = require("../../models/offerSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -123,7 +124,46 @@ const cartPage = async (req, res) => {
       await cart.save();
     }
 
-    res.render("cart", { cart });
+    // offer
+    const activeOffers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    });
+
+    const cartWithOffer = cart.items.map((item) => {
+      let maxDiscount = 0;
+      let appliedOffer = null;
+
+      activeOffers.forEach((offer) => {
+        const applies =
+          (offer.offerType === "product" &&
+            offer.targetId.toString() === item.productId._id.toString()) ||
+          (offer.offerType === "category" &&
+            offer.targetId.toString() === item.productId.category.toString()) ||
+          (offer.offerType === "brand" &&
+            offer.targetId.toString() === item.productId.brand.toString());
+
+        if (applies && offer.discount > maxDiscount) {
+          maxDiscount = offer.discount;
+          appliedOffer = offer;
+        }
+      });
+
+      const offerPrice = item.productAmount * (1 - maxDiscount / 100);
+      const totalOfferPrice = offerPrice * item.quantity;
+
+      return {
+        product: item,
+        quantity: item.quantity,
+        originalPrice: item.price,
+        offerPrice,
+        totalOfferPrice,
+        offer: appliedOffer,
+      };
+    });
+    console.log("cart with offer : ", cartWithOffer);
+    res.render("cart", { cart: cartWithOffer });
   } catch (error) {
     console.log("error from cart page rendering", error);
   }

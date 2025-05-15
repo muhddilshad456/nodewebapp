@@ -11,16 +11,30 @@ const offerPage = async (req, res) => {
     const brand = await Brand.find({ isListed: true });
 
     const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4;
+    const skip = limit * (page - 1);
 
     const offer = await Offer.find({
       offerName: { $regex: ".*" + search + ".*", $options: "i" },
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const totalOffers = await Offer.countDocuments({
+      offerName: { $regex: ".*" + search + ".*", $options: "i" },
     });
+
+    const totalPages = Math.ceil(totalOffers / limit);
 
     res.render("offer", {
       product,
       category,
       brand,
       offer,
+      currentPage: page,
+      totalPages,
     });
   } catch (error) {
     console.log("error from offer page render", error);
@@ -31,7 +45,6 @@ const offerPage = async (req, res) => {
 
 const addOffer = async (req, res) => {
   try {
-    console.log("add offer data", req.body);
     const {
       offerName,
       description,
@@ -40,7 +53,6 @@ const addOffer = async (req, res) => {
       startDate,
       endDate,
       discount,
-      status,
     } = req.body;
 
     const offer = await Offer.findOne({ offerName });
@@ -57,7 +69,6 @@ const addOffer = async (req, res) => {
       startDate,
       endDate,
       discount,
-      status,
     });
 
     await newOffer.save();
@@ -67,7 +78,68 @@ const addOffer = async (req, res) => {
   }
 };
 
+// edit offer
+
+const editOffer = async (req, res) => {
+  try {
+    const {
+      eofferName,
+      edescription,
+      eofferType,
+      eitemSelect,
+      estartDate,
+      eendDate,
+      ediscount,
+      eofferId,
+    } = req.body;
+
+    const offer = await Offer.findById(eofferId);
+
+    offer.offerName = eofferName;
+    offer.description = edescription;
+    offer.discount = ediscount;
+    offer.startDate = estartDate;
+    offer.endDate = eendDate;
+    offer.offerType = eofferType;
+    offer.targetId = eitemSelect;
+
+    await offer.save();
+    res.json({ success: true, message: "Offer edited successfully" });
+  } catch (error) {
+    console.log("error from edit offer", error);
+  }
+};
+
+// disable offer
+
+const disableOffer = async (req, res) => {
+  try {
+    const { offerId } = req.body;
+    const offer = await Offer.findById(offerId);
+    offer.status = "Disabled";
+    await offer.save();
+    res.json({ success: true, message: "Offer disabled successfully" });
+  } catch (error) {
+    console.log("error from disable offer", error);
+  }
+};
+
+// enable offer
+const enableOffer = async (req, res) => {
+  try {
+    const { offerId } = req.body;
+    const offer = await Offer.findById(offerId);
+    offer.status = "Active";
+    await offer.save();
+    res.json({ success: true, message: "Offer enabled successfully" });
+  } catch (error) {
+    console.log("error from enable offer", error);
+  }
+};
 module.exports = {
   offerPage,
   addOffer,
+  editOffer,
+  disableOffer,
+  enableOffer,
 };

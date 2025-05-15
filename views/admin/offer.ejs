@@ -21,7 +21,11 @@
           <button class="btn btn-dark" type="submit">
             <i class="bi bi-search"></i>
           </button>
-          <button class="btn btn-outline-secondary" type="button">
+          <button
+            class="btn btn-outline-secondary"
+            onclick="clearSearch()"
+            type="button"
+          >
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
@@ -62,13 +66,35 @@
           <td>
             <div class="d-flex">
               <button
-                class="btn btn-secondary"
+                class="btn btn-secondary edit-offer-btn"
+                data-id="<%= item._id %>"
+                data-name="<%= item.offerName %>"
+                data-description="<%= item.description %>"
+                data-type="<%= item.offerType %>"
+                data-item="<%= item.targetId %>"
+                data-start="<%= item.startDate.toISOString().substring(0, 10) %>"
+                data-end="<%= item.endDate.toISOString().substring(0, 10) %>"
+                data-discount="<%= item.discount %>"
                 data-bs-toggle="modal"
                 data-bs-target="#editOfferModal"
               >
                 EDIT
               </button>
-              <button class="btn btn-danger">BLOCK</button>
+              <% if(item.status==="Active"){ %>
+              <button
+                class="btn-disable btn btn-danger"
+                data-id="<%= item._id %>"
+              >
+                Disable
+              </button>
+              <% }else{ %>
+              <button
+                class="btn-enable btn btn-success"
+                data-id="<%= item._id %>"
+              >
+                Enable
+              </button>
+              <% } %>
             </div>
           </td>
         </tr>
@@ -79,12 +105,11 @@
   <div class="d-flex justify-content-between align-items-center mt-3">
     <nav aria-label="Page navigation">
       <ul class="pagination">
-        <li class="page-item active">
-          <a class="page-link" href="?page=1">1</a>
+        <% for(i=1;i<=totalPages;i++){ %>
+        <li class="page-item <%= i===currentPage ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
         </li>
-        <li class="page-item">
-          <a class="page-link" href="?page=2">2</a>
-        </li>
+        <% } %>
       </ul>
     </nav>
   </div>
@@ -174,42 +199,6 @@
               placeholder="Enter discount percentage"
             />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Offer Status</label>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="isActive"
-                id="isActiveTrue"
-                value="Active"
-                checked
-              />
-              <label
-                style="color: black"
-                class="form-check-label"
-                for="isActiveTrue"
-              >
-                Active
-              </label>
-            </div>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="isActive"
-                id="isActiveFalse"
-                value="Disabled"
-              />
-              <label
-                style="color: black"
-                class="form-check-label"
-                for="isActiveFalse"
-              >
-                Inactive
-              </label>
-            </div>
-          </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -230,7 +219,7 @@
   class="modal fade"
   id="editOfferModal"
   tabindex="-1"
-  aria-labelledby="editOfferModalLabel"
+  aria-labelledby="addOfferModalLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
@@ -246,64 +235,79 @@
       </div>
       <div class="modal-body">
         <form id="editOfferForm">
-          <input type="hidden" id="editOfferId" name="editId" />
           <div class="mb-3">
-            <label for="editOfferBrand" class="form-label">Brand</label>
+            <label for="offerName" class="form-label">Offer Name</label>
             <input
               type="text"
               class="form-control"
-              id="editOfferBrand"
-              name="editBrand"
+              name="eofferName"
+              id="eofferName"
+              placeholder="Enter offer name"
             />
           </div>
+          <input
+            type="hidden"
+            class="form-control"
+            name="eofferId"
+            id="eofferId"
+          />
           <div class="mb-3">
-            <label for="editStartDate" class="form-label">Start Date</label>
+            <label for="offerName" class="form-label">Description</label>
+            <textarea
+              type="text"
+              class="form-control"
+              name="edescription"
+              id="edescription"
+              placeholder="Enter description"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="offerType" class="form-label">Offer Type</label>
+            <select class="form-select" name="eofferType" id="eofferType">
+              <option value="" disabled selected>Select offer type</option>
+              <option value="product">Product</option>
+              <option value="category">Category</option>
+              <option value="brand">Brand</option>
+            </select>
+          </div>
+          <div class="mb-3" id="eitemSelectContainer">
+            <label for="itemSelect" class="form-label">Select Item</label>
+            <select class="form-select" name="eitemSelect" id="eitemSelect">
+              <option value="" disabled selected>Select an item</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Start Date</label>
             <input
               type="date"
               class="form-control"
-              id="editStartDate"
-              name="editStartDate"
+              name="estartDate"
+              id="estartDate"
             />
           </div>
           <div class="mb-3">
-            <label for="editEndDate" class="form-label">End Date</label>
+            <label for="endDate" class="form-label">End Date</label>
             <input
               type="date"
               class="form-control"
-              id="editEndDate"
-              name="editEndDate"
+              name="eendDate"
+              id="eendDate"
             />
           </div>
           <div class="mb-3">
-            <label for="editMinPrize1" class="form-label">Min Prize 1</label>
+            <label for="discount" class="form-label">Discount (%)</label>
             <input
               type="number"
               class="form-control"
-              id="editMinPrize1"
-              name="editMinPrize1"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="editMinPrize2" class="form-label">Min Prize 2</label>
-            <input
-              type="number"
-              class="form-control"
-              id="editMinPrize2"
-              name="editMinPrize2"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="editDiscount" class="form-label">Discount (%)</label>
-            <input
-              type="number"
-              class="form-control"
-              id="editDiscount"
-              name="editDiscount"
+              name="ediscount"
+              id="ediscount"
+              placeholder="Enter discount percentage"
             />
           </div>
         </form>
       </div>
       <div class="modal-footer">
+        <span id="emsgSpace"></span>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
@@ -318,116 +322,355 @@
 <!-- script section -->
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const offerTypeSelect = document.getElementById("offerType");
-    const itemSelectContainer = document.getElementById("itemSelectContainer");
-    const itemSelect = document.getElementById("itemSelect");
+        // clear search
+        function clearSearch() {
+        const searchInput = document.getElementById("searchInput");
+        searchInput.value = "";
+        window.location.href = "/admin/offer";
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        // add offer
+        const offerTypeSelect = document.getElementById("offerType");
+        const itemSelectContainer = document.getElementById("itemSelectContainer");
+        const itemSelect = document.getElementById("itemSelect");
 
-    // Sample data (replace with API calls)
-   const allData = {
-   product:  <%- JSON.stringify(product) %>,
-   category: <%- JSON.stringify(category) %>,
-   brand:    <%- JSON.stringify(brand) %>
-   };
+       const allData = {
+       product:  <%- JSON.stringify(product) %>,
+       category: <%- JSON.stringify(category) %>,
+       brand:    <%- JSON.stringify(brand) %>
+       };
 
-    console.log("allData", allData);
+        console.log("allData", allData);
 
-    offerTypeSelect.addEventListener("change", (e) => {
-      const selectedType = e.target.value;
-      itemSelect.innerHTML =
-        '<option value="" disabled selected>Select an item</option>';
+        offerTypeSelect.addEventListener("change", (e) => {
+          const selectedType = e.target.value;
+          itemSelect.innerHTML =
+            '<option value="" disabled selected>Select an item</option>';
 
-      if (selectedType) {
-        itemSelectContainer.style.display = "block";
+          if (selectedType) {
+            itemSelectContainer.style.display = "block";
 
-        const items = allData[selectedType] || [];
+            const items = allData[selectedType] || [];
 
-        items.forEach((item) => {
-          const option = document.createElement("option");
-          option.value = item._id;
-          option.textContent = item.name ? item.name : item.productName;
-          itemSelect.appendChild(option);
+            items.forEach((item) => {
+              const option = document.createElement("option");
+              option.value = item._id;
+              option.textContent = item.name ? item.name : item.productName;
+              itemSelect.appendChild(option);
+            });
+          } else {
+            itemSelectContainer.style.display = "none";
+          }
         });
-      } else {
-        itemSelectContainer.style.display = "none";
-      }
-    });
 
-    // Form submission (example)
-    document.getElementById("addOfferForm").addEventListener("submit", async(e) => {
-      e.preventDefault();
+        document.getElementById("addOfferForm").addEventListener("submit", async(e) => {
+          e.preventDefault();
 
-      const offerName=document.getElementById("offerName").value
-      const description=document.getElementById("description").value
-      const offerType=document.getElementById("offerType").value
-      const itemSelect=document.getElementById("itemSelect").value
-      const startDate=document.getElementById("startDate").value
-      const endDate=document.getElementById("endDate").value
-      const discount=document.getElementById("discount").value
-      const status=document.querySelector('input[name="isActive"]:checked').value
-      const msgSpace=document.getElementById("msgSpace")
+          const offerName=document.getElementById("offerName").value
+          const description=document.getElementById("description").value
+          const offerType=document.getElementById("offerType").value
+          const itemSelect=document.getElementById("itemSelect").value
+          const startDate=document.getElementById("startDate").value
+          const endDate=document.getElementById("endDate").value
+          const discount=document.getElementById("discount").value
+          const msgSpace=document.getElementById("msgSpace")
 
-      if (!offerName || !offerType ||!itemSelect||!startDate||!endDate||!discount||!status || !description) {
-      msgSpace.style.display="block"
-      msgSpace.style.color="red"
-      msgSpace.innerHTML="Fill required spaces"
-      return false;
-      }
-      if (new Date(startDate) >= new Date(endDate)) {
-      msgSpace.style.display="block"
-      msgSpace.style.color="red"
-      msgSpace.innerHTML="End date must be after start date."
-      return false;
-      }
-      if (isNaN(discount) || Number(discount) <= 0 || Number(discount) > 100) {
-      msgSpace.style.display="block"
-      msgSpace.style.color="red"
-      msgSpace.innerHTML="Please enter a valid discount."
-      return false;
-      }
+          if (!offerName || !offerType ||!itemSelect||!startDate||!endDate||!discount || !description) {
+          msgSpace.style.display="block"
+          msgSpace.style.color="red"
+          msgSpace.innerHTML="Fill required spaces"
+          return false;
+          }
+          if (new Date(startDate) >= new Date(endDate)) {
+          msgSpace.style.display="block"
+          msgSpace.style.color="red"
+          msgSpace.innerHTML="End date must be after start date."
+          return false;
+          }
+          if (isNaN(discount) || Number(discount) <= 0 || Number(discount) > 100) {
+          msgSpace.style.display="block"
+          msgSpace.style.color="red"
+          msgSpace.innerHTML="Please enter a valid discount."
+          return false;
+          }
 
-      try {
-        const result=await fetch("/admin/addOffer",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            offerName,
-            description,
-            offerType,
-            itemSelect,
-            startDate,
-            endDate,
-            discount,
-            status,
+          try {
+            const result=await fetch("/admin/addOffer",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                offerName,
+                description,
+                offerType,
+                itemSelect,
+                startDate,
+                endDate,
+                discount,
+            })
+          })
+
+          const response=await result.json()
+
+          if(response.success){
+            Swal.fire({
+                icon:"success",
+                title:"Success",
+                text:response.message || "Offer added successfully",
+                showConfirmButton:false,
+                timer:1500
+            }).then(()=>location.reload())
+          }else{
+            Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:response.message || "Failed to add offer"
+            })
+          }
+          } catch (error) {
+              Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:error.message || "something went wrong"
+            })
+          }
+        });
+
+
+       // edit offer
+       const editButtons=document.querySelectorAll(".edit-offer-btn")
+       editButtons.forEach((button)=>{
+        button.addEventListener("click",function(){
+            const type=this.dataset.type
+            const itemId=this.dataset.item
+            const items=allData[type] || []
+
+            const eofferType=document.getElementById("eofferType")
+            const eitemSelected=document.getElementById("eitemSelected")
+
+            document.getElementById('eofferName').value = this.dataset.name || '';
+            document.getElementById('eofferId').value=this.dataset.id || ''
+            document.getElementById('edescription').value = this.dataset.description || '';
+            document.getElementById('estartDate').value = this.dataset.start || '';
+            document.getElementById('eendDate').value = this.dataset.end || '';
+            document.getElementById('ediscount').value = this.dataset.discount || '';
+
+            eofferType.value=type
+            eitemSelect.innerHTML = '<option value="" disabled>Select an item</option>';
+            items.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item._id;
+            option.textContent = item.name || item.productName;
+            eitemSelect.appendChild(option);
+           });
+
+            eitemSelect.value = itemId;
+
+            eofferType.onchange=function(){
+            const selectedType=this.value
+            const newItems=allData[selectedType] || []
+
+            eitemSelect.innerHTML = '<option value="" disabled selected>Select an item</option>';
+            newItems.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item._id;
+            option.textContent = item.name || item.productName;
+            eitemSelect.appendChild(option);
+          });
+           }
+
         })
       })
 
-      const response=await result.json()
+      // validation
+      document.getElementById("editOfferForm").addEventListener("submit",async(e)=>{
+        e.preventDefault()
 
-      if(response.success){
-        Swal.fire({
-            icon:"success",
-            title:"Success",
-            text:response.message || "Offer added successfully"
-        }).then(()=>location.reload())
-      }else{
-        Swal.fire({
-            icon:"error",
-            title:"Failed",
-            text:response.message || "Failed to add offer"
+          const eofferId=document.getElementById('eofferId').value
+          const eofferName=document.getElementById("eofferName").value
+          const edescription=document.getElementById("edescription").value
+          const eofferType=document.getElementById("eofferType").value
+          const eitemSelect=document.getElementById("eitemSelect").value
+          const estartDate=document.getElementById("estartDate").value
+          const eendDate=document.getElementById("eendDate").value
+          const ediscount=document.getElementById("ediscount").value
+          const emsgSpace=document.getElementById("emsgSpace")
+
+          if (!eofferName || !eofferType ||!eitemSelect||!estartDate||!eendDate||!ediscount || !edescription) {
+          emsgSpace.style.display="block"
+          emsgSpace.style.color="red"
+          emsgSpace.innerHTML="Fill required spaces"
+          return false;
+          }
+          if (new Date(estartDate) >= new Date(eendDate)) {
+          emsgSpace.style.display="block"
+          emsgSpace.style.color="red"
+          emsgSpace.innerHTML="End date must be after start date."
+          return false;
+          }
+          if (isNaN(ediscount) || Number(ediscount) <= 0 || Number(ediscount) > 100) {
+          emsgSpace.style.display="block"
+          emsgSpace.style.color="red"
+          emsgSpace.innerHTML="Please enter a valid discount."
+          return false;
+          }
+
+          try {
+            const result=await fetch("/admin/editOffer",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                eofferName,
+                edescription,
+                eofferType,
+                eitemSelect,
+                estartDate,
+                eendDate,
+                ediscount,
+                eofferId
+            })
+          })
+
+          const response=await result.json()
+
+          if(response.success){
+            Swal.fire({
+                icon:"success",
+                title:"Success",
+                text:response.message || "Offer edited successfully",
+                showConfirmButton:false,
+                timer:1500
+            }).then(()=>location.reload())
+          }else{
+            Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:response.message || "Failed to edit offer"
+            })
+          }
+          } catch (error) {
+              Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:error.message || "something went wrong"
+            })
+          }
+      })
+
+
+    // offer status updation
+    // disable
+    document.querySelectorAll(".btn-disable").forEach((button)=>{
+      button.addEventListener("click",async()=>{
+        const offerId=button.dataset.id
+
+        const cnfrm=await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to disable this offer?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, disable it!",
         })
-      }
-      } catch (error) {
-          Swal.fire({
-            icon:"error",
-            title:"Failed",
-            text:error.message || "something went wrong"
+
+        if(cnfrm.isConfirmed){
+          try {
+            const result=await fetch("/admin/disableOffer",{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                offerId
+              }),
+            })
+
+            const data=await result.json()
+
+            if(data.success){
+              Swal.fire({
+                icon:"success",
+                title:"Success",
+                text:data.message || "Offer disable successfully",
+                showConfirmButton:false,
+                timer:1500
+            }).then(()=>location.reload())
+            }else{
+              Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:data.message || "Failed to disable offer"
+            })
+            }
+          } catch (error) {
+            Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:error.message || "something went wrong"
+            })
+          }
+        }
+     })
+    })
+    // enable offer
+    document.querySelectorAll(".btn-enable").forEach((button)=>{
+      button.addEventListener("click",async()=>{
+        const offerId=button.dataset.id
+
+        const cnfrm=await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to enable this offer?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, disable it!",
         })
-      }
-    });
-  });
+
+        if(cnfrm.isConfirmed){
+          try {
+            const result=await fetch("/admin/enableOffer",{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                offerId
+              }),
+            })
+
+            const data=await result.json()
+
+            if(data.success){
+              Swal.fire({
+                icon:"success",
+                title:"Success",
+                text:data.message || "Offer enable successfully",
+                showConfirmButton:false,
+                timer:1500
+            }).then(()=>location.reload())
+            }else{
+              Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:data.message || "Failed to enable offer"
+            })
+            }
+          } catch (error) {
+            Swal.fire({
+                icon:"error",
+                title:"Failed",
+                text:error.message || "something went wrong"
+            })
+          }
+        }
+     })
+    })
+  })
 </script>
 
 <%- include("../../views/partials/admin/footer") %>
