@@ -2,34 +2,41 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const couponSchema = new Schema({
-  name: {
+  couponCode: {
     type: String,
     required: true,
+    unique: true,
   },
-  createdOn: {
+  startDate: {
     type: Date,
     default: Date.now,
     required: true,
   },
-  expireOn: {
+  endDate: {
     type: Date,
     required: true,
   },
-  offerPrice: {
+  discount: {
     type: Number,
     required: true,
   },
-  minimumPrice: {
+  minCartValue: {
     type: Number,
     required: true,
   },
-  isListed: {
-    type: Boolean,
-    default: true,
+  status: {
+    type: String,
+    enum: ["Active", "Disabled"],
+    default: "Active",
   },
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
+  description: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

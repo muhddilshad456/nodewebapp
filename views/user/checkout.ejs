@@ -328,23 +328,23 @@
           <div class="order-summary">
             <h4 class="section-title">Order Summary</h4>
             <div class="cart-item">
-              <% cart.items.forEach((item)=>{ %>
+              <% cart.forEach((item)=>{ %>
               <div class="cart-product">
-                <img src="<%= item.productId.productImage[0] %>" alt="Item" />
-                <span><%= item.productId.productName %></span>
+                <img src="<%= item.product.productImage[0] %>" alt="Item" />
+                <span><%= item.product.productName %></span>
+                <span>pcs: <%= item.quantity %></span>
               </div>
               <% }) %>
             </div>
             <div class="cart-total">
               <p>
                 <span>Subtotal</span>
-                <span>₹<%= cart ? cart.cartTotal : 0 %></span>
+                <span>₹<%= grandTotal %></span>
               </p>
-              <p><span>Delivery</span> <span>₹0.00</span></p>
-              <p><span>Discount</span> <span>₹0.00</span></p>
+              <p><span>Discount</span> <span>₹<%= totalDiscount %></span></p>
               <p>
                 <strong>Total</strong>
-                <strong>₹<%= cart ? cart.cartTotal : 0 %></strong>
+                <strong>₹<%= grandOfferTotal %></strong>
               </p>
             </div>
           </div>

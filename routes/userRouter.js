@@ -99,8 +99,8 @@ router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
 // check out
 router.get("/checkout", userAuth, checkoutController.checkoutPage);
 router.post("/placeOrder", userAuth, checkoutController.placeOrder);
-// order success page
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
+
 // wallet
 router.get("/wallet", userAuth, walletController.walletPage);
 module.exports = router;

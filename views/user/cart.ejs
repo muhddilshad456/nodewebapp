@@ -169,7 +169,7 @@
               <input
                 type="number"
                 class="form-control text-center"
-                id="quantity-<%= item._id %>"
+                id="quantity-<%= item.product._id %>"
                 value="<%=item.quantity %>"
                 data-stock="<%= item.product.productId.stockCount %>"
                 readonly
@@ -183,7 +183,10 @@
               </button>
             </div>
           </td>
-          <td id="price-<%= item._id %>">₹<%=item.totalPrice %></td>
+          <td id="price-<%= item.product._id %>">
+            <% if(item.offer){ %>₹<%=item.totalOfferPrice %> <% }else{ %>
+            ₹<%=item.product.totalPrice %> <% } %>
+          </td>
           <td>
             <button
               class="delete-btn"
@@ -199,11 +202,10 @@
 
     <div class="cart-totals">
       <h4>CART TOTALS</h4>
-      <p id="subTotal">Subtotal: ₹<%= cart.cartTotal %></p>
-      <p>Delivery: ₹0.00</p>
-      <p>Discount: ₹0.00</p>
+      <p id="subTotal">Subtotal: ₹<%= cartTotal %></p>
+      <p>Discount: ₹<%= (cartTotal-finalCartTotal) %></p>
       <hr />
-      <h5 id="cartTotal">TOTAL: ₹<%= cart.cartTotal %></h5>
+      <h5 id="cartTotal">TOTAL: ₹<%= finalCartTotal %></h5>
       <div class="input-group mt-3">
         <input
           type="text"
@@ -223,7 +225,7 @@
   // check cart empty or not
   const checkoutBtn = document.getElementById("checkoutBtn");
 
-  const cartSize = Number("<%= cart.product %>");
+  const cartSize = Number("<%= cart %>");
 
   checkoutBtn.addEventListener("click", function (e) {
     if (cartSize === 0) {

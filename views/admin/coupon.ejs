@@ -8,7 +8,7 @@
   >
     <h2>Coupons</h2>
     <div class="d-flex">
-      <form action="/admin/coupons" method="get">
+      <form action="/admin/coupon" method="get">
         <div class="input-group me-2" style="width: 300px">
           <input
             type="text"
@@ -21,7 +21,11 @@
           <button class="btn btn-dark" type="submit">
             <i class="bi bi-search"></i>
           </button>
-          <button class="btn btn-outline-secondary" type="button">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            onclick="clearSearch()"
+          >
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
@@ -40,31 +44,33 @@
     <table class="table table-dark">
       <thead>
         <tr>
-          <th scope="col">S.NO.</th>
-          <th scope="col">Coupon</th>
-          <th scope="col">Redeem</th>
-          <th scope="col">min cart value</th>
-          <th scope="col">min discount</th>
-          <th scope="col">max discount</th>
-          <th scope="col">Coupon Code</th>
-          <th scope="col">Valid TILL</th>
+          <th scope="col">Coupon code</th>
+          <th scope="col">Min cart value</th>
+          <th scope="col">Discount</th>
+          <th scope="col">Start date</th>
+          <th scope="col">End date</th>
           <th scope="col">Action</th>
         </tr>
       </thead>
       <tbody>
+        <% coupon.forEach((item)=>{ %>
         <tr>
-          <td>1</td>
-          <td>₹100 off on a purchase</td>
-          <td>$100</td>
-          <td>$1000</td>
-          <td>$200</td>
-          <td>$1000</td>
-          <td>#6355</td>
-          <td>01-01-2025</td>
+          <td><%= item.couponCode %></td>
+          <td><%= item.minCartValue %></td>
+          <td><%= item.discount %></td>
+          <td><%= item.startDate.toISOString().substring(0, 10) %></td>
+          <td><%= item.endDate.toISOString().substring(0, 10) %></td>
           <td>
             <div class="d-flex">
               <button
-                class="btn btn-secondary"
+                class="btn-edit-coupon btn btn-secondary"
+                data-id="<%= item._id %>"
+                data-coupon-code="<%= item.couponCode %>"
+                data-description="<%= item.description %>"
+                data-mincartvalue="<%= item.minCartValue %>"
+                data-discount="<%= item.discount %>"
+                data-start-date="<%= item.startDate.toISOString().substring(0, 10) %>"
+                data-end-date="<%= item.endDate.toISOString().substring(0, 10) %>"
                 data-bs-toggle="modal"
                 data-bs-target="#editCouponModal"
               >
@@ -74,41 +80,18 @@
             </div>
           </td>
         </tr>
-        <tr>
-          <td>2</td>
-          <td>₹250 off on 500 above</td>
-          <td>$250</td>
-          <td>$1000</td>
-          <td>$200</td>
-          <td>$1000</td>
-          <td>#7565</td>
-          <td>31-12-2024</td>
-          <td>
-            <div class="d-flex">
-              <button
-                class="btn btn-secondary"
-                data-bs-toggle="modal"
-                data-bs-target="#editCouponModal"
-              >
-                EDIT
-              </button>
-              <button class="btn btn-danger">BLOCK</button>
-            </div>
-          </td>
-        </tr>
+        <% }) %>
       </tbody>
     </table>
   </div>
   <div class="d-flex justify-content-between align-items-center mt-3">
-    <span>Showing 1-2 of 2</span>
     <nav aria-label="Page navigation">
       <ul class="pagination">
-        <li class="page-item active">
-          <a class="page-link" href="?page=1">1</a>
+        <% for(i=1;i<=totalPages;i++){ %>
+        <li class="page-item <%= i===currentPage ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
         </li>
-        <li class="page-item">
-          <a class="page-link" href="?page=2">2</a>
-        </li>
+        <% } %>
       </ul>
     </nav>
   </div>
@@ -136,77 +119,69 @@
       <div class="modal-body">
         <form id="addCouponForm">
           <div class="mb-3">
-            <label for="couponName" class="form-label">Coupon</label>
-            <input
-              type="text"
-              class="form-control"
-              name="coupon"
-              id="couponName"
-              placeholder="Enter coupon name (e.g., ₹100 off)"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="redeemAmount" class="form-label">Redeem Amount</label>
-            <input
-              type="text"
-              class="form-control"
-              name="redeem"
-              id="redeemAmount"
-              placeholder="Enter redeem amount (e.g., $100)"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="minCartValue" class="form-label">Min Cart Value</label>
-            <input
-              type="text"
-              class="form-control"
-              name="minCartValue"
-              id="minCartValue"
-              placeholder="Enter minimum cart value (e.g., $1000)"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="minDiscount" class="form-label">Min Discount</label>
-            <input
-              type="text"
-              class="form-control"
-              name="minDiscount"
-              id="minDiscount"
-              placeholder="Enter minimum discount (e.g., $200)"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="maxDiscount" class="form-label">Max Discount</label>
-            <input
-              type="text"
-              class="form-control"
-              name="maxDiscount"
-              id="maxDiscount"
-              placeholder="Enter maximum discount (e.g., $1000)"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="couponCode" class="form-label">Coupon Code</label>
+            <label class="form-label">Coupon Code</label>
             <input
               type="text"
               class="form-control"
               name="couponCode"
               id="couponCode"
-              placeholder="Enter coupon code (e.g., #6355)"
+              placeholder="Enter coupon code"
             />
           </div>
           <div class="mb-3">
-            <label for="validTill" class="form-label">Valid Till</label>
+            <label class="form-label">Description</label>
+            <textarea
+              type="text"
+              class="form-control"
+              name="description"
+              id="description"
+              placeholder="Enter description"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="minCartValue" class="form-label">Min Cart Value</label>
+            <input
+              type="number"
+              class="form-control"
+              name="minCartValue"
+              id="minCartValue"
+              placeholder="Enter minimum cart value "
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="maxDiscount" class="form-label">Discount</label>
+            <input
+              type="number"
+              class="form-control"
+              name="discount"
+              id="discount"
+              placeholder="Enter discount"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Start date</label>
             <input
               type="date"
               class="form-control"
-              name="validTill"
-              id="validTill"
+              name="startDate"
+              id="startDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">End date</label>
+            <input
+              type="date"
+              class="form-control"
+              name="endDate"
+              id="endDate"
             />
           </div>
         </form>
       </div>
       <div class="modal-footer">
+        <span id="msgSpace"></span>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
@@ -223,13 +198,13 @@
   class="modal fade"
   id="editCouponModal"
   tabindex="-1"
-  aria-labelledby="editCouponModalLabel"
+  aria-labelledby="addCouponModalLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editCouponModalLabel">Edit Coupon</h5>
+        <h5 class="modal-title" id="addCouponModalLabel">Edit Coupon</h5>
         <button
           type="button"
           class="btn-close"
@@ -239,77 +214,71 @@
       </div>
       <div class="modal-body">
         <form id="editCouponForm">
-          <input type="hidden" id="editCouponId" name="editId" />
           <div class="mb-3">
-            <label for="editCouponName" class="form-label">Coupon</label>
+            <label class="form-label">Coupon Code</label>
             <input
               type="text"
               class="form-control"
-              id="editCouponName"
-              name="editCoupon"
+              name="ecouponCode"
+              id="ecouponCode"
+              placeholder="Enter coupon code"
             />
           </div>
+          <input type="hidden" id="ecouponId" />
           <div class="mb-3">
-            <label for="editRedeemAmount" class="form-label"
-              >Redeem Amount</label
-            >
-            <input
+            <label class="form-label">Description</label>
+            <textarea
               type="text"
               class="form-control"
-              id="editRedeemAmount"
-              name="editRedeem"
-            />
+              name="edescription"
+              id="edescription"
+              placeholder="Enter description"
+            ></textarea>
           </div>
           <div class="mb-3">
-            <label for="editMinCartValue" class="form-label"
-              >Min Cart Value</label
-            >
+            <label for="minCartValue" class="form-label">Min Cart Value</label>
             <input
-              type="text"
+              type="number"
               class="form-control"
-              id="editMinCartValue"
-              name="editMinCartValue"
+              name="eminCartValue"
+              id="eminCartValue"
+              placeholder="Enter minimum cart value "
             />
           </div>
+
           <div class="mb-3">
-            <label for="editMinDiscount" class="form-label">Min Discount</label>
+            <label for="maxDiscount" class="form-label">Discount</label>
             <input
-              type="text"
+              type="number"
               class="form-control"
-              id="editMinDiscount"
-              name="editMinDiscount"
+              name="ediscount"
+              id="ediscount"
+              placeholder="Enter discount"
             />
           </div>
+
           <div class="mb-3">
-            <label for="editMaxDiscount" class="form-label">Max Discount</label>
-            <input
-              type="text"
-              class="form-control"
-              id="editMaxDiscount"
-              name="editMaxDiscount"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="editCouponCode" class="form-label">Coupon Code</label>
-            <input
-              type="text"
-              class="form-control"
-              id="editCouponCode"
-              name="editCouponCode"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="editValidTill" class="form-label">Valid Till</label>
+            <label class="form-label">Start date</label>
             <input
               type="date"
               class="form-control"
-              id="editValidTill"
-              name="editValidTill"
+              name="estartDate"
+              id="estartDate"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">End date</label>
+            <input
+              type="date"
+              class="form-control"
+              name="eendDate"
+              id="eendDate"
             />
           </div>
         </form>
       </div>
       <div class="modal-footer">
+        <span id="emsgSpace"></span>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
@@ -321,4 +290,222 @@
   </div>
 </div>
 
+<!-- script section -->
+<script>
+  // clear search
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/admin/coupon";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document
+      .getElementById("addCouponForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const couponCode = document.getElementById("couponCode").value;
+        const description = document.getElementById("description").value;
+        const minCartValue = document.getElementById("minCartValue").value;
+        const discount = document.getElementById("discount").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const msgSpace = document.getElementById("msgSpace");
+
+        // validation
+
+        if (
+          !couponCode ||
+          !description ||
+          !minCartValue ||
+          !discount ||
+          !endDate ||
+          !startDate
+        ) {
+          msgSpace.style.display = "block";
+          msgSpace.style.color = "red";
+          msgSpace.innerHTML = "Fill required spaces";
+          return false;
+        }
+        if (new Date(startDate) >= new Date(endDate)) {
+          msgSpace.style.display = "block";
+          msgSpace.style.color = "red";
+          msgSpace.innerHTML = "End date must be after start date.";
+          return false;
+        }
+        if (isNaN(minCartValue)) {
+          msgSpace.style.display = "block";
+          msgSpace.style.color = "red";
+          msgSpace.innerHTML = "Please enter a valid min cart value.";
+          return false;
+        }
+        if (
+          isNaN(discount) ||
+          Number(discount) <= 0 ||
+          Number(discount) > 100
+        ) {
+          msgSpace.style.display = "block";
+          msgSpace.style.color = "red";
+          msgSpace.innerHTML = "Please enter a valid discount.";
+          return false;
+        }
+
+        // fetch for add coupon
+        try {
+          const result = await fetch("/admin/addCoupon", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              couponCode,
+              description,
+              minCartValue,
+              startDate,
+              endDate,
+              discount,
+            }),
+          });
+
+          const response = await result.json();
+
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.message || "Coupon added successfully",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => location.reload());
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: response.message || "Failed to add coupon",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: error.message || "something went wrong",
+          });
+        }
+      });
+
+    //  edit coupon
+    document.querySelectorAll(".btn-edit-coupon").forEach((button) => {
+      button.addEventListener("click", function () {
+        document.getElementById("ecouponCode").value =
+          this.dataset.couponCode || "";
+        document.getElementById("ecouponId").value = this.dataset.id || "";
+        document.getElementById("edescription").value =
+          this.dataset.description || "";
+        document.getElementById("estartDate").value =
+          this.dataset.startDate || "";
+        document.getElementById("eendDate").value = this.dataset.endDate || "";
+        document.getElementById("ediscount").value =
+          this.dataset.discount || "";
+        document.getElementById("eminCartValue").value =
+          this.dataset.mincartvalue || "";
+      });
+    });
+
+    document
+      .getElementById("editCouponForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ecouponCode = document.getElementById("ecouponCode").value;
+        const edescription = document.getElementById("edescription").value;
+        const eminCartValue = document.getElementById("eminCartValue").value;
+        const ediscount = document.getElementById("ediscount").value;
+        const estartDate = document.getElementById("estartDate").value;
+        const eendDate = document.getElementById("eendDate").value;
+        const ecouponId = document.getElementById("ecouponId").value;
+        const emsgSpace = document.getElementById("emsgSpace");
+
+        // validation
+
+        if (
+          !ecouponCode ||
+          !edescription ||
+          !eminCartValue ||
+          !ediscount ||
+          !eendDate ||
+          !estartDate
+        ) {
+          emsgSpace.style.display = "block";
+          emsgSpace.style.color = "red";
+          emsgSpace.innerHTML = "Fill required spaces";
+          return false;
+        }
+        if (new Date(estartDate) >= new Date(eendDate)) {
+          emsgSpace.style.display = "block";
+          emsgSpace.style.color = "red";
+          emsgSpace.innerHTML = "End date must be after start date.";
+          return false;
+        }
+        if (isNaN(eminCartValue)) {
+          emsgSpace.style.display = "block";
+          emsgSpace.style.color = "red";
+          emsgSpace.innerHTML = "Please enter a valid min cart value.";
+          return false;
+        }
+        if (
+          isNaN(ediscount) ||
+          Number(ediscount) <= 0 ||
+          Number(ediscount) > 100
+        ) {
+          emsgSpace.style.display = "block";
+          emsgSpace.style.color = "red";
+          emsgSpace.innerHTML = "Please enter a valid discount.";
+          return false;
+        }
+
+        try {
+          const result = await fetch("/admin/editCoupon", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              minCartValue: eminCartValue,
+              couponCode: ecouponCode,
+              description: edescription,
+              startDate: estartDate,
+              endDate: eendDate,
+              discount: ediscount,
+              couponId: ecouponId,
+            }),
+          });
+
+          const response = await result.json();
+
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: response.message || "Coupon edited successfully",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => location.reload());
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: response.message || "Failed to edit coupon",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: error.message || "something went wrong",
+          });
+        }
+      });
+  });
+</script>
 <%- include("../../views/partials/admin/footer") %>
