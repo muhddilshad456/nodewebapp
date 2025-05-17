@@ -76,5 +76,7 @@ router.post("/enableOffer", adminAuth, offerController.enableOffer);
 router.get("/coupon", adminAuth, couponController.couponPage);
 router.post("/addCoupon", adminAuth, couponController.addCoupon);
 router.post("/editCoupon", adminAuth, couponController.editCoupon);
+router.post("/disableCoupon", adminAuth, couponController.disableCoupon);
+router.post("/enableCoupon", adminAuth, couponController.enableCoupon);
 
 module.exports = router;

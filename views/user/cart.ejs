@@ -95,21 +95,6 @@
     font-weight: 600;
     color: #212529;
   }
-  .coupon-input {
-    border-radius: 20px 0 0 20px;
-    border: 1px solid #ced4da;
-  }
-  .coupon-btn {
-    background-color: #0d6efd;
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 0 20px 20px 0;
-    transition: background-color 0.3s ease;
-  }
-  .coupon-btn:hover {
-    background-color: #0b5ed7;
-  }
   .checkout-btn {
     background-color: #212529;
     color: #fff;
@@ -122,6 +107,9 @@
   }
   .checkout-btn:hover {
     background-color: #343a40;
+  }
+  .message {
+    font-size: 0.8rem;
   }
 </style>
 
@@ -206,14 +194,6 @@
       <p>Discount: ₹<%= (cartTotal-finalCartTotal) %></p>
       <hr />
       <h5 id="cartTotal">TOTAL: ₹<%= finalCartTotal %></h5>
-      <div class="input-group mt-3">
-        <input
-          type="text"
-          class="form-control coupon-input"
-          placeholder="Coupon Code"
-        />
-        <button class="coupon-btn">Apply Coupon</button>
-      </div>
     </div>
 
     <a href="/checkout" class="btn checkout-btn mt-4" id="checkoutBtn"

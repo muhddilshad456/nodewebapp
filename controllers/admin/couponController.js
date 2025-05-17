@@ -134,8 +134,46 @@ const editCoupon = async (req, res) => {
       .json({ success: false, message: "Something went wrong", error });
   }
 };
+
+// disable coupon
+const disableCoupon = async (req, res) => {
+  try {
+    console.log("disableCoupon", req.body);
+    const { couponId } = req.body;
+    const coupon = await Coupon.findById(couponId);
+
+    coupon.status = "Disabled";
+    await coupon.save();
+    res.json({ success: true, message: "Coupon disabled successfully" });
+  } catch (error) {
+    console.log("error from coupon disable ", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Something went wrong", error });
+  }
+};
+
+// enable coupon
+const enableCoupon = async (req, res) => {
+  try {
+    console.log("enableCoupon", req.body);
+    const { couponId } = req.body;
+    const coupon = await Coupon.findById(couponId);
+
+    coupon.status = "Active";
+    await coupon.save();
+    res.json({ success: true, message: "Coupon enabled successfully" });
+  } catch (error) {
+    console.log("error from coupon enable ", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Something went wrong", error });
+  }
+};
 module.exports = {
   couponPage,
   addCoupon,
   editCoupon,
+  disableCoupon,
+  enableCoupon,
 };

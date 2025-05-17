@@ -6,6 +6,7 @@ const Address = require("../../models/addressSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Offer = require("../../models/offerSchema");
+const Coupon = require("../../models/couponScema");
 const { now } = require("mongoose");
 
 // check out page
@@ -29,6 +30,14 @@ const checkoutPage = async (req, res) => {
         address: [],
       };
     }
+
+    const couponCode = req.session.couponCode;
+
+    console.log("couponCode", couponCode);
+
+    const applyCoupon = await Coupon.findOne({ couponCode });
+
+    console.log("applyCoupon", applyCoupon);
 
     const activeOffers = await Offer.find({
       status: "Active",
@@ -77,14 +86,28 @@ const checkoutPage = async (req, res) => {
       return acc + product.totalRegularPrice;
     }, 0);
 
-    const grandOfferTotal = cartWithOffer.reduce((acc, product) => {
+    let grandOfferTotal = cartWithOffer.reduce((acc, product) => {
       return acc + product.totalOfferPrice;
     }, 0);
+
+    if (applyCoupon) {
+      grandOfferTotal =
+        Number(grandOfferTotal) * (1 - Number(applyCoupon.discount) / 100);
+    }
+
+    let currentDate = new Date();
+    const coupon = await Coupon.find({
+      status: "Active",
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+      minCartValue: { $gte: grandOfferTotal },
+    });
 
     const totalDiscount = grandTotal - grandOfferTotal;
 
     console.log("grandTotal", grandTotal);
     console.log("grandOfferTotal", grandOfferTotal);
+    console.log("coupon", coupon);
 
     res.render("checkout", {
       cart: cartWithOffer,
@@ -92,9 +115,31 @@ const checkoutPage = async (req, res) => {
       grandOfferTotal,
       grandTotal,
       totalDiscount,
+      coupon,
     });
   } catch (error) {
     console.log("error in checkout page ", error);
+  }
+};
+
+// coupon apply
+
+const couponApplied = async (req, res) => {
+  try {
+    const { couponApplied } = req.body;
+    const coupon = await Coupon.findOne({ couponCode: couponApplied });
+    if (!coupon) {
+      return res
+        .status(409)
+        .json({ success: false, message: "coupon not found" });
+    }
+    req.session.couponCode = coupon.couponCode;
+    res.json({
+      success: true,
+      message: "Coupon applied successfully",
+    });
+  } catch (error) {
+    console.log("error in coupon apply ", error);
   }
 };
 
@@ -129,6 +174,12 @@ const placeOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Address not found." });
     }
+
+    const couponCode = req.session.couponCode;
+
+    const coupon = await Coupon.findOne({ couponCode });
+
+    console.log("coupon", coupon);
 
     const activeOffers = await Offer.find({
       status: "Active",
@@ -176,6 +227,10 @@ const placeOrder = async (req, res) => {
       };
     });
 
+    if (coupon) {
+      finalAmount = finalAmount * (1 - coupon.discount / 100);
+    }
+
     for (const item of cart.items) {
       const product = await Product.findOne({ _id: item.productId });
       if (!product) {
@@ -209,6 +264,8 @@ const placeOrder = async (req, res) => {
     cart.items = [];
 
     await cart.save();
+
+    delete req.session.couponCode;
     res.json({
       success: true,
       redirectUrl: `/orderSuccess?orderId=${newOrder._id}`,
@@ -247,6 +304,7 @@ const orderSuccessPage = async (req, res) => {
 
 module.exports = {
   checkoutPage,
+  couponApplied,
   placeOrder,
   orderSuccessPage,
 };

@@ -10,9 +10,9 @@ const categoryInfo = async (req, res) => {
     const categoryData = await Category.find({
       name: { $regex: ".*" + search + ".*", $options: "i" },
     })
-      .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     const totalCategories = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategories / limit);

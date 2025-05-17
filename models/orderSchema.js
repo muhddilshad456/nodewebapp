@@ -32,6 +32,14 @@ const orderSchema = new Schema({
         type: Number,
         required: true,
       },
+      offerPrice: {
+        type: Number,
+        required: true,
+      },
+      totalOfferPrice: {
+        type: Number,
+        required: true,
+      },
       status: {
         type: String,
         enum: [
@@ -55,6 +63,10 @@ const orderSchema = new Schema({
     },
   ],
   totalAmount: {
+    type: Number,
+    required: true,
+  },
+  finalAmount: {
     type: Number,
     required: true,
   },

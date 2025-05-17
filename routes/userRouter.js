@@ -98,6 +98,7 @@ router.post("/deleteCartItem", userAuth, cartController.deleteCartItem);
 router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
 // check out
 router.get("/checkout", userAuth, checkoutController.checkoutPage);
+router.post("/applyCoupon", userAuth, checkoutController.couponApplied);
 router.post("/placeOrder", userAuth, checkoutController.placeOrder);
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
 

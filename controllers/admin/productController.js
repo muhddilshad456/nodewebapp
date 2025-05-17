@@ -52,6 +52,7 @@ const listProduct = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate("category")
+      .sort({ createdAt: -1 })
       .exec();
 
     const count = await Product.find({

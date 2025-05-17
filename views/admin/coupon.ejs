@@ -76,7 +76,21 @@
               >
                 EDIT
               </button>
-              <button class="btn btn-danger">BLOCK</button>
+              <% if(item.status==="Active"){ %>
+              <button
+                class="btn-disable-coupon btn btn-danger"
+                data-id="<%= item._id %>"
+              >
+                Disable
+              </button>
+              <% }else{ %>
+              <button
+                class="btn-enable-coupon btn btn-success"
+                data-id="<%= item._id %>"
+              >
+                Enable
+              </button>
+              <% } %>
             </div>
           </td>
         </tr>
@@ -506,6 +520,118 @@
           });
         }
       });
+
+    // status updation of coupon
+    // disable
+    document.querySelectorAll(".btn-disable-coupon").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const couponId = button.dataset.id;
+
+        const cnfrm = await Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to disable this coupon?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, disable it!",
+        });
+
+        if (cnfrm.isConfirmed) {
+          try {
+            const result = await fetch("/admin/disableCoupon", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                couponId,
+              }),
+            });
+
+            const data = await result.json();
+
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: data.message || "Coupon disable successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => location.reload());
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: data.message || "Failed to disable Coupon",
+              });
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: error.message || "something went wrong",
+            });
+          }
+        }
+      });
+    });
+
+    // enable coupon
+
+    document.querySelectorAll(".btn-enable-coupon").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const couponId = button.dataset.id;
+
+        const cnfrm = await Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to enable this coupon?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, disable it!",
+        });
+
+        if (cnfrm.isConfirmed) {
+          try {
+            const result = await fetch("/admin/enableCoupon", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                couponId,
+              }),
+            });
+
+            const data = await result.json();
+
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: data.message || "Coupon enable successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => location.reload());
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: data.message || "Failed to enable Coupon",
+              });
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: error.message || "something went wrong",
+            });
+          }
+        }
+      });
+    });
   });
 </script>
 <%- include("../../views/partials/admin/footer") %>

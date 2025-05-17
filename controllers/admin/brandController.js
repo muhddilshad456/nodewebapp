@@ -11,9 +11,9 @@ const brandInfo = async (req, res) => {
     const brandData = await Brand.find({
       name: { $regex: ".*" + search + ".*", $options: "i" },
     })
-      .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     const totalBrands = await Brand.countDocuments();
     const totalPages = Math.ceil(totalBrands / limit);

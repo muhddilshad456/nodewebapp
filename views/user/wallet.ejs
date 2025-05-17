@@ -117,9 +117,9 @@
     <h1 class="text-center mb-4">WELCOME TO YOUR WALLET</h1>
     <div class="wallet-balance">
       <div>
-        <p>SKINOVA</p>
+        <p><%= wallet.userId.name %></p>
         <p>**** **** **** 1234</p>
-        <h2>₹3,495</h2>
+        <h2>₹<%= wallet.balance %></h2>
       </div>
       <div class="card-details">
         <p>Valid Thru: 12/26</p>
@@ -132,31 +132,21 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th scope="col">#</th>
           <th scope="col">Amount</th>
           <th scope="col">Type</th>
+          <th scope="col">Method</th>
           <th scope="col">Date</th>
         </tr>
       </thead>
       <tbody>
+        <% wallet.transactions.forEach((transaction)=>{ %>
         <tr>
-          <td>1</td>
-          <td>₹50</td>
-          <td>Credit</td>
-          <td>2024-08-08</td>
+          <td>₹<%= transaction.amount %></td>
+          <td><%= transaction.type %></td>
+          <td><%= transaction.method %></td>
+          <td><%= transaction.date.toISOString().slice(0, 10); %></td>
         </tr>
-        <tr>
-          <td>2</td>
-          <td>₹30</td>
-          <td>Debit</td>
-          <td>2024-08-07</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>₹30</td>
-          <td>Bank Transfer</td>
-          <td>2024-08-06</td>
-        </tr>
+        <% }) %>
       </tbody>
     </table>
   </div>

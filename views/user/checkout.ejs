@@ -216,6 +216,56 @@
       margin-bottom: 20px;
     }
   }
+  .coupon-container {
+    max-width: 450px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+  .coupon-input {
+    font-size: 0.9rem;
+    height: 36px;
+    border-radius: 6px;
+  }
+  .copy-btn,
+  .apply-btn {
+    font-size: 0.9rem;
+    height: 36px;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .copy-btn:hover {
+    background-color: #0a58ca;
+    color: #fff;
+  }
+  .apply-btn {
+    background-color: #198754;
+    border-color: #198754;
+    color: #fff;
+  }
+  .apply-btn:hover {
+    background-color: #157347;
+    border-color: #157347;
+  }
+  .message {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  .input-group {
+    align-items: center;
+  }
+  @media (max-width: 576px) {
+    .coupon-container {
+      padding: 1rem;
+    }
+    .coupon-input,
+    .copy-btn,
+    .apply-btn {
+      font-size: 0.85rem;
+      height: 34px;
+    }
+  }
 </style>
 <body>
   <!-- Checkout Heading -->
@@ -341,12 +391,58 @@
                 <span>Subtotal</span>
                 <span>₹<%= grandTotal %></span>
               </p>
-              <p><span>Discount</span> <span>₹<%= totalDiscount %></span></p>
+              <p>
+                <span>Discount</span>
+                <span id="discount">₹<%= totalDiscount %></span>
+              </p>
               <p>
                 <strong>Total</strong>
-                <strong>₹<%= grandOfferTotal %></strong>
+                <strong id="total">₹<%= grandOfferTotal %></strong>
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="container mt-3">
+        <div class="coupon-container">
+          <h6 class="mb-3 text-muted">Available Coupons</h6>
+          <!-- Example of multiple coupons (simulating a forEach loop) -->
+          <% coupon.forEach((coup)=>{ %>
+          <div class="coupon-item">
+            <div class="row g-2 align-items-center">
+              <div class="col-8">
+                <input
+                  type="text"
+                  class="form-control coupon-input"
+                  id="couponCode-2"
+                  value="<%= coup.couponCode %>"
+                  readonly
+                />
+              </div>
+              <div class="col-4">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary copy-btn w-100"
+                  onclick="copyCoupon('couponCode-2', 'couponMessage-2')"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div id="couponMessage-2" class="message mt-2"></div>
+          </div>
+          <% }) %>
+          <!-- Apply Coupon Section -->
+          <div class="input-group mt-3">
+            <input
+              type="text"
+              id="couponApplied"
+              class="form-control coupon-input"
+              placeholder="Enter Coupon Code"
+            />
+            <button type="button" class="btn-coupon-apply btn btn-success">
+              Apply
+            </button>
           </div>
         </div>
       </div>
@@ -357,6 +453,28 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // copy coupon code
+  function copyCoupon(inputId, messageId) {
+    const couponInput = document.getElementById(inputId);
+    const messageDiv = document.getElementById(messageId);
+    couponInput.select();
+    try {
+      document.execCommand("copy");
+      showMessage(messageDiv, "Copied!", "text-success");
+    } catch (err) {
+      showMessage(messageDiv, "Copy failed.", "text-danger");
+    }
+  }
+
+  function showMessage(messageDiv, message, className) {
+    messageDiv.textContent = message;
+    messageDiv.className = `message ${className}`;
+    setTimeout(() => {
+      messageDiv.textContent = "";
+      messageDiv.className = "message";
+    }, 2000);
+  }
+  // place order
   document
     .getElementById("placeOrder")
     .addEventListener("submit", async function (e) {
@@ -410,6 +528,53 @@
       } catch (error) {
         alert("Something went wrong. Please try again.");
         console.error("Fetch error:", error);
+      }
+    });
+
+  // apply coupon
+  document
+    .querySelector(".btn-coupon-apply")
+    .addEventListener("click", async () => {
+      const couponApplied = document.getElementById("couponApplied").value;
+      if (!couponApplied) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Apply a valid coupon",
+        });
+        return;
+      }
+      try {
+        const result = await fetch("/applyCoupon", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ couponApplied }),
+        });
+
+        const data = await result.json();
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Successs",
+            text: data.message || "Coupon applied",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => location.reload());
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "Failed to apply coupon",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Unable to proceed",
+        });
       }
     });
 </script>

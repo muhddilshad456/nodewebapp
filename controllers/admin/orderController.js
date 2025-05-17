@@ -1,5 +1,6 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
+const Wallet = require("../../models/walletSchema");
 
 // order page
 const orderPage = async (req, res) => {
@@ -99,6 +100,7 @@ const orderStatus = async (req, res) => {
 const confirmReturn = async (req, res) => {
   try {
     const { orderId } = req.body;
+    const userId = req.session.user;
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
@@ -127,6 +129,36 @@ const confirmReturn = async (req, res) => {
       product.stockCount += item.quantity;
       await product.save();
     }
+
+    const wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      const newWallet = new Wallet({
+        userId,
+        balance: order.finalAmount,
+        transactions: [
+          {
+            amount: order.finalAmount,
+            type: "Credit",
+            method: "Refund",
+            status: "Completed",
+            orderId: order._id,
+          },
+        ],
+      });
+      await newWallet.save();
+    } else {
+      wallet.balance += order.finalAmount;
+      wallet.transactions.push({
+        amount: order.finalAmount,
+        type: "Credit",
+        method: "Refund",
+        status: "Completed",
+        orderId: order._id,
+      });
+      await wallet.save();
+    }
+
+    res.json({ success: true, message: "Return successfull" });
   } catch (error) {
     console.error("error from confirming return ", error);
     return res.status(500).json({ success: false, message: "Server error" });
