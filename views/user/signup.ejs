@@ -33,6 +33,22 @@
         color: red;
         font-size: 0.75rem;
       }
+      .password-wrapper {
+        position: relative;
+      }
+
+      .password-wrapper input {
+        padding-right: 30px;
+      }
+
+      .toggle-eye {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        user-select: none;
+      }
     </style>
   </head>
   <body>
@@ -90,7 +106,7 @@
             />
             <div id="phone-err" class="err-msg"></div>
           </div>
-          <div class="mb-3">
+          <div class="password-wrapper mb-3">
             <input
               type="password"
               class="form-control"
@@ -98,9 +114,10 @@
               placeholder="Password"
               name="password"
             />
+            <span class="toggle-eye" onclick="togglePassword()">👁️</span>
             <div id="password-err" class="err-msg"></div>
           </div>
-          <div class="mb-3">
+          <div class="password-wrapper mb-3">
             <input
               type="password"
               class="form-control"
@@ -108,6 +125,7 @@
               placeholder="Confirm Password"
               name="confirmpassword"
             />
+            <span class="toggle-eye" onclick="togglecPassword()">👁️</span>
             <div id="cpassword-err" class="err-msg"></div>
           </div>
           <%if(locals.message && message.length>0){%>
@@ -145,6 +163,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
+      // eye button
+      function togglePassword() {
+        const input = document.getElementById("password");
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+      function togglecPassword() {
+        const input = document.getElementById("cpassword");
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+      // validation
       const nameId = document.getElementById("name");
       const emailId = document.getElementById("email");
       const phoneId = document.getElementById("phone");

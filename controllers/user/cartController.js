@@ -204,16 +204,12 @@ const deleteCartItem = async (req, res) => {
 // cart updation
 const updateCartQuantity = async (req, res) => {
   try {
-    console.log("========================");
     const { itemId, quantity } = req.body;
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate("items.productId");
-    console.log("cart", cart);
     const cartItem = cart.items.find((i) => i._id.toString() === itemId);
-    console.log("cart items", cartItem);
     if (!cartItem) return res.status(404).json({ error: "Item not found" });
     const product = await Product.findOne({ _id: cartItem.productId._id });
-    console.log("product", product);
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -221,65 +217,75 @@ const updateCartQuantity = async (req, res) => {
       return res.status(409).json({ message: "No stock available" });
     }
 
+    cartItem.quantity = quantity;
+    cartItem.totalPrice = cartItem.price * quantity;
+    const cartTotal = cart.items.reduce(
+      (total, item) => total + item.totalPrice,
+      0
+    );
+
+    cart.cartTotal = cartTotal;
+    await cart.save();
+
     const activeOffers = await Offer.find({
       status: "Active",
       startDate: { $lte: new Date() },
       endDate: { $gte: new Date() },
     });
 
-    console.log("activeOffers", activeOffers);
+    let finalCartTotal = 0;
 
-    let maxDiscount = 0;
-    let appliedOffer = null;
+    const cartWithOffer = cart.items.map((item) => {
+      let maxDiscount = 0;
+      let appliedOffer = null;
 
-    activeOffers.forEach((offer) => {
-      const applies =
-        (offer.offerType === "product" &&
-          offer.targetId.toString() === product._id.toString()) ||
-        (offer.offerType === "category" &&
-          product.category &&
-          offer.targetId.toString() === product.category.toString()) ||
-        (offer.offerType === "brand" &&
-          product.brand &&
-          offer.targetId.toString() === product.brand.toString());
+      activeOffers.forEach((offer) => {
+        const applies =
+          (offer.offerType === "product" &&
+            offer.targetId.toString() === item.productId._id.toString()) ||
+          (offer.offerType === "category" &&
+            offer.targetId.toString() === item.productId.category.toString()) ||
+          (offer.offerType === "brand" &&
+            offer.targetId.toString() === item.productId.brand.toString());
 
-      if (applies && offer.discount > maxDiscount) {
-        maxDiscount = offer.discount;
-        appliedOffer = offer;
-      }
+        if (applies && offer.discount > maxDiscount) {
+          maxDiscount = offer.discount;
+          appliedOffer = offer;
+        }
+      });
+
+      const offerPrice = Number(item.price) * (1 - maxDiscount / 100);
+      const totalOfferPrice = offerPrice * item.quantity;
+
+      finalCartTotal += totalOfferPrice;
+
+      return {
+        product: item,
+        quantity: item.quantity,
+        originalPrice: item.price,
+        offerPrice,
+        totalOfferPrice,
+        offer: appliedOffer,
+      };
     });
 
-    console.log("maxDiscount", maxDiscount);
-    console.log("appliedOffer", appliedOffer);
-
-    const offerPrice = product.productAmount * (1 - maxDiscount / 100);
-    const totalOfferPrice = offerPrice * quantity;
-
-    console.log("offerPrice", offerPrice);
-    console.log("totalOfferPrice", totalOfferPrice);
-
-    cartItem.quantity = quantity;
-    cartItem.totalPrice = totalOfferPrice;
-
-    console.log("cartItem.quantity", cartItem.quantity);
-    console.log("cartItem.totalPrice", cartItem.totalPrice);
-
-    const cartTotal = cart.items.reduce(
-      (total, item) => total + item.totalPrice,
-      0
+    const updatedItem = cartWithOffer.filter(
+      (item) => item.product._id == itemId
     );
 
-    console.log("cartTotal", cartTotal);
+    const newPrice = updatedItem[0].totalOfferPrice;
 
-    cart.cartTotal = cartTotal;
-    await cart.save();
     res.json({
       message: "cart updated successfully",
-      newPrice: totalOfferPrice,
+      newPrice,
       cartTotal,
+      finalCartTotal,
     });
   } catch (error) {
     console.log("error from update cart quantity : ", error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong while updating the cart" });
   }
 };
 module.exports = {

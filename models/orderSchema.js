@@ -74,10 +74,10 @@ const orderSchema = new Schema({
   //   type: Number,
   //   default: 0,
   // },
-  // finalAmound: {
-  //   type: Number,
-  //   required: true,
-  // },
+  paymentId: {
+    type: String,
+    required: false,
+  },
   address: {
     name: { type: String, required: true },
     city: { type: String, required: true },
@@ -117,7 +117,7 @@ const orderSchema = new Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ["card", "upi", "netbanking", "cod"],
+    enum: ["cod", "razorpay", "wallet"],
   },
   // couppenApplied: {
   //   type: Boolean,

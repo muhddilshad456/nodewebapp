@@ -191,7 +191,7 @@
     <div class="cart-totals">
       <h4>CART TOTALS</h4>
       <p id="subTotal">Subtotal: ₹<%= cartTotal %></p>
-      <p>Discount: ₹<%= (cartTotal-finalCartTotal) %></p>
+      <p id="discount">Discount: ₹<%= (cartTotal-finalCartTotal) %></p>
       <hr />
       <h5 id="cartTotal">TOTAL: ₹<%= finalCartTotal %></h5>
     </div>
@@ -315,9 +315,12 @@
         document.getElementById(
           "subTotal"
         ).textContent = `Subtotal: ₹${data.cartTotal}`;
+        document.getElementById("discount").textContent = `Discount : ₹${
+          data.cartTotal - data.finalCartTotal
+        }`;
         document.getElementById(
           "cartTotal"
-        ).textContent = `TOTAL:₹${data.cartTotal}`;
+        ).textContent = `TOTAL:₹${data.finalCartTotal}`;
         console.log("Quantity updated successfully");
       })
       .catch((error) => {

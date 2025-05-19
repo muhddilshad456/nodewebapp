@@ -7,6 +7,9 @@ const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Offer = require("../../models/offerSchema");
 const Coupon = require("../../models/couponScema");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+const env = require("dotenv").config();
 const { now } = require("mongoose");
 
 // check out page
@@ -231,6 +234,163 @@ const placeOrder = async (req, res) => {
       finalAmount = finalAmount * (1 - coupon.discount / 100);
     }
 
+    const razorpayIns = new Razorpay({
+      key_id: process.env.RZ_KEY_ID,
+      key_secret: process.env.RZ_KEY_SECRET,
+    });
+
+    if (payment === "razorpay") {
+      const razorpayOrder = await razorpayIns.orders.create({
+        amount: Math.round(finalAmount * 100),
+        currency: "INR",
+        receipt: `order_rcptid_${Math.floor(Math.random() * 10000)}`,
+      });
+      return res.json({
+        success: true,
+        orderType: "razorpay",
+        rzOrderId: razorpayOrder.id,
+        finalAmount,
+        key_id: process.env.RZ_KEY_ID,
+      });
+    }
+
+    if (payment === "cod") {
+      for (const item of cart.items) {
+        const product = await Product.findOne({ _id: item.productId });
+        if (!product) {
+          return res
+            .status(404)
+            .json({ success: false, message: "Product not found." });
+        }
+
+        if (item.quantity > product.stockCount) {
+          return res.status(400).json({
+            success: false,
+            message: `Insufficient stock for ${product.productName}`,
+          });
+        }
+        product.stockCount -= item.quantity;
+        await product.save();
+      }
+      const newOrder = new Order({
+        orderedItems,
+        totalAmount: cart.cartTotal,
+        finalAmount,
+        address,
+        userId,
+        paymentMethod: payment,
+        status: "Pending",
+      });
+      await newOrder.save();
+
+      cart.cartTotal = 0;
+      cart.items = [];
+
+      await cart.save();
+      delete req.session.couponCode;
+      res.json({
+        success: true,
+        redirectUrl: `/orderSuccess?orderId=${newOrder._id}`,
+      });
+    }
+  } catch (error) {
+    console.error("Error from placing order:", error);
+    res.status(500).json({ success: false, message: "Failed to place order." });
+  }
+};
+
+// razor pay verify payment
+const rzVerifyPayment = async (req, res) => {
+  try {
+    console.log("razor pay verify payment", req.body);
+    const userId = req.session.user;
+    const cart = await Cart.findOne({ userId });
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      addressId,
+    } = req.body;
+    // create signeture
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RZ_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return res
+        .status(400)
+        .json({ success: false, message: "signature not match" });
+    }
+
+    const result = await Address.findOne(
+      { userId, "address._id": addressId },
+      { "address.$": 1 }
+    );
+    let address = result?.address?.[0];
+
+    if (!address) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Address not found" });
+    }
+
+    const couponCode = req.session.couponCode;
+
+    const coupon = await Coupon.findOne({ couponCode });
+
+    console.log("coupon", coupon);
+
+    const activeOffers = await Offer.find({
+      status: "Active",
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    });
+
+    let finalAmount = 0;
+
+    const orderedItems = cart.items.map((item) => {
+      let maxDiscount = 0;
+      let offerApplied = null;
+
+      activeOffers.forEach((offer) => {
+        const applies =
+          (offer.offerType === "product" &&
+            offer.targetId.toString() === item.productId._id.toString()) ||
+          (offer.offerType === "category" &&
+            offer.targetId.toString() === item.productId.category.toString()) ||
+          (offer.offerType === "brand" &&
+            offer.targetId.toString() === item.productId.brand.toString());
+
+        if (applies && offer.discount > maxDiscount) {
+          maxDiscount = offer.discount;
+          offerApplied = offer;
+        }
+      });
+
+      const regularPrice = Number(item.price);
+      const offerPrice = regularPrice * (1 - maxDiscount / 100);
+      const totalRegular = regularPrice * item.quantity;
+      const totalDiscounted = offerPrice * item.quantity;
+
+      finalAmount += totalDiscounted;
+
+      return {
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: regularPrice,
+        totalPrice: totalRegular,
+        offerPrice,
+        totalOfferPrice: totalDiscounted,
+        status: "Pending",
+        offerApplied,
+      };
+    });
+
+    if (coupon) {
+      finalAmount = finalAmount * (1 - coupon.discount / 100);
+    }
+
     for (const item of cart.items) {
       const product = await Product.findOne({ _id: item.productId });
       if (!product) {
@@ -251,27 +411,28 @@ const placeOrder = async (req, res) => {
 
     const newOrder = new Order({
       orderedItems,
+      userId,
       totalAmount: cart.cartTotal,
       finalAmount,
       address,
-      userId,
-      paymentMethod: payment,
       status: "Pending",
+      paymentMethod: "razorpay",
+      paymentId: razorpay_payment_id,
     });
+
     await newOrder.save();
 
     cart.cartTotal = 0;
     cart.items = [];
 
     await cart.save();
-
     delete req.session.couponCode;
     res.json({
       success: true,
       redirectUrl: `/orderSuccess?orderId=${newOrder._id}`,
     });
   } catch (error) {
-    console.error("Error from placing order:", error);
+    console.error("Error from razor pay verify payment :", error);
     res.status(500).json({ success: false, message: "Failed to place order." });
   }
 };
@@ -306,5 +467,6 @@ module.exports = {
   checkoutPage,
   couponApplied,
   placeOrder,
+  rzVerifyPayment,
   orderSuccessPage,
 };

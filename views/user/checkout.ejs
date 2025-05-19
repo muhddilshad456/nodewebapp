@@ -318,8 +318,8 @@
                 <input
                   type="radio"
                   name="payment"
-                  value="card"
-                  id="card"
+                  value="razorpay"
+                  id="razorpay"
                   checked
                 />
                 <label for="card">
@@ -328,34 +328,19 @@
                     class="payment-icon"
                     alt="Card"
                   />
-                  Card
+                  Razorpay
                 </label>
               </li>
+
               <li class="payment-item">
-                <input type="radio" name="payment" value="upi" id="upi" />
-                <label for="upi">
-                  <img
-                    src="https://img.icons8.com/color/24/000000/google-pay.png"
-                    class="payment-icon"
-                    alt="UPI"
-                  />
-                  UPI
-                </label>
-              </li>
-              <li class="payment-item">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="netbanking"
-                  id="netbanking"
-                />
+                <input type="radio" name="payment" value="wallet" id="wallet" />
                 <label for="netbanking">
                   <img
                     src="https://img.icons8.com/color/24/000000/bank.png"
                     class="payment-icon"
                     alt="Net Banking"
                   />
-                  Banking
+                  Wallet
                 </label>
               </li>
               <li class="payment-item">
@@ -452,6 +437,7 @@
   </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   // copy coupon code
   function copyCoupon(inputId, messageId) {
@@ -516,6 +502,40 @@
         });
 
         const data = await response.json();
+
+        if (data.orderType === "razorpay") {
+          const options = {
+            key: data.key_id,
+            amount: data.finalAmount * 100,
+            currency: "INR",
+            name: "Watchsy",
+            description: "Order payment",
+            order_id: data.rzOrderId,
+            handler: async function (response) {
+              const verifyResponse = await fetch("/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  addressId: address,
+                }),
+              });
+              const result = await verifyResponse.json();
+              if (result.success) {
+                window.location.href = result.redirectUrl;
+              } else {
+                alert(result.message || "Payment verification failed");
+              }
+            },
+            theme: { color: "#3399cc" },
+          };
+          const rzp = new Razorpay(options);
+          rzp.open();
+          return;
+        }
+
         if (response.ok) {
           window.location.href = data.redirectUrl;
         } else {

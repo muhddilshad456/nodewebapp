@@ -987,7 +987,12 @@ const returnReq = async (req, res) => {
     order.returnReason = reson;
 
     for (const item of order.orderedItems) {
-      item.status = "Return requisted";
+      if (
+        item.status !== "Return requisted" &&
+        item.status !== "Returned" &&
+        order.status !== "Cancelled"
+      )
+        item.status = "Return requisted";
     }
     await order.save();
     return res.json({
@@ -1007,7 +1012,6 @@ const returnReq = async (req, res) => {
 
 const invoiceDownload = async (req, res) => {
   try {
-    console.log("order id of invoice download", req.params.id);
     const orderId = req.params.id;
 
     const order = await Order.findById(orderId)
@@ -1017,39 +1021,81 @@ const invoiceDownload = async (req, res) => {
       return res.status(404).send("Invoice not available for this order.");
     }
 
-    const doc = new PDFDocument();
+    const generateInvoice = (order, res) => {
+      const doc = new PDFDocument({ margin: 50 });
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Desposition",
-      `attachment;filename=invoice-${order.orderId}.pdf`
-    );
-    doc.pipe(res);
-
-    doc.fontSize(24).text("WATCHSY", { align: "center" });
-    doc.moveDown();
-
-    doc.fontSize(18).text("INVOICE", { align: "center" });
-    doc.moveDown();
-
-    doc.fontSize(12).text(`Order Id : ${order.orderId}`);
-    doc.text(`Customer: ${order.userId.name}`);
-    doc.text(`Date: ${order.createdOn.toDateString()}`);
-    doc.moveDown();
-
-    doc.text("Items", { underline: true });
-    order.orderedItems.forEach((item, index) => {
-      doc.text(
-        `${index + 1}. ${item.productId.productName} - Quantity: ${
-          item.quantity
-        } - Price: $${item.productId.productAmount}`
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=invoice-${order.orderId}.pdf`
       );
-    });
+      doc.pipe(res);
 
-    doc.moveDown();
-    doc.text(`Total : ${order.totalAmount}`);
+      // === Header ===
+      doc
+        .fontSize(26)
+        .fillColor("#333")
+        .text("WATCHSY", { align: "center", underline: true });
+      doc.moveDown(0.5);
 
-    doc.end();
+      doc.fontSize(18).fillColor("#000").text("INVOICE", { align: "center" });
+      doc.moveDown();
+
+      // === Order Info ===
+      doc.fontSize(12).fillColor("#333");
+      doc.text(`Order ID: ${order.orderId}`, { continued: true });
+      doc.text(`   Date: ${order.createdOn.toDateString()}`);
+      doc.text(`Customer Name: ${order.userId.name}`);
+      doc.moveDown(1);
+
+      // === Table Header ===
+      doc.fontSize(14).fillColor("#000").text("Items:", { underline: true });
+      doc.moveDown(0.5);
+
+      doc.fontSize(12).fillColor("#333");
+
+      // === Item Rows ===
+      order.orderedItems.forEach((item, index) => {
+        const product = item.productId;
+        doc.text(
+          `${index + 1}. ${product.productName}\n    Quantity: ${
+            item.quantity
+          }\n   Price: Rs.${product.productAmount}\n`,
+          { lineGap: 4 }
+        );
+      });
+
+      doc.moveDown(1);
+
+      // === Summary ===
+      doc
+        .fontSize(12)
+        .fillColor("#000")
+        .text(`Subtotal: Rs.${order.totalAmount}`, { align: "right" });
+
+      doc.text(`Discount: Rs.${order.totalAmount - order.finalAmount}`, {
+        align: "right",
+      });
+
+      doc
+        .fontSize(14)
+        .fillColor("#000")
+        .text(`Total Payable: Rs.${order.finalAmount}`, {
+          align: "right",
+          underline: true,
+        });
+
+      doc.moveDown(2);
+
+      // === Footer ===
+      doc
+        .fontSize(10)
+        .fillColor("#888")
+        .text("Thank you for shopping with WATCHSY!", { align: "center" });
+
+      doc.end();
+    };
+    generateInvoice(order, res);
   } catch (error) {
     console.error("error from dowload invoice", error);
   }

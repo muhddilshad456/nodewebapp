@@ -102,25 +102,41 @@
 <div class="container my-5">
   <div class="row">
     <div class="col-md-6">
-      <img
-        src="<%= products.productImage[0] %>"
-        alt="Samsung Watch6"
-        class="main-img product-img"
-        onclick="zoomImage(this)"
-      />
+      <!-- min -->
+      <div>
+        <img
+          src="<%= products.productImage[0] %>"
+          alt="Samsung Watch6"
+          class="product-img"
+          id="mainImage"
+        />
+      </div>
+
       <div class="gallery" id="gallery">
-        <img
-          src="<%= products.productImage[1] %>"
-          alt="Watch Image 2"
-          class="product-img"
-          onclick="zoomImage(this)"
-        />
-        <img
-          src="<%= products.productImage[2] %>"
-          alt="Watch Image 3"
-          class="product-img"
-          onclick="zoomImage(this)"
-        />
+        <div>
+          <img
+            src="<%= products.productImage[0] %>"
+            alt="Samsung Watch6"
+            class="product-img"
+            onclick="changeImage(this)"
+          />
+        </div>
+        <div>
+          <img
+            src="<%= products.productImage[1] %>"
+            alt="Watch Image 2"
+            class="product-img"
+            onclick="changeImage(this)"
+          />
+        </div>
+        <div>
+          <img
+            src="<%= products.productImage[2] %>"
+            alt="Watch Image 3"
+            class="product-img"
+            onclick="changeImage(this)"
+          />
+        </div>
       </div>
     </div>
     <div class="col-md-6 highlight">
@@ -180,11 +196,13 @@
       <% recomendedProduct.forEach(product=> { %>
       <div class="col-md-3">
         <div class="card">
-          <img
-            src="<%=product.productImage[0] %>"
-            alt="Empower Watch"
-            class="card-img"
-          />
+          <a href="/productDetailes?id=<%= product._id %>">
+            <img
+              src="<%=product.productImage[0] %>"
+              alt="Empower Watch"
+              class="card-img"
+            />
+          </a>
           <p class="text-center">
             <%=product.productName %><br />₹<%=product.productAmount %>
           </p>
@@ -198,46 +216,28 @@
 <%- include("../../views/partials/user/footer") %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  let quantity = 1;
+  // image changing
+  function changeImage(img) {
+    const mainImage = document.getElementById("mainImage");
+    mainImage.src = img.src;
+  }
+  // quantity adjustment
+  function increaseQuantity() {
+    const quantitySpan = document.getElementById("quantity");
+    let quantity = parseInt(quantitySpan.textContent);
+    quantity++;
+    quantitySpan.textContent = quantity;
+  }
 
   function decreaseQuantity() {
+    const quantitySpan = document.getElementById("quantity");
+    let quantity = parseInt(quantitySpan.textContent);
     if (quantity > 1) {
       quantity--;
-      document.getElementById("quantity").innerText = quantity;
+      quantitySpan.textContent = quantity;
     }
   }
 
-  function increaseQuantity() {
-    quantity++;
-    document.getElementById("quantity").innerText = quantity;
-  }
-
-  let zoomedImg = null;
-
-  function zoomImage(img) {
-    if (zoomedImg) {
-      zoomedImg.classList.remove("zoom");
-      zoomedImg.style.display = "none";
-    }
-    const clone = img.cloneNode();
-    clone.classList.add("zoom");
-    clone.style.top = img.getBoundingClientRect().top + window.scrollY + "px";
-    clone.style.left = img.getBoundingClientRect().left + window.scrollX + "px";
-    document.body.appendChild(clone);
-    zoomedImg = clone;
-
-    clone.onclick = function () {
-      clone.remove();
-      zoomedImg = null;
-    };
-  }
-
-  document.addEventListener("click", function (e) {
-    if (zoomedImg && !e.target.classList.contains("product-img")) {
-      zoomedImg.remove();
-      zoomedImg = null;
-    }
-  });
   // fetch for add to cart
   function addToCart(productId) {
     const productQuantity = document.getElementById("quantity").innerText;
