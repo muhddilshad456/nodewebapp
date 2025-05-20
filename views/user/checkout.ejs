@@ -322,7 +322,7 @@
                   id="razorpay"
                   checked
                 />
-                <label for="card">
+                <label for="razorpay">
                   <img
                     src="https://img.icons8.com/color/24/000000/visa.png"
                     class="payment-icon"
@@ -334,7 +334,7 @@
 
               <li class="payment-item">
                 <input type="radio" name="payment" value="wallet" id="wallet" />
-                <label for="netbanking">
+                <label for="wallet">
                   <img
                     src="https://img.icons8.com/color/24/000000/bank.png"
                     class="payment-icon"
@@ -504,6 +504,7 @@
         const data = await response.json();
 
         if (data.orderType === "razorpay") {
+          let paymentFailedHandled = false;
           const options = {
             key: data.key_id,
             amount: data.finalAmount * 100,
@@ -529,9 +530,30 @@
                 alert(result.message || "Payment verification failed");
               }
             },
+
             theme: { color: "#3399cc" },
           };
           const rzp = new Razorpay(options);
+
+          rzp.on("payment.failed", async function (response) {
+            if (paymentFailedHandled) return;
+            paymentFailedHandled = true;
+            const failResponse = await fetch("/payment-failed", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                rzOrderId: options.order_id,
+                addressId: address,
+              }),
+            });
+
+            const result = await failResponse.json();
+            if (result.success) {
+              window.location.href = result.redirectUrl;
+            } else {
+              alert("Payment failure not recorded");
+            }
+          });
           rzp.open();
           return;
         }

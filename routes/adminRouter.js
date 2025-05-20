@@ -8,6 +8,7 @@ const productController = require("../controllers/admin/productController");
 const orderController = require("../controllers/admin/orderController");
 const offerController = require("../controllers/admin/offerController");
 const couponController = require("../controllers/admin/couponController");
+const salesreportController = require("../controllers/admin/salesreportController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 // login
 router.get("/login", adminController.loadLogin);
@@ -78,5 +79,8 @@ router.post("/addCoupon", adminAuth, couponController.addCoupon);
 router.post("/editCoupon", adminAuth, couponController.editCoupon);
 router.post("/disableCoupon", adminAuth, couponController.disableCoupon);
 router.post("/enableCoupon", adminAuth, couponController.enableCoupon);
+
+// sales
+router.get("/salesreport", adminAuth, salesreportController.salesreportPage);
 
 module.exports = router;

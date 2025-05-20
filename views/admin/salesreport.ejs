@@ -1,0 +1,129 @@
+<%- include("../../views/partials/admin/header") %>
+<!-- Main Content -->
+<div class="content">
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Sales Report</span>
+      <div class="d-flex">
+        <span class="me-3">Today</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Date Range Selector -->
+  <div class="mb-4">
+    <form action="/admin/salesreport">
+      <div class="d-flex align-items-center">
+        <label for="dateRange" class="me-2"
+          ><strong>Select Range:</strong></label
+        >
+        <select
+          id="dateRange"
+          name="selectRange"
+          class="form-select w-auto me-3"
+        >
+          <option value="" disabled <%= !selectRange ? 'selected' : '' %> >Select Range</option>
+          <option value="today" <%= selectRange==='today' ? 'selected' : '' %>>Today</option>
+          <option value="thisWeek" <%= selectRange==='thisWeek' ? 'selected' : '' %>>This Week</option>
+          <option value="thisMonth" <%= selectRange==='thisMonth' ? 'selected' : '' %>>This Month</option>
+          <option value="thisYear" <%= selectRange==='thisYear' ? 'selected' : '' %>>This Year</option>
+        </select>
+        <div id="customDateRange" class="d-flex align-items-center">
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            value="<%= startDate %>"
+            class="form-control d-inline-block w-auto me-2"
+          />
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            value="<%= endDate %>"
+            class="form-control d-inline-block w-auto me-2"
+          />
+          <button class="btn btn-info" type="submit">Submit</button>
+          <button class="btn btn-danger" type="submit" onclick="clearSearch()">Clear</button>
+        </div>
+        <button class="btn btn-primary ms-3" onclick="downloadPDF()">
+          Download PDF
+        </button>
+        <button class="btn btn-success ms-2" onclick="downloadExcel()">
+          Download Excel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sales Report Table -->
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Total Amount</th>
+          <th>Discount Applied</th>
+          <th>Final Amount</th>
+          <th>Payment Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach((order)=>{ %>
+        <tr>
+          <td><%= order._id %></td>
+          <td><%= order.createdOn.toISOString().slice(0, 10); %></td>
+          <td>₹<%= order.totalAmount %></td>
+          <td>₹<%= order.totalAmount-order.finalAmount %></td>
+          <td>₹<%= order.finalAmount %></td>
+          <td><%= order.paymentMethod %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+    // clear inputs
+    function clearSearch() {
+    const startDate = document.getElementById("startDate");
+    const endDate = document.getElementById("endDate");
+    startDate.value = "";
+    endDate.value = "";
+    window.location.href = "/admin/salesReport";
+  }
+
+
+  function downloadPDF() {
+    // Placeholder for PDF download logic
+    alert("PDF download initiated");
+  }
+
+  function downloadExcel() {
+    // Placeholder for Excel download logic
+    alert("Excel download initiated");
+  }
+
+  function handleDateRangeChange() {
+    // Placeholder for handling predefined date range selection
+    const dateRange = document.getElementById("dateRange").value;
+    console.log("Selected range:", dateRange);
+    // Add logic to filter table based on selected range
+  }
+
+  function searchByDateRange() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    if (startDate && endDate) {
+      // Placeholder for search logic
+      alert(`Searching sales from ${startDate} to ${endDate}`);
+      // Add logic to filter table based on custom date range
+    } else {
+      alert("Please select both start and end dates");
+    }
+  }
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

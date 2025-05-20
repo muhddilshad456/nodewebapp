@@ -12,6 +12,9 @@ const walletPage = async (req, res) => {
   try {
     const userId = req.session.user;
     const wallet = await Wallet.findOne({ userId }).populate("userId");
+    if (wallet) {
+      wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
     res.render("wallet", { wallet });
   } catch (error) {
     console.log("error from wallet render page", error);

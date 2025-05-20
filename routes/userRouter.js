@@ -101,6 +101,23 @@ router.get("/checkout", userAuth, checkoutController.checkoutPage);
 router.post("/applyCoupon", userAuth, checkoutController.couponApplied);
 router.post("/placeOrder", userAuth, checkoutController.placeOrder);
 router.post("/verify-payment", userAuth, checkoutController.rzVerifyPayment);
+router.post("/payment-failed", userAuth, checkoutController.paymentFailed);
+router.get(
+  "/paymentFailedPage",
+  userAuth,
+  checkoutController.paymentFailedPage
+);
+router.get(
+  "/retryRazorpay",
+  userAuth,
+  checkoutController.renderRetryPaymentPage
+);
+router.post("/retryPayment", userAuth, checkoutController.retryPayment);
+router.post(
+  "/verify-retry-payment",
+  userAuth,
+  checkoutController.verifyRetryPayment
+);
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
 
 // wallet

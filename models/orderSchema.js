@@ -50,6 +50,7 @@ const orderSchema = new Schema({
           "Cancelled",
           "Return requisted",
           "Returned",
+          "Payment failed",
         ],
         default: "Placed",
       },
@@ -78,6 +79,15 @@ const orderSchema = new Schema({
     type: String,
     required: false,
   },
+  paymentVerified: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+  razorpayOrderId: {
+    type: String,
+    required: false,
+  },
   address: {
     name: { type: String, required: true },
     city: { type: String, required: true },
@@ -103,6 +113,7 @@ const orderSchema = new Schema({
       "Cancelled",
       "Return requisted",
       "Returned",
+      "Payment failed",
     ],
   },
   returnReason: {
