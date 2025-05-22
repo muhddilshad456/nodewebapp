@@ -118,17 +118,15 @@
     <div class="wallet-balance">
       <div>
         <p><%= wallet.userId.name %></p>
-        <p>**** **** **** 1234</p>
-        <h2>₹<%= wallet.balance %></h2>
+        <h2>Total : ₹ <%= wallet.balance %></h2>
       </div>
-      <div class="card-details">
-        <p>Valid Thru: 12/26</p>
-      </div>
+      <div class="card-details"></div>
     </div>
-    <div class="add-amount">
-      <input type="text" class="form-control" placeholder="Enter Amount" />
-      <button class="btn">Add</button>
-    </div>
+
+    <% if(wallet.transactions.length===0){ %>
+    <br />
+    <h2 style="color: red">No Transaction Available</h2>
+    <% }else{ %>
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -149,6 +147,7 @@
         <% }) %>
       </tbody>
     </table>
+    <% } %>
   </div>
 </body>
 <%- include("../../views/partials/user/footer") %>

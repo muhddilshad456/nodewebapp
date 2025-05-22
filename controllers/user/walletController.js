@@ -11,13 +11,27 @@ const Wallet = require("../../models/walletSchema");
 const walletPage = async (req, res) => {
   try {
     const userId = req.session.user;
-    const wallet = await Wallet.findOne({ userId }).populate("userId");
-    if (wallet) {
+    let wallet = await Wallet.findOne({ userId }).populate("userId");
+    if (!wallet) {
+      const newWallet = new Wallet({
+        userId,
+        balance: 0,
+        transactions: [],
+      });
+
+      await newWallet.save();
+
+      wallet = newWallet;
+    }
+    if (wallet.transactions && wallet.transactions.length > 0) {
       wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
     res.render("wallet", { wallet });
   } catch (error) {
     console.log("error from wallet render page", error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong loading your wallet." });
   }
 };
 

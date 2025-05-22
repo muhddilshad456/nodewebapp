@@ -135,10 +135,9 @@
               <p class="mb-1">
                 <strong>Subtotal:</strong> ₹.<%= order.totalAmount %>
               </p>
-              <p class="mb-1"><strong>Shipping:</strong> ₹.0.00</p>
-              <p class="mb-1"><strong>Discount:</strong> ₹.0.00</p>
+              <p class="mb-1"><strong>Discount:</strong> ₹<%= order.totalAmount-order.finalAmount %></p>
               <p class="mb-1">
-                <strong>Total:</strong> ₹.<%= order.totalAmount %>
+                <strong>Total:</strong> ₹.<%= order.finalAmount %>
               </p>
             </div>
           </div>
@@ -166,9 +165,9 @@
               <tr>
                 <td><%= item.productId.productName %></td>
                 <td><img src="<%= item.productId.productImage[0] %>" alt="" style="width: 80px; height: auto;"></td>
-                <td><%= item.productId.productAmount %></td>
+                <td><%= item.offerPrice %></td>
                 <td><%= item.quantity %></td>
-                <td><%= item.totalPrice %></td>
+                <td><%= item.totalOfferPrice %></td>
                 <td>
                 <!-- Status Button -->
                 <button disabled class="btn btn-secondary mb-2">
@@ -216,7 +215,7 @@
             <tbody>
               <tr>
                 <td><%= order.createdOn.toISOString().slice(0, 10); %></td>
-                <td>₹<%= order.totalAmount %></td>
+                <td>₹<%= order.finalAmount %></td>
                 <td><%= order.paymentMethod %></td>
                 <td>214343442</td>
               </tr>

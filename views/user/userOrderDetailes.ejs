@@ -181,9 +181,9 @@
                   />
                 </td>
                 <td><%= item.productId.productName %></td>
-                <td><%= item.productId.productAmount %></td>
+                <td><%= item.productId.offerPrice %></td>
                 <td><%= item.quantity %></td>
-                <td>₹<%= item.totalPrice %></td>
+                <td>₹<%= item.totalOfferPrice %></td>
                 <td><span class="status-delivered"><%= item.status%></span></td>
 
                 <td>
@@ -249,8 +249,10 @@
       <div class="total-box">
         <h6 class="section-header">Total Amount</h6>
         <p><strong>Subtotal</strong> ₹<%= order.totalAmount %></p>
-        <p><strong>Discount</strong> ₹0.00</p>
-        <p class="total"><strong>Total</strong> ₹<%= order.totalAmount %></p>
+        <p>
+          <strong>Discount</strong> ₹<%= order.totalAmount-order.finalAmount %>
+        </p>
+        <p class="total"><strong>Total</strong> ₹<%= order.finalAmount %></p>
       </div>
 
       <!-- Action Buttons -->

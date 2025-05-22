@@ -104,7 +104,7 @@ const checkoutPage = async (req, res) => {
       status: "Active",
       startDate: { $lte: currentDate },
       endDate: { $gte: currentDate },
-      minCartValue: { $gte: grandOfferTotal },
+      minCartValue: { $lte: grandOfferTotal },
     });
 
     const totalDiscount = grandTotal - grandOfferTotal;
@@ -120,6 +120,7 @@ const checkoutPage = async (req, res) => {
       grandTotal,
       totalDiscount,
       coupon,
+      couponCode,
     });
   } catch (error) {
     console.log("error in checkout page ", error);
@@ -147,6 +148,18 @@ const couponApplied = async (req, res) => {
   }
 };
 
+// remove coupon
+
+const couponRemove = async (req, res) => {
+  try {
+    console.log("hello");
+    delete req.session.couponCode;
+    res.json({ success: true, message: "Coupon removed successfully" });
+  } catch (error) {
+    console.log("error in coupon remove ", error);
+  }
+};
+
 // placing order
 const placeOrder = async (req, res) => {
   try {
@@ -159,7 +172,7 @@ const placeOrder = async (req, res) => {
         .json({ success: false, message: "Missing required data." });
     }
 
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     const wallet = await Wallet.findOne({ userId });
 
@@ -258,6 +271,14 @@ const placeOrder = async (req, res) => {
     }
 
     if (payment === "cod" || payment === "wallet") {
+      if (payment === "wallet") {
+        if (!wallet || wallet.balance < finalAmount) {
+          return res
+            .status(402)
+            .json({ success: false, message: "Insuffitient balace in wallet" });
+        }
+      }
+
       for (const item of cart.items) {
         const product = await Product.findOne({ _id: item.productId });
         if (!product) {
@@ -291,38 +312,17 @@ const placeOrder = async (req, res) => {
 
       await cart.save();
       if (payment === "wallet") {
-        if (wallet.balance < newOrder.finalAmount) {
-          return res
-            .status(402)
-            .json({ success: false, message: "Insuffitient balace in wallet" });
-        }
-        if (!wallet) {
-          const newWallet = new Wallet({
-            userId,
-            balance: newOrder.finalAmount,
-            transactions: [
-              {
-                amount: newOrder.finalAmount,
-                type: "Debit",
-                method: "OrderPayment",
-                status: "Completed",
-                orderId: newOrder._id,
-              },
-            ],
-          });
-          await newWallet.save();
-        } else {
-          wallet.balance -= newOrder.finalAmount;
-          wallet.transactions.push({
-            amount: newOrder.finalAmount,
-            type: "Debit",
-            method: "OrderPayment",
-            status: "Completed",
-            orderId: newOrder._id,
-          });
-          await wallet.save();
-        }
+        wallet.balance -= newOrder.finalAmount;
+        wallet.transactions.push({
+          amount: newOrder.finalAmount,
+          type: "Debit",
+          method: "OrderPayment",
+          status: "Completed",
+          orderId: newOrder._id,
+        });
+        await wallet.save();
       }
+
       delete req.session.couponCode;
       res.json({
         success: true,
@@ -340,7 +340,7 @@ const rzVerifyPayment = async (req, res) => {
   try {
     console.log("razor pay verify payment", req.body);
     const userId = req.session.user;
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
     const {
       razorpay_order_id,
       razorpay_payment_id,
@@ -479,7 +479,7 @@ const paymentFailed = async (req, res) => {
     const { rzOrderId, addressId } = req.body;
 
     const userId = req.session.user;
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     const existingOrder = await Order.findOne({
       userId,
@@ -762,6 +762,7 @@ const orderSuccessPage = async (req, res) => {
 module.exports = {
   checkoutPage,
   couponApplied,
+  couponRemove,
   placeOrder,
   rzVerifyPayment,
   orderSuccessPage,

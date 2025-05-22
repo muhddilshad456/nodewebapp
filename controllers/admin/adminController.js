@@ -24,7 +24,7 @@ const login = async (req, res) => {
       res.status(401).render("admin-login", { message: "Incorrect password" });
     }
     req.session.admin = findAdmin._id;
-    res.redirect("/admin");
+    res.redirect("/admin/dashboard");
   } catch (error) {
     console.log("login error", error);
   }

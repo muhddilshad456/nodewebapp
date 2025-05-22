@@ -10,6 +10,42 @@
     </div>
   </nav>
 
+  <div class="row text-center mb-4 px-3">
+  <div class="col-md-3 mb-2">
+    <div class="card shadow-sm">
+      <div class="card-body bg-success text-white rounded">
+        <h6 class="card-title">Total Amount</h6>
+        <h4>₹<%= completeAmount %></h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-2">
+    <div class="card shadow-sm">
+      <div class="card-body bg-success text-white rounded">
+        <h6 class="card-title">Final Amount</h6>
+        <h4>₹<%= completeFinalAmount %></h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-2">
+    <div class="card shadow-sm">
+      <div class="card-body bg-success text-dark rounded">
+        <h6 class="card-title">Total Discount</h6>
+        <h4>₹<%= completeDiscount %></h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-2">
+    <div class="card shadow-sm">
+      <div class="card-body bg-success text-white rounded">
+        <h6 class="card-title">Total Orders</h6>
+        <h4><%= numOfSales %></h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- Date Range Selector -->
   <div class="mb-4">
     <form action="/admin/salesreport">
@@ -46,12 +82,12 @@
           <button class="btn btn-info" type="submit">Submit</button>
           <button class="btn btn-danger" type="submit" onclick="clearSearch()">Clear</button>
         </div>
-        <button class="btn btn-primary ms-3" onclick="downloadPDF()">
+        <a class="btn btn-primary ms-3" href="/admin/salesreportPdf">
           Download PDF
-        </button>
-        <button class="btn btn-success ms-2" onclick="downloadExcel()">
+        </a>
+        <a class="btn btn-success ms-2" href="/admin/salesreportExcel"> 
           Download Excel
-        </button>
+        </a>
       </div>
     </form>
   </div>
@@ -90,8 +126,10 @@
     function clearSearch() {
     const startDate = document.getElementById("startDate");
     const endDate = document.getElementById("endDate");
+    const dateRange = document.getElementById("dateRange")
     startDate.value = "";
     endDate.value = "";
+    dateRange.value=""
     window.location.href = "/admin/salesReport";
   }
 

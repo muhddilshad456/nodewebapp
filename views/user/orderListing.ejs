@@ -186,7 +186,7 @@
         <% orders.forEach((order)=>{ %>
         <tr>
           <td><%= order.orderId %></td>
-          <td>₹<%= order.totalAmount %></td>
+          <td>₹<%= order.finalAmount %></td>
           <td><%= order.createdOn.toISOString().slice(0, 10); %></td>
           <td><span class="status-delivered"><%= order.status %></span></td>
           <td><%= order.paymentMethod%></td>

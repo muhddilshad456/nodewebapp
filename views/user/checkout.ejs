@@ -422,12 +422,19 @@
             <input
               type="text"
               id="couponApplied"
+              value="<%= couponCode %>"
               class="form-control coupon-input"
               placeholder="Enter Coupon Code"
             />
+            <% if(couponCode && couponCode.trim() !== ''){ %>
+            <button type="button" class="btn-coupon-remove btn btn-danger">
+              Remove
+            </button>
+            <% }else{ %>
             <button type="button" class="btn-coupon-apply btn btn-success">
               Apply
             </button>
+            <% } %>
           </div>
         </div>
       </div>
@@ -460,6 +467,102 @@
       messageDiv.className = "message";
     }, 2000);
   }
+
+  // apply coupon
+  document
+    .querySelector(".btn-coupon-apply")
+    ?.addEventListener("click", async () => {
+      const couponApplied = document.getElementById("couponApplied").value;
+      if (!couponApplied) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Apply a valid coupon",
+        });
+        return;
+      }
+      try {
+        const result = await fetch("/applyCoupon", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ couponApplied }),
+        });
+
+        const data = await result.json();
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Successs",
+            text: data.message || "Coupon applied",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => location.reload());
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "Failed to apply coupon",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Unable to proceed",
+        });
+      }
+    });
+
+  // remove coupon
+
+  document
+    .querySelector(".btn-coupon-remove")
+    ?.addEventListener("click", async () => {
+      const couponApplied = document.getElementById("couponApplied").value;
+      if (!couponApplied) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Apply a valid coupon",
+        });
+        return;
+      }
+      try {
+        const result = await fetch("/removeCoupon", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ couponApplied }),
+        });
+
+        const data = await result.json();
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Successs",
+            text: data.message || "Coupon removed",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => location.reload());
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: data.message || "Failed to remove coupon",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: error.message || "Unable to proceed",
+        });
+      }
+    });
+
   // place order
   document
     .getElementById("placeOrder")
@@ -570,53 +673,6 @@
       } catch (error) {
         alert("Something went wrong. Please try again.");
         console.error("Fetch error:", error);
-      }
-    });
-
-  // apply coupon
-  document
-    .querySelector(".btn-coupon-apply")
-    .addEventListener("click", async () => {
-      const couponApplied = document.getElementById("couponApplied").value;
-      if (!couponApplied) {
-        Swal.fire({
-          icon: "error",
-          title: "Failed",
-          text: "Apply a valid coupon",
-        });
-        return;
-      }
-      try {
-        const result = await fetch("/applyCoupon", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ couponApplied }),
-        });
-
-        const data = await result.json();
-        if (data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Successs",
-            text: data.message || "Coupon applied",
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => location.reload());
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Failed",
-            text: data.message || "Failed to apply coupon",
-          });
-        }
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Failed",
-          text: error.message || "Unable to proceed",
-        });
       }
     });
 </script>

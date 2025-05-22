@@ -160,35 +160,6 @@
   <!-- Table Actions (Search, Filter, Sort) -->
   <div class="table-actions-container">
     <!-- Filter and Sort Container -->
-    <form action="/admin/orders" method="get" id="filterSortForm" class="filter-form">
-    <div class="filter-sort-container">
-        <div class="filter-group">
-          <select
-            name="filter"
-            id="status"
-            class="form-control"
-            onchange="document.getElementById('filterSortForm').submit()"
-          >
-          <option value="">Filter by Status</option>
-          <option value="Delivered" <%= filter === 'Delivered' ? 'selected' : '' %>>DELIVERED</option>
-          <option value="Cancelled" <%= filter === 'Cancelled' ? 'selected' : '' %>>CANCELLED</option>
-          <option value="Pending" <%= filter === 'Pending' ? 'selected' : '' %>>ON DELIVERY</option>
-          </select>
-        </div>
-      <!-- Sort Form -->
-        <div class="sort-group">
-          <select
-            name="sort"
-            id="sort"
-            class="form-control"
-            onchange="document.getElementById('filterSortForm').submit()"
-          >
-          <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
-          <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
-          </select>
-        </div>
-    </div>
-</form>
 
     <!-- Search Form -->
     <div class="search-form">
@@ -199,7 +170,7 @@
             class="form-control"
             name="search"
             id="searchInput"
-            placeholder="Search for User Name"
+            placeholder="Search for order id"
             aria-label="Search"
           />
           <button class="btn btn-dark" type="submit">
@@ -235,10 +206,14 @@
           <td><%= item.address.name %></td>
           <td><%= item.orderId %></td>
           <td><%= item.address.streetAddress %>,<%= item.address.city %></td>
-          <td>₹<%= item.totalAmount %></td>
+          <td>₹<%= item.finalAmount %></td>
           <td><%= item.createdOn.toISOString().slice(0, 10); %></td>
           <td><%= item.status %></td>
-          <td><a href="/admin/orderDetailes/<%= item._id %>"><i class="bi bi-pencil action-pencil"></i></a></td>
+          <td>
+            <a href="/admin/orderDetailes/<%= item._id %>"
+              ><i class="bi bi-pencil action-pencil"></i
+            ></a>
+          </td>
         </tr>
         <% }) %>
       </tbody>
@@ -259,10 +234,10 @@
   </div>
 </div>
 <script>
-    function clearSearch() {
-      const searchInput = document.getElementById("searchInput");
-      searchInput.value = "";
-      window.location.href = "/admin/orders";
-    }
-  </script>
+  function clearSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    window.location.href = "/admin/orders";
+  }
+</script>
 <%- include("../../views/partials/admin/footer") %>

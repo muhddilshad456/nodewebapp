@@ -6,45 +6,31 @@ const Wallet = require("../../models/walletSchema");
 const orderPage = async (req, res) => {
   try {
     const search = req.query.search || "";
-    const filter = req.query.filter || "";
-    const sort = req.query.sort || "newest";
     const page = parseInt(req.query.page) || 1;
 
-    let sortOption = {};
-    if (sort === "newest") {
-      sortOption = { createdAt: -1 };
-    } else if (sort === "oldest") {
-      sortOption = { createdAt: 1 };
-    }
-
-    const limit = 3;
+    const limit = 6;
 
     const orderData = await Order.find({
-      $or: [
-        { orderId: { $regex: ".*" + search + ".*", $options: "i" } },
-        { status: filter },
-      ],
+      orderId: { $regex: ".*" + search + ".*", $options: "i" },
     })
-      .sort(sortOption)
+      .sort({ createdOn: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate("address")
       .populate("orderedItems.productId")
       .exec();
 
-    const count = await Order.find({
-      $or: [{ orderId: { $regex: ".*" + search + ".*" } }, { status: filter }],
-    }).countDocuments();
+    const count = await Order.countDocuments({
+      orderId: { $regex: ".*" + search + ".*", $options: "i" },
+    });
 
     const totalPages = Math.ceil(count / limit);
 
     res.render("order", {
       order: orderData,
-      sort,
       currentPage: page,
       totalPages,
       search,
-      filter,
       count,
     });
   } catch (error) {
@@ -101,6 +87,11 @@ const confirmReturn = async (req, res) => {
   try {
     const { orderId } = req.body;
     const userId = req.session.user;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing userId" });
+    }
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
@@ -176,6 +167,12 @@ const confirmReturn = async (req, res) => {
 // accept single item return
 const acceptSingleItemReturn = async (req, res) => {
   try {
+    const userId = req.session.user;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing userId" });
+    }
     const { itemId, orderId } = req.body;
     if (!itemId || !orderId) {
       return res
@@ -201,11 +198,40 @@ const acceptSingleItemReturn = async (req, res) => {
         .json({ success: false, message: "product not found" });
     }
 
+    const wallet = await Wallet.findOne({ userId });
+
     item.status = "Returned";
     if (order.orderedItems.every((item) => item.status === "Returned")) {
       order.status = "Returned";
     }
     await order.save();
+
+    if (!wallet) {
+      const newWallet = new Wallet({
+        userId,
+        balance: item.totalOfferPrice,
+        transactions: [
+          {
+            amount: item.totalOfferPrice,
+            type: "Credit",
+            method: "Refund",
+            status: "Completed",
+            orderId: order._id,
+          },
+        ],
+      });
+      await newWallet.save();
+    } else {
+      wallet.balance += item.totalOfferPrice;
+      wallet.transactions.push({
+        amount: item.totalOfferPrice,
+        type: "Credit",
+        method: "Refund",
+        status: "Completed",
+        orderId: order._id,
+      });
+      await wallet.save();
+    }
     product.stockCount += item.quantity;
     await product.save();
     res.json({ success: true, message: "Order returned successfully" });

@@ -1,150 +1,329 @@
 <%- include("../../views/partials/admin/header") %>
 <!-- Main Content -->
 <div class="content">
-  <nav class="navbar navbar-dark bg-dark mb-4">
+  <!-- Main Heading -->
+  <h1 class="mb-4">Dashboard</h1>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark bg-dark navbar-custom mb-4">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">Dashboard</span>
-      <div class="d-flex">
-        <span class="me-3">Today</span>
-      </div>
     </div>
   </nav>
 
   <!-- Stats Cards -->
   <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card card-custom">
-        <h5>Views</h5>
-        <h3>721K <span class="text-success">+11.02% ↑</span></h3>
+    <!-- Stats Cards -->
+    <div class="col-md-6">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card card-custom card-small">
+            <h5 class="text-muted">Views</h5>
+            <h3 class="fw-bold">
+              721K <span class="text-success">+11.02% ↑</span>
+            </h3>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card card-custom card-small">
+            <h5 class="text-muted">Visits</h5>
+            <h3 class="fw-bold">
+              367K <span class="text-danger">-0.03% ↓</span>
+            </h3>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card card-custom card-small">
+            <h5 class="text-muted">New Users</h5>
+            <h3 class="fw-bold">
+              1,156 <span class="text-success">+15.03% ↑</span>
+            </h3>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card card-custom card-small">
+            <h5 class="text-muted">Active Users</h5>
+            <h3 class="fw-bold">
+              239K <span class="text-success">+6.08% ↑</span>
+            </h3>
+            <a href="#" class="text-primary text-decoration-none"
+              >Show more ></a
+            >
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card card-custom">
-        <h5>Visits</h5>
-        <h3>367K <span class="text-danger">-0.03% ↓</span></h3>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-custom">
-        <h5>New Users</h5>
-        <h3>1,156 <span class="text-success">+15.03% ↑</span></h3>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-custom">
-        <h5>Active Users</h5>
-        <h3>239K <span class="text-success">+6.08% ↑</span></h3>
-        <a href="#" class="text-primary">Show more ></a>
+    <!-- Chart -->
+    <div class="col-md-6">
+      <div class="chart-container">
+        <h5 class="mb-3">Revenue Over Time</h5>
+        <canvas id="revenueChart" style="max-height: 200px"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Products Table -->
-  <div class="table-responsive">
-    <table class="table table-custom">
-      <thead>
+  <!-- Filter Dropdown -->
+  <div class="d-flex justify-content-end mb-3">
+    <select class="form-select w-auto" id="filterSelect" name="filterSelect">
+      <option value="all">All Orders</option>
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+      <option value="year">This Year</option>
+    </select>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-responsive mb-4">
+    <h5 class="mb-3 top-selling-heading">Recent Orders</h5>
+    <table class="table table-custom table-hover">
+      <thead class="table-dark">
         <tr>
           <th>ID</th>
-          <th>Product Image</th>
-          <th>Product Name</th>
-          <th>Brand</th>
-          <th>Amount</th>
-          <th>Revenue</th>
-          <th>Qty Sold</th>
+          <th>Date</th>
+          <th>Costumer Name</th>
+          <th>Total Amount</th>
+          <th>Payment method</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
+        <% orders.forEach((order)=>{ %>
         <tr>
-          <td>#11225</td>
-          <td>
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Watch"
-              class="img-fluid"
-            />
-          </td>
-          <td>TIMEX EASY READER</td>
-          <td>TIMEX</td>
-          <td>₹705</td>
-          <td>₹18,360</td>
-          <td>3</td>
+          <td><%= order.orderId.slice(-6) %></td>
+          <td><%= order.createdOn.toISOString().slice(0, 10) %></td>
+          <td><%= order.userId.name %></td>
+          <td>₹<%= order.finalAmount %></td>
+          <td><%= order.paymentMethod %></td>
+          <td><%= order.status %></td>
         </tr>
-        <tr>
-          <td>#11226</td>
-          <td>
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Watch"
-              class="img-fluid"
-            />
-          </td>
-          <td>APPLE WATCH SERIES 10</td>
-          <td>APPLE</td>
-          <td>₹55,000</td>
-          <td>₹55,000</td>
-          <td>1</td>
-        </tr>
-        <tr>
-          <td>#11227</td>
-          <td>
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Watch"
-              class="img-fluid"
-            />
-          </td>
-          <td>REDMI WATCH 5</td>
-          <td>REDMI</td>
-          <td>₹2,800</td>
-          <td>₹14,000</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>#11228</td>
-          <td>
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Watch"
-              class="img-fluid"
-            />
-          </td>
-          <td>CASIO G-SHOCK G160</td>
-          <td>G-SHOCK</td>
-          <td>₹8,795</td>
-          <td>₹61,565</td>
-          <td>7</td>
-        </tr>
-        <tr>
-          <td>#11229</td>
-          <td>
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Watch"
-              class="img-fluid"
-            />
-          </td>
-          <td>R.D.S.K TEC GEN 9 SMARTWATCH</td>
-          <td>R.D.S.K</td>
-          <td>₹1,373</td>
-          <td>₹4,119</td>
-          <td>3</td>
-        </tr>
+        <% }) %>
       </tbody>
     </table>
     <nav aria-label="Page navigation">
       <ul class="pagination justify-content-end">
-        <li class="page-item">
-          <a class="page-link" href="#">Previous</a>
+        <% for(let i=1;i<=totalPages;i++){ %>
+        <li class="page-item <%=(i===currentPage) ? 'active' : '' %>">
+          <a
+            class="page-link"
+            href="?page=<%= i %><%= filter ? '&filter='+filter : '' %>"
+          >
+            <%= i %>
+          </a>
         </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">4</a></li>
-        <li class="page-item"><a class="page-link" href="#">5</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        <% } %>
       </ul>
     </nav>
-    <p class="text-muted">Showing 1 of 10</p>
+  </div>
+
+  <!-- Top Selling Tables (Products, Brands, Categories) -->
+  <div class="row g-3 mb-4">
+    <!-- Top 10 Products Table -->
+    <div class="col-md-4">
+      <h5 class="mb-3 top-selling-heading">Top 10 Best-Selling Products</h5>
+      <div class="table-responsive">
+        <table class="table table-custom table-hover">
+          <thead class="table-dark">            
+            <tr>
+              <th>Rank</th>
+              <th>Product</th>
+              <th>Total Revenue</th>
+              <th>Units Sold</th>
+            </tr>    
+          </thead>
+          <tbody>
+            <% for(i=0;i<topSellingProducts.length;i++){ %>
+            <tr>
+              <td><%= i+1 %></td>
+              <td><%= topSellingProducts[i].product.productName %></td>
+              <td>₹<%= topSellingProducts[i].totalRevenuw %></td>
+              <td><%= topSellingProducts[i].totalSold %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top 10 Brands Table -->
+    <div class="col-md-4">
+      <h5 class="mb-3 top-selling-heading">Top 10 Best-Selling Brands</h5>
+      <div class="table-responsive">
+        <table class="table table-custom table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Rank</th>
+              <th>Brand</th>
+              <th>Total Revenue</th>
+              <th>Units Sold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(i=0;i<topSellingBrands.length;i++){ %>
+            <tr>
+              <td><%= i+1 %></td>
+              <td><%= topSellingBrands[i].brand.name %></td>
+              <td>₹<%= topSellingBrands[i].totalRevenuw %></td>
+              <td><%= topSellingBrands[i].totalSold %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top 10 Categories Table -->
+    <div class="col-md-4">
+      <h5 class="mb-3 top-selling-heading">Top 10 Best-Selling Categories</h5>
+      <div class="table-responsive">
+        <table class="table table-custom table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Rank</th>
+              <th>Category</th>
+              <th>Total Revenue</th>
+              <th>Units Sold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(i=0;i<topSellingCategories.length;i++){ %>
+            <tr>
+              <td><%= i+1 %></td>
+              <td><%= topSellingCategories[i].category.name %></td>
+              <td>₹<%= topSellingCategories[i].totalRevenuw %></td>
+              <td><%= topSellingCategories[i].totalSold %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Inline CSS and JavaScript -->
+<style>
+  .content {
+    padding: 20px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+  }
+  .card-custom {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background-color: #fff;
+    transition: transform 0.2s;
+  }
+  .card-custom:hover {
+    transform: translateY(-5px);
+  }
+  .table-custom {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .table-custom th,
+  .table-custom td {
+    vertical-align: middle;
+  }
+  .navbar-custom {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .dropdown-menu {
+    min-width: 150px;
+  }
+  .chart-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .top-selling-heading {
+    color: #000000;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // fetch for filter
+  document
+    .getElementById("filterSelect")
+    .addEventListener("change", async function () {
+      const filter = this.value;
+      window.location.href = `/admin/dashboard?filter=${filter}`;
+    });
+
+  const ctx = document.getElementById("revenueChart").getContext("2d");
+  const revenueChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+      datasets: [
+        {
+          label: "Revenue (₹)",
+          data: [
+            50000, 60000, 75000, 80000, 65000, 90000, 100000, 85000, 95000,
+            110000, 120000, 130000,
+          ],
+          borderColor: "#007bff",
+          backgroundColor: "rgba(0, 123, 255, 0.1)",
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Revenue (₹)",
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Month",
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+        },
+      },
+    },
+  });
+
+  // Dropdown filter logic
+  document.querySelectorAll(".dropdown-item").forEach((item) => {
+    item.addEventListener("click", function (e) {
+      e.preventDefault();
+      const filter = this.getAttribute("data-filter");
+      document.getElementById("filterDropdown").textContent = this.textContent;
+      // Add logic to filter data based on selection (e.g., update chart and tables)
+      console.log(`Filter selected: ${filter}`);
+    });
+  });
+</script>
+
 <%- include("../../views/partials/admin/footer") %>

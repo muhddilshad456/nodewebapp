@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin/adminController");
+const dashbordController = require("../controllers/admin/dashbordController");
 const costumerController = require("../controllers/admin/costumerController");
 const categoryController = require("../controllers/admin/categoryController");
 const brandController = require("../controllers/admin/brandController");
@@ -82,5 +83,14 @@ router.post("/enableCoupon", adminAuth, couponController.enableCoupon);
 
 // sales
 router.get("/salesreport", adminAuth, salesreportController.salesreportPage);
+router.get("/salesreportPdf", adminAuth, salesreportController.salesreportPdf);
+router.get(
+  "/salesreportExcel",
+  adminAuth,
+  salesreportController.salesreportExcel
+);
+
+//  dashbord
+router.get("/dashboard", adminAuth, dashbordController.dashbordPage);
 
 module.exports = router;

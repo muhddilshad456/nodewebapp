@@ -99,6 +99,7 @@ router.post("/updateCartQuantity", userAuth, cartController.updateCartQuantity);
 // check out
 router.get("/checkout", userAuth, checkoutController.checkoutPage);
 router.post("/applyCoupon", userAuth, checkoutController.couponApplied);
+router.post("/removeCoupon", userAuth, checkoutController.couponRemove);
 router.post("/placeOrder", userAuth, checkoutController.placeOrder);
 router.post("/verify-payment", userAuth, checkoutController.rzVerifyPayment);
 router.post("/payment-failed", userAuth, checkoutController.paymentFailed);
