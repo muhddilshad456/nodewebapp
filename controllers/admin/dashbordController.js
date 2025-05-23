@@ -8,7 +8,7 @@ const dashbordPage = async (req, res) => {
     const today = new Date();
     let fromDate, toDate;
 
-    let filter = { status: { $ne: "Payment failed" } };
+    let filter = { status: "Delivered" };
 
     if (filterData && filterData !== "all") {
       if (filterData === "today") {
@@ -47,7 +47,20 @@ const dashbordPage = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
     totalOrders = await Order.countDocuments(filter);
-    const totalPages = totalOrders / limit;
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    const graph = await Order.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdOn" } },
+          totalRevenue: { $sum: "$finalAmount" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    console.log("chart", graph);
 
     const topSellingProducts = await Order.aggregate([
       { $match: { status: "Delivered" } },
@@ -138,10 +151,6 @@ const dashbordPage = async (req, res) => {
       { $limit: 10 },
     ]);
 
-    console.log("top sellig cat", topSellingCategories);
-    console.log("top sellig cat", topSellingBrands);
-    console.log("top selling product ", topSellingProducts);
-
     res.render("dashbord", {
       orders,
       totalPages,
@@ -150,6 +159,7 @@ const dashbordPage = async (req, res) => {
       topSellingProducts,
       topSellingCategories,
       topSellingBrands,
+      graph,
     });
   } catch (error) {
     console.log("error from dashbord page", error);

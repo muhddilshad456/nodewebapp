@@ -128,6 +128,15 @@
             <span class="toggle-eye" onclick="togglecPassword()">👁️</span>
             <div id="cpassword-err" class="err-msg"></div>
           </div>
+          <div class="mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="refCode"
+              placeholder="refCode"
+              name="refCode"
+            />
+          </div>
           <%if(locals.message && message.length>0){%>
           <div class="alert alert-danger text-center"><%=message%></div>
           <%}%>

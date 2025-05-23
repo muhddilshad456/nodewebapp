@@ -88,7 +88,8 @@ async function sendVerificationEmail(email, otp) {
 
 const signup = async (req, res) => {
   try {
-    const { name, phone, email, password, confirmpassword } = req.body;
+    const { name, phone, email, password, confirmpassword, refCode } = req.body;
+    console.log("ref code", refCode);
     if (password !== confirmpassword) {
       return res
         .status(400)
@@ -111,7 +112,7 @@ const signup = async (req, res) => {
       otp,
       createdAt: Date.now(),
     };
-    req.session.userData = { name, phone, email, password };
+    req.session.userData = { name, phone, email, password, refCode };
 
     res.render("verify-otp");
     console.log("otp-send", otp);
@@ -155,21 +156,72 @@ const verifyOtp = async (req, res) => {
     const user = req.session.userData;
     const passwordHash = await securePassword(user.password);
 
+    const userRefName = user.name;
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const referalCode = `${userRefName.substring(0, 3).toUpperCase()}${random}`;
+
     const saveUserData = new User({
       name: user.name,
       email: user.email,
       phone: user.phone,
       password: passwordHash,
+      referalCode,
     });
     await saveUserData.save();
     req.session.user = saveUserData._id;
 
-    res.json({ success: true, redirectUrl: "/" });
+    const refCode = user.refCode;
+    console.log("refCode from verify otp", refCode);
 
-    res.on("finish", () => {
-      delete req.session.userOtp;
-      delete req.session.userData;
-    });
+    if (refCode && refCode.length !== 0) {
+      const refUser = await User.findOne({ referalCode: refCode });
+      const wallet = await Wallet.findOne({ userId: refUser._id });
+      const newUserWallet = await Wallet.findOne({ userId: saveUserData._id });
+
+      if (!wallet) {
+        const newWallet = new Wallet({
+          userId: refUser._id,
+          balance: 1000,
+          transactions: [
+            {
+              amount: 1000,
+              type: "Credit",
+              method: "Referral",
+              status: "Completed",
+            },
+          ],
+        });
+        await newWallet.save();
+      } else {
+        wallet.balance += 1000;
+        wallet.transactions.push({
+          amount: 1000,
+          type: "Credit",
+          method: "Referral",
+          status: "Completed",
+        });
+        await wallet.save();
+      }
+
+      const newWallet = new Wallet({
+        userId: saveUserData._id,
+        balance: 500,
+        transactions: [
+          {
+            amount: 500,
+            type: "Credit",
+            method: "Referral",
+            status: "Completed",
+          },
+        ],
+      });
+      await newWallet.save();
+    }
+
+    delete req.session.userOtp;
+    delete req.session.userData;
+
+    res.json({ success: true, message: "Sign up success", redirectUrl: "/" });
   } catch (error) {
     console.error("Error Verifying OTP", error);
     res.status(500).json({ success: false, message: "An error occurred" });

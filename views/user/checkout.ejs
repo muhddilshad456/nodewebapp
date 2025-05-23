@@ -374,15 +374,15 @@
             <div class="cart-total">
               <p>
                 <span>Subtotal</span>
-                <span>₹<%= grandTotal %></span>
+                <span>₹<%= grandTotal.toFixed(2) %></span>
               </p>
               <p>
                 <span>Discount</span>
-                <span id="discount">₹<%= totalDiscount %></span>
+                <span id="discount">₹<%= totalDiscount.toFixed(2) %></span>
               </p>
               <p>
                 <strong>Total</strong>
-                <strong id="total">₹<%= grandOfferTotal %></strong>
+                <strong id="total">₹<%= grandOfferTotal.toFixed(2) %></strong>
               </p>
             </div>
           </div>
@@ -399,7 +399,7 @@
                 <input
                   type="text"
                   class="form-control coupon-input"
-                  id="couponCode-2"
+                  id="coupon-<%= coup._id %>"
                   value="<%= coup.couponCode %>"
                   readonly
                 />
@@ -407,8 +407,7 @@
               <div class="col-4">
                 <button
                   type="button"
-                  class="btn btn-outline-primary copy-btn w-100"
-                  onclick="copyCoupon('couponCode-2', 'couponMessage-2')"
+                  class="btn-coupon-copy btn btn-outline-primary copy-btn w-100"
                 >
                   Copy
                 </button>
@@ -447,26 +446,13 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   // copy coupon code
-  function copyCoupon(inputId, messageId) {
-    const couponInput = document.getElementById(inputId);
-    const messageDiv = document.getElementById(messageId);
-    couponInput.select();
-    try {
-      document.execCommand("copy");
-      showMessage(messageDiv, "Copied!", "text-success");
-    } catch (err) {
-      showMessage(messageDiv, "Copy failed.", "text-danger");
-    }
-  }
 
-  function showMessage(messageDiv, message, className) {
-    messageDiv.textContent = message;
-    messageDiv.className = `message ${className}`;
-    setTimeout(() => {
-      messageDiv.textContent = "";
-      messageDiv.className = "message";
-    }, 2000);
-  }
+  document.querySelectorAll(".btn-coupon-copy").forEach((button) => {
+    button.addEventListener("click", async function () {
+      const input = this.closest(".row").querySelector(".coupon-input");
+      navigator.clipboard.writeText(input.value);
+    });
+  });
 
   // apply coupon
   document

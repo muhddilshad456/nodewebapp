@@ -271,6 +271,14 @@ const placeOrder = async (req, res) => {
     }
 
     if (payment === "cod" || payment === "wallet") {
+      if (payment === "cod" && finalAmount > 1000) {
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "COD not allowed for order above 1000",
+          });
+      }
       if (payment === "wallet") {
         if (!wallet || wallet.balance < finalAmount) {
           return res

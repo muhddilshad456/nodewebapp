@@ -66,10 +66,10 @@
   <div class="d-flex justify-content-end mb-3">
     <select class="form-select w-auto" id="filterSelect" name="filterSelect">
       <option value="all">All Orders</option>
-      <option value="today">Today</option>
-      <option value="week">This Week</option>
-      <option value="month">This Month</option>
-      <option value="year">This Year</option>
+      <option value="today" <%= filter==="today" ? 'selected' : '' %>>Today</option>
+      <option value="week" <%= filter==="week" ? 'selected' : '' %>>This Week</option>
+      <option value="month" <%= filter==="month" ? 'selected' : '' %>>This Month</option>
+      <option value="year" <%= filter==="year" ? 'selected' : '' %>>This Year</option>
     </select>
   </div>
 
@@ -256,31 +256,21 @@
       window.location.href = `/admin/dashboard?filter=${filter}`;
     });
 
+    // graph 
+
+  const graph = <%- JSON.stringify(graph) %>;
+
+  const labels=graph.map(date=>date._id)
+  const data=graph.map(rev=>rev.totalRevenue)
   const ctx = document.getElementById("revenueChart").getContext("2d");
   const revenueChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      labels:labels ,
       datasets: [
         {
           label: "Revenue (₹)",
-          data: [
-            50000, 60000, 75000, 80000, 65000, 90000, 100000, 85000, 95000,
-            110000, 120000, 130000,
-          ],
+          data: data,
           borderColor: "#007bff",
           backgroundColor: "rgba(0, 123, 255, 0.1)",
           fill: true,
@@ -301,7 +291,7 @@
         x: {
           title: {
             display: true,
-            text: "Month",
+            text: "Date",
           },
         },
       },
@@ -314,16 +304,7 @@
     },
   });
 
-  // Dropdown filter logic
-  document.querySelectorAll(".dropdown-item").forEach((item) => {
-    item.addEventListener("click", function (e) {
-      e.preventDefault();
-      const filter = this.getAttribute("data-filter");
-      document.getElementById("filterDropdown").textContent = this.textContent;
-      // Add logic to filter data based on selection (e.g., update chart and tables)
-      console.log(`Filter selected: ${filter}`);
-    });
-  });
+  
 </script>
 
 <%- include("../../views/partials/admin/footer") %>

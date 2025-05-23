@@ -7,10 +7,10 @@ const salesreportPage = async (req, res) => {
     const selectRange = req.query.selectRange;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
-    const page = req.query.page;
+    const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
-
+    console.log("page number", page);
     let filter = { status: "Delivered" };
 
     const today = new Date();
@@ -48,12 +48,12 @@ const salesreportPage = async (req, res) => {
       filter.createdOn = { $gte: fromDate, $lte: toDate };
     }
 
-    const orders = await Order.find(filter).sort({ createdOn: -1 });
-    //   .skip(skip)
-    //   .limit(limit);
+    const orders = await Order.find(filter)
+      .sort({ createdOn: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    const totalOrders = await Order.find(filter).countDocuments();
-
+    const totalOrders = await Order.countDocuments(filter);
     // calculating total values
 
     let completeAmount = 0;
@@ -68,11 +68,11 @@ const salesreportPage = async (req, res) => {
 
     const numOfSales = orders.length;
 
-    // const totalPages = totalOrders / limit;
+    const totalPages = Math.ceil(totalOrders / limit);
     res.render("salesreport", {
       orders,
-      //   totalPages,
-      //   currentPage: page,
+      totalPages,
+      currentPage: page,
       selectRange,
       startDate,
       endDate,

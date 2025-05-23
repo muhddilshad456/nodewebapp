@@ -62,6 +62,25 @@
       };
 
       const rzp = new Razorpay(options);
+      rzp.on("payment.failed", async function (response) {
+        if (paymentFailedHandled) return;
+        paymentFailedHandled = true;
+        const failResponse = await fetch("/payment-failed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            rzOrderId: options.order_id,
+            addressId: address,
+          }),
+        });
+
+        const result = await failResponse.json();
+        if (result.success) {
+          window.location.href = result.redirectUrl;
+        } else {
+          alert("Payment failure not recorded");
+        }
+      });
       rzp.open();
     </script>
   </body>
