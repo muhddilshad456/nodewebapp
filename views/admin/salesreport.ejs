@@ -39,7 +39,7 @@
     <div class="card shadow-sm">
       <div class="card-body bg-success text-white rounded">
         <h6 class="card-title">Total Orders</h6>
-        <h4><%= numOfSales %></h4>
+        <h4><%= totalOrders %></h4>
       </div>
     </div>
   </div>
@@ -82,10 +82,20 @@
           <button class="btn btn-info" type="submit">Submit</button>
           <button class="btn btn-danger" type="submit" onclick="clearSearch()">Clear</button>
         </div>
-        <a class="btn btn-primary ms-3" href="/admin/salesreportPdf">
+        <a class="btn btn-primary ms-3" href="/admin/salesreportPdf<% 
+        const params1=[]
+        if(selectRange) params1.push("selectRange="+selectRange)
+        if(startDate) params1.push("startDate="+startDate)
+        if(endDate) params1.push("endDate="+endDate)
+        if(params1.length) { %>?<%= params1.join('&') %><% } %>">
           Download PDF
         </a>
-        <a class="btn btn-success ms-2" href="/admin/salesreportExcel"> 
+        <a class="btn btn-success ms-2" href="/admin/salesreportExcel<% 
+        const params=[]
+        if(selectRange) params.push("selectRange="+selectRange)
+        if(startDate) params.push("startDate="+startDate)
+        if(endDate) params.push("endDate="+endDate)
+        if(params.length) { %>?<%= params.join('&') %><% } %>">
           Download Excel
         </a>
       </div>

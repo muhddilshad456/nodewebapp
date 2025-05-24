@@ -1116,7 +1116,6 @@ const invoiceDownload = async (req, res) => {
     const generateInvoice = (order, res) => {
       const doc = new PDFDocument({ margin: 50, size: "A4" });
 
-      // Set response headers for PDF download
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
@@ -1124,7 +1123,6 @@ const invoiceDownload = async (req, res) => {
       );
       doc.pipe(res);
 
-      // === Helper Functions ===
       const drawLine = (x1, y1, x2, y2, color = "#cccccc", width = 1) => {
         doc
           .strokeColor(color)
@@ -1134,7 +1132,6 @@ const invoiceDownload = async (req, res) => {
           .stroke();
       };
 
-      // === Header Section ===
       doc
         .font("Helvetica-Bold")
         .fontSize(30)
@@ -1147,11 +1144,9 @@ const invoiceDownload = async (req, res) => {
         .fillColor("#333333")
         .text("INVOICE", 50, 70, { align: "center" });
 
-      // Add a horizontal line below header
       drawLine(50, 90, 550, 90, "#1a3c34", 2);
       doc.moveDown(1);
 
-      // === Company Info ===
       doc
         .font("Helvetica")
         .fontSize(10)
@@ -1161,14 +1156,13 @@ const invoiceDownload = async (req, res) => {
         .text("Email: support@watchsy.com", 50, 130)
         .text("Phone: +91 123 456 7890", 50, 145);
 
-      // === Order & Customer Info ===
       const infoTop = 100;
       const infoX = 350;
       doc
-        .font("Helvetica") // Explicitly set font to avoid encoding issues
+        .font("Helvetica")
         .fontSize(12)
         .fillColor("#333333")
-        .text(`Order ID: ${order.orderId}`, infoX, infoTop, {
+        .text(`Order ID: ${order.orderId.slice(-6)}`, infoX, infoTop, {
           align: "right",
           width: 200,
         })
@@ -1189,13 +1183,12 @@ const invoiceDownload = async (req, res) => {
 
       doc.moveDown(2);
 
-      // === Table Header ===
       const tableTop = doc.y;
-      const col1 = 50; // Product
-      const col2 = 350; // Quantity
-      const col3 = 400; // Price
-      const col4 = 470; // Total
-      const colWidths = [300, 50, 70, 80]; // Widths for Product, Qty, Price, Total
+      const col1 = 50;
+      const col2 = 350;
+      const col3 = 400;
+      const col4 = 470;
+      const colWidths = [300, 50, 70, 80];
 
       doc
         .font("Helvetica-Bold")
@@ -1212,16 +1205,13 @@ const invoiceDownload = async (req, res) => {
           align: "right",
         });
 
-      // Draw table header underline
       drawLine(col1, tableTop + 15, col1 + 500, tableTop + 15, "#1a3c34", 1.5);
 
-      // === Item Rows ===
       let yPos = tableTop + 25;
       order.orderedItems.forEach((item, index) => {
         const product = item.productId;
         const itemTotal = item.quantity * product.productAmount;
 
-        // Calculate row height based on wrapped text for product name
         const rowHeight =
           doc
             .font("Helvetica")
@@ -1253,14 +1243,11 @@ const invoiceDownload = async (req, res) => {
         yPos += rowHeight;
       });
 
-      // Draw table bottom line
       const tableBottom = yPos;
       drawLine(col1, tableBottom, col1 + 500, tableBottom, "#1a3c34", 1.5);
 
-      // Ensure enough space before summary
       doc.y = tableBottom + 40;
 
-      // === Summary Section ===
       const summaryTop = doc.y;
       const labelX = 350;
       const valueX = 470;
@@ -1300,7 +1287,6 @@ const invoiceDownload = async (req, res) => {
           align: "right",
         });
 
-      // === Footer ===
       const footerTop = doc.page.height - 100;
       drawLine(50, footerTop - 10, 550, footerTop - 10, "#1a3c34", 1);
 
@@ -1321,30 +1307,7 @@ const invoiceDownload = async (req, res) => {
       doc.end();
     };
 
-    // Sample order data with multiple items
-    const sampleOrder = {
-      orderId: "cda907a3-8ddb-44a5a-9d3",
-      createdOn: new Date("2025-05-21"),
-      userId: { name: "Dishad Aaa" },
-      orderedItems: [
-        {
-          productId: { productName: "Smart Watch X1", productAmount: 1500 },
-          quantity: 2,
-        },
-        {
-          productId: { productName: "Leather Strap", productAmount: 500 },
-          quantity: 1,
-        },
-        {
-          productId: { productName: "Watch Case", productAmount: 200 },
-          quantity: 3,
-        },
-      ],
-      totalAmount: 4100, // 1500*2 + 500*1 + 200*3 = 3000 + 500 + 600
-      finalAmount: 4000,
-    };
-
-    generateInvoice(sampleOrder, res);
+    generateInvoice(order, res);
   } catch (error) {
     console.error("error from dowload invoice", error);
   }

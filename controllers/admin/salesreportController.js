@@ -28,7 +28,7 @@ const salesreportPage = async (req, res) => {
       toDate.setHours(23, 59, 59, 999);
       filter.createdOn = { $gte: fromDate, $lte: toDate };
     } else if (selectRange === "thisWeek") {
-      const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+      const dayOfWeek = today.getDay();
       const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
       fromDate = new Date(today);
       fromDate.setDate(today.getDate() - diffToMonday);
@@ -48,6 +48,8 @@ const salesreportPage = async (req, res) => {
       filter.createdOn = { $gte: fromDate, $lte: toDate };
     }
 
+    const allMatchingOrders = await Order.find(filter);
+
     const orders = await Order.find(filter)
       .sort({ createdOn: -1 })
       .skip(skip)
@@ -59,14 +61,12 @@ const salesreportPage = async (req, res) => {
     let completeAmount = 0;
     let completeFinalAmount = 0;
 
-    orders.forEach((order) => {
+    allMatchingOrders.forEach((order) => {
       completeAmount += order.totalAmount;
       completeFinalAmount += order.finalAmount;
     });
 
     const completeDiscount = completeAmount - completeFinalAmount;
-
-    const numOfSales = orders.length;
 
     const totalPages = Math.ceil(totalOrders / limit);
     res.render("salesreport", {
@@ -76,10 +76,10 @@ const salesreportPage = async (req, res) => {
       selectRange,
       startDate,
       endDate,
-      numOfSales,
       completeDiscount,
       completeAmount,
       completeFinalAmount,
+      totalOrders,
     });
   } catch (error) {
     console.log("error from salesreportPage", error);
@@ -90,9 +90,51 @@ const salesreportPage = async (req, res) => {
 
 const salesreportExcel = async (req, res) => {
   try {
-    const orders = await Order.find({ status: "Delivered" });
+    const selectRange = req.query.selectRange;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
 
-    const totalOrders = orders.length;
+    let filter = { status: "Delivered" };
+
+    const today = new Date();
+    let fromDate, toDate;
+
+    if (startDate && endDate) {
+      fromDate = new Date(startDate);
+      toDate = new Date(endDate);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "today") {
+      fromDate = new Date();
+      fromDate.setHours(0, 0, 0, 0);
+      toDate = new Date();
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisWeek") {
+      const dayOfWeek = today.getDay();
+      const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      fromDate = new Date(today);
+      fromDate.setDate(today.getDate() - diffToMonday);
+      fromDate.setHours(0, 0, 0, 0);
+      toDate = new Date();
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisMonth") {
+      fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisYear") {
+      fromDate = new Date(today.getFullYear(), 0, 1);
+      toDate = new Date(today.getFullYear(), 11, 31);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    }
+
+    const orders = await Order.find(filter);
+
+    const totalOrders = await Order.countDocuments(filter);
+
     const totalAmount = orders.reduce(
       (sum, order) => sum + order.totalAmount,
       0
@@ -117,7 +159,7 @@ const salesreportExcel = async (req, res) => {
 
     orders.forEach((order) => {
       worksheet.addRow({
-        _id: order._id.toString(),
+        _id: order.orderId.slice(-6),
         createdOn: order.createdOn.toISOString().slice(0, 10),
         totalAmount: order.totalAmount,
         discount: order.totalAmount - order.finalAmount,
@@ -153,9 +195,52 @@ const salesreportExcel = async (req, res) => {
 
 const salesreportPdf = async (req, res) => {
   try {
-    const orders = await Order.find({ status: "Delivered" });
+    console.log("filter data for pdf download", req.query);
 
-    const totalOrders = orders.length;
+    const selectRange = req.query.selectRange;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    let filter = { status: "Delivered" };
+
+    const today = new Date();
+    let fromDate, toDate;
+
+    if (startDate && endDate) {
+      fromDate = new Date(startDate);
+      toDate = new Date(endDate);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "today") {
+      fromDate = new Date();
+      fromDate.setHours(0, 0, 0, 0);
+      toDate = new Date();
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisWeek") {
+      const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+      const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      fromDate = new Date(today);
+      fromDate.setDate(today.getDate() - diffToMonday);
+      fromDate.setHours(0, 0, 0, 0);
+      toDate = new Date();
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisMonth") {
+      fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    } else if (selectRange === "thisYear") {
+      fromDate = new Date(today.getFullYear(), 0, 1);
+      toDate = new Date(today.getFullYear(), 11, 31);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdOn = { $gte: fromDate, $lte: toDate };
+    }
+
+    const orders = await Order.find(filter);
+
+    const totalOrders = await Order.countDocuments(filter);
     const totalAmount = orders.reduce(
       (sum, order) => sum + order.totalAmount,
       0
@@ -169,7 +254,7 @@ const salesreportPdf = async (req, res) => {
       0
     );
 
-    // Initialize PDF document
+    // pdf function defnition
     const generateSalesReport = (
       orders,
       totalOrders,
@@ -180,7 +265,6 @@ const salesreportPdf = async (req, res) => {
     ) => {
       const doc = new PDFDocument({ margin: 50, size: "A4" });
 
-      // Set response headers for PDF download
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
@@ -188,7 +272,6 @@ const salesreportPdf = async (req, res) => {
       );
       doc.pipe(res);
 
-      // === Helper Functions ===
       const drawLine = (x1, y1, x2, y2, color = "#cccccc", width = 1) => {
         doc
           .strokeColor(color)
@@ -198,7 +281,6 @@ const salesreportPdf = async (req, res) => {
           .stroke();
       };
 
-      // === Header Section ===
       doc
         .font("Helvetica-Bold")
         .fontSize(30)
@@ -211,11 +293,9 @@ const salesreportPdf = async (req, res) => {
         .fillColor("#333333")
         .text("SALES REPORT", 50, 70, { align: "center" });
 
-      // Add a horizontal line below header
       drawLine(50, 90, 550, 90, "#1a3c34", 2);
       doc.moveDown(1);
 
-      // === Company Info ===
       doc
         .font("Helvetica")
         .fontSize(10)
@@ -225,10 +305,9 @@ const salesreportPdf = async (req, res) => {
         .text("Email: support@watchsy.com", 50, 130)
         .text("Phone: +91 123 456 7890", 50, 145);
 
-      // === Report Info (instead of customer info) ===
       const infoTop = 100;
       const infoX = 350;
-      const reportDate = new Date("2025-05-21"); // Using current date as per system info
+      const reportDate = new Date();
       doc
         .font("Helvetica")
         .fontSize(12)
@@ -250,16 +329,15 @@ const salesreportPdf = async (req, res) => {
 
       doc.moveDown(2);
 
-      // === Table Header ===
       const tableTop = doc.y;
       const colWidths = [90, 80, 80, 80, 80, 100];
       const colSpacing = 10;
-      const col1 = 50; // Order ID
-      const col2 = col1 + colWidths[0] + colSpacing; // Date
-      const col3 = col2 + colWidths[1] + colSpacing; // Total
-      const col4 = col3 + colWidths[2] + colSpacing; // Discount
-      const col5 = col4 + colWidths[3] + colSpacing; // Final
-      const col6 = col5 + colWidths[4] + colSpacing; // Payment
+      const col1 = 50;
+      const col2 = col1 + colWidths[0] + colSpacing;
+      const col3 = col2 + colWidths[1] + colSpacing;
+      const col4 = col3 + colWidths[2] + colSpacing;
+      const col5 = col4 + colWidths[3] + colSpacing;
+      const col6 = col5 + colWidths[4] + colSpacing;
 
       doc
         .font("Helvetica-Bold")
@@ -281,20 +359,17 @@ const salesreportPdf = async (req, res) => {
           align: "left",
         });
 
-      // Draw table header underline
       drawLine(col1, tableTop + 15, col1 + 500, tableTop + 15, "#1a3c34", 1.5);
 
-      // === Table Rows ===
       let yPos = tableTop + 25;
       doc.font("Helvetica").fontSize(11).fillColor("#333333");
       orders.forEach((order) => {
-        // Check for page overflow
         if (yPos > 700) {
           doc.addPage();
           yPos = 50;
         }
 
-        const rowHeight = 20; // Fixed row height for simplicity
+        const rowHeight = 20;
         const row = [
           order._id.toString().slice(-6),
           order.createdOn.toISOString().slice(0, 10),
@@ -315,11 +390,9 @@ const salesreportPdf = async (req, res) => {
         yPos += rowHeight + 5;
       });
 
-      // Draw table bottom line
       const tableBottom = yPos;
       drawLine(col1, tableBottom, col1 + 500, tableBottom, "#1a3c34", 1.5);
 
-      // Ensure enough space before summary
       if (tableBottom + 40 > 700) {
         doc.addPage();
         doc.y = 50;
@@ -327,7 +400,6 @@ const salesreportPdf = async (req, res) => {
         doc.y = tableBottom + 40;
       }
 
-      // === Summary Section ===
       const summaryTop = doc.y;
       const labelX = 350;
       const valueX = 470;
@@ -378,7 +450,6 @@ const salesreportPdf = async (req, res) => {
           align: "right",
         });
 
-      // === Footer ===
       const footerTop = doc.page.height - 100;
       drawLine(50, footerTop - 10, 550, footerTop - 10, "#1a3c34", 1);
 
@@ -399,50 +470,12 @@ const salesreportPdf = async (req, res) => {
       doc.end();
     };
 
-    // Sample data for testing
-    const sampleOrders = [
-      {
-        _id: "1234567890abcdef",
-        createdOn: new Date("2025-05-20"),
-        totalAmount: 1500,
-        finalAmount: 1400,
-        paymentMethod: "Credit Card",
-      },
-      {
-        _id: "0987654321fedcba",
-        createdOn: new Date("2025-05-19"),
-        totalAmount: 500,
-        finalAmount: 450,
-        paymentMethod: "PayPal",
-      },
-      {
-        _id: "abcdef1234567890",
-        createdOn: new Date("2025-05-18"),
-        totalAmount: 200,
-        finalAmount: 200,
-        paymentMethod: "Cash",
-      },
-    ];
-    const sampleTotalOrders = sampleOrders.length;
-    const sampleTotalAmount = sampleOrders.reduce(
-      (sum, order) => sum + order.totalAmount,
-      0
-    );
-    const sampleTotalDiscount = sampleOrders.reduce(
-      (sum, order) => sum + (order.totalAmount - order.finalAmount),
-      0
-    );
-    const sampleFinalAmount = sampleOrders.reduce(
-      (sum, order) => sum + order.finalAmount,
-      0
-    );
-
     generateSalesReport(
-      sampleOrders,
-      sampleTotalOrders,
-      sampleTotalAmount,
-      sampleTotalDiscount,
-      sampleFinalAmount,
+      orders,
+      totalOrders,
+      totalAmount,
+      totalDiscount,
+      finalAmount,
       res
     );
   } catch (error) {

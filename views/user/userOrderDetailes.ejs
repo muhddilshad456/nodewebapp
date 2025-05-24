@@ -149,6 +149,10 @@
       .btn-go-back:hover {
         color: #333333;
       }
+      .btn-retry {
+        width: 10rem;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -217,7 +221,7 @@
       <div class="order-status">
         <h6 class="section-header">Order Status</h6>
         <div class="button-div">
-          <span class="highlighted-status" style="width: min-content"
+          <span class="highlighted-status" style="width: 10rem"
             ><%= order.status %></span
           >
           <br />
@@ -230,6 +234,8 @@
           >
             <i class="bi bi-download"></i> Download Invoice
           </a>
+          <% } %> <% if(order.status==="Payment failed"){ %>
+          <button class="btn-retry btn btn-danger">Retry Payment</button>
           <% } %>
         </div>
       </div>
@@ -595,6 +601,38 @@
                   text: "Something went wrong. Please try again later.",
                 });
               });
+          }
+        });
+      // retry payment
+      document
+        .querySelector(".btn-retry")
+        .addEventListener("click", async () => {
+          const orderId = "<%= order._id %>";
+          try {
+            const result = await fetch("/retryPayment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId }),
+            });
+
+            const data = await result.json();
+
+            if (data.success) {
+              console.log(data.message || "retry payment successfully");
+              window.location.href = data.redirectUrl;
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: data.message || "failed to retry payment",
+              });
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: error.message || "something went wrong",
+            });
           }
         });
     </script>

@@ -69,7 +69,7 @@
           <!-- Order ID, Date, and Status -->
           <div class="row mb-4">
             <div class="col-md-6">
-              <p class="mb-1"><strong>Order ID:</strong><%= order.orderId %></p>
+              <p class="mb-1"><strong>Order ID:</strong><%= order.orderId.slice(-6) %></p>
               <p class="mb-1">
                 <strong>Order Date:</strong><%=
                 order.createdOn.toISOString().slice(0, 10); %>
