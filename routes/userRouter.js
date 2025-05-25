@@ -6,6 +6,7 @@ const wishlistController = require("../controllers/user/wishlistController");
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require("../controllers/user/checkoutController");
 const walletController = require("../controllers/user/walletController");
+const referralController = require("../controllers/user/referralControllet");
 const passport = require("passport");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -123,4 +124,6 @@ router.get("/orderSuccess", userAuth, checkoutController.orderSuccessPage);
 
 // wallet
 router.get("/wallet", userAuth, walletController.walletPage);
+// refer and earn
+router.get("/referralpage", userAuth, referralController.referralPage);
 module.exports = router;

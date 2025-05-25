@@ -49,10 +49,16 @@ const loadProductDetailes = async (req, res) => {
       }
     });
 
+    let maxDiscountAmount = 0;
+    if (appliedOffer) {
+      const discountAmount = (product.productAmount * maxDiscount) / 100;
+      maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+    }
+
     const productWithOffer = {
       ...product.toObject(),
       originalPrice: product.productAmount,
-      offerPrice: product.productAmount * (1 - maxDiscount / 100),
+      offerPrice: product.productAmount - maxDiscountAmount,
       offer: appliedOffer,
     };
 

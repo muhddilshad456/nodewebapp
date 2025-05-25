@@ -158,16 +158,16 @@
     <div
       class="product-card p-3 bg-white rounded-3 shadow-sm position-relative overflow-hidden"
       style="transition: all 0.3s ease"
-      data-product-id="<%= products[i]._id %>"
+      data-product-id="<%= products[i].product._id %>"
     >
       <a
-        href="/productDetailes?id=<%= products[i]._id %>"
+        href="/productDetailes?id=<%= products[i].product._id %>"
         class="text-decoration-none"
       >
         <img
           class="product-image img-fluid rounded-2 w-100"
-          src="<%= products[i].productImage[0] %>"
-          alt="<%= products[i].productName %>"
+          src="<%= products[i].product.productImage[0] %>"
+          alt="<%= products[i].product.productName %>"
           style="height: 220px; object-fit: cover"
         />
         <div
@@ -181,11 +181,11 @@
       <!-- Wishlist Heart Button -->
       <button
         class="wishlist-btn btn position-absolute top-0 end-0 m-2 p-2"
-        onclick="toggleWishlist('<%= products[i]._id %>', this)"
+        onclick="toggleWishlist('<%= products[i].product._id %>', this)"
         title="Add to Wishlist"
         style="z-index: 10;"
       >
-      <i class="<%= wishlistProductIds.includes(products[i]._id.toString()) ? 'fa-solid fa-heart fs-5 text-danger' : 'fa-regular fa-heart fs-5 text-danger' %>"></i>
+      <i class="<%= wishlistProductIds.includes(products[i].product._id.toString()) ? 'fa-solid fa-heart fs-5 text-danger' : 'fa-regular fa-heart fs-5 text-danger' %>"></i>
     </button> 
       <h5
         class="product-title text-dark mt-3 fw-semibold"
@@ -196,7 +196,7 @@
           text-overflow: ellipsis;
         "
       >
-        <%= products[i].productName %>
+        <%= products[i].product.productName %>
       </h5>
       
       <div class="ratings text-warning mb-2">
@@ -211,7 +211,16 @@
         class="product-price text-dark fw-bold"
         style="font-size: 1.2rem"
       >
-        ₹<%= products[i].productAmount %>
+      <% if(products[i].offerPrice){ %>
+        <span class="ms-2">
+        ₹<%= products[i].offerPrice %>
+        </span>
+        <span style="font-size: 0.8rem; text-decoration: line-through; color: grey;">
+        ₹<%= products[i].product.productAmount %>
+        </span>   
+        <% }else{ %>
+        ₹<%= products[i].product.productAmount %>
+        <% } %>
       </div>
     </div>  
   </div>

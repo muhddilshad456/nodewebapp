@@ -53,6 +53,7 @@ const addOffer = async (req, res) => {
       startDate,
       endDate,
       discount,
+      maxDiscount,
     } = req.body;
 
     const offer = await Offer.findOne({ offerName });
@@ -69,6 +70,7 @@ const addOffer = async (req, res) => {
       startDate,
       endDate,
       discount,
+      maxDiscount,
     });
 
     await newOffer.save();
@@ -91,6 +93,7 @@ const editOffer = async (req, res) => {
       eendDate,
       ediscount,
       eofferId,
+      emaxDiscount,
     } = req.body;
 
     const offer = await Offer.findById(eofferId);
@@ -102,6 +105,7 @@ const editOffer = async (req, res) => {
     offer.endDate = eendDate;
     offer.offerType = eofferType;
     offer.targetId = eitemSelect;
+    offer.maxDiscount = emaxDiscount;
 
     await offer.save();
     res.json({ success: true, message: "Offer edited successfully" });

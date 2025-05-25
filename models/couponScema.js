@@ -20,6 +20,10 @@ const couponSchema = new Schema({
     type: Number,
     required: true,
   },
+  maxDiscount: {
+    type: Number,
+    required: true,
+  },
   minCartValue: {
     type: Number,
     required: true,

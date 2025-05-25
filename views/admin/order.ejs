@@ -204,7 +204,7 @@
         <% order.forEach((item)=>{ %>
         <tr>
           <td><%= item.address.name %></td>
-          <td><%= item.orderId %></td>
+          <td><%= item.orderId.slice(-6) %></td>
           <td><%= item.address.streetAddress %>,<%= item.address.city %></td>
           <td>₹<%= item.finalAmount %></td>
           <td><%= item.createdOn.toISOString().slice(0, 10); %></td>

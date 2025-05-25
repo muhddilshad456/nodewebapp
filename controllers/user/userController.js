@@ -6,6 +6,7 @@ const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
 const Wishlist = require("../../models/wishlistSchema");
 const Wallet = require("../../models/walletSchema");
+const Offer = require("../../models/offerSchema");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -89,7 +90,6 @@ async function sendVerificationEmail(email, otp) {
 const signup = async (req, res) => {
   try {
     const { name, phone, email, password, confirmpassword, refCode } = req.body;
-    console.log("ref code", refCode);
     if (password !== confirmpassword) {
       return res
         .status(400)
@@ -170,7 +170,7 @@ const verifyOtp = async (req, res) => {
     await saveUserData.save();
     req.session.user = saveUserData._id;
 
-    const refCode = user.refCode;
+    const refCode = (user.refCode || "").trim();
     console.log("refCode from verify otp", refCode);
 
     if (refCode && refCode.length !== 0) {
@@ -461,6 +461,48 @@ const loadShopPage = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    const activeOffers = await Offer.find({
+      status: "Active",
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    });
+
+    const productWithOffer = products.map((item) => {
+      let maxDiscount = 0;
+      let appliedOffer = null;
+
+      activeOffers.forEach((offer) => {
+        const applies =
+          (offer.offerType === "product" &&
+            offer.targetId.toString() === item._id.toString()) ||
+          (offer.offerType === "category" &&
+            offer.targetId.toString() === item.category.toString()) ||
+          (offer.offerType === "brand" &&
+            offer.targetId.toString() === item.brand.toString());
+
+        if (applies && offer.discount > maxDiscount) {
+          maxDiscount = offer.discount;
+          appliedOffer = offer;
+        }
+      });
+
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.productAmount * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
+      const offerPrice = Number(item.productAmount) - maxDiscountAmount;
+
+      return {
+        product: item,
+        offerPrice,
+        offer: appliedOffer,
+      };
+    });
+
+    console.log("==product with offer==", productWithOffer);
+
     // count products
     const totalProducts = await Product.countDocuments(filter);
 
@@ -468,7 +510,7 @@ const loadShopPage = async (req, res) => {
 
     res.render("shop", {
       user: userData,
-      products,
+      products: productWithOffer,
       category: categories,
       brand: brands,
       totalProducts,

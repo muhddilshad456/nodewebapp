@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refer and Earn</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS for additional styling -->
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .referral-section {
+        background: linear-gradient(135deg, #6f42c1, #007bff);
+        color: white;
+        padding: 50px 20px;
+        border-radius: 10px;
+        text-align: center;
+      }
+      .referral-code {
+        font-size: 1.5rem;
+        font-weight: bold;
+        background-color: #ffffff;
+        color: #6f42c1;
+        padding: 10px 20px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 20px;
+      }
+      .details-section {
+        margin-top: 40px;
+      }
+      .details-section h3 {
+        color: #343a40;
+      }
+      .card {
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Referral Offer Section -->
+    <div class="container my-5">
+      <div class="referral-section">
+        <h1 class="display-4">Refer and Earn</h1>
+        <p class="lead">Invite your friends and earn rewards together!</p>
+        <p>
+          Share your unique referral code with friends. When they sign up using
+          your code, both of you get exciting rewards!
+        </p>
+        <div class="referral-code">
+          Your Referral Code: <%= user.referalCode %>
+        </div>
+      </div>
+
+      <!-- Referral Details Section -->
+      <div class="details-section">
+        <h3>How It Works</h3>
+        <div class="row mt-4">
+          <div class="col-md-4 mb-4">
+            <div class="card p-4">
+              <h5>1. Share Your Code</h5>
+              <p>
+                Share your unique referral code with friends via email, social
+                media, or any platform.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="card p-4">
+              <h5>2. Friends Sign Up</h5>
+              <p>
+                Your friends sign up using your referral code to join the
+                platform.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="card p-4">
+              <h5>3. Both Earn Rewards</h5>
+              <p>
+                Once your friend completes their sign-up, both of you receive a
+                reward!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

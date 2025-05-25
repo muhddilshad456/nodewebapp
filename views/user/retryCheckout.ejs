@@ -28,6 +28,7 @@
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+      let paymentFailedHandled = false;
       const options = {
         key: "<%= key_id %>",
         amount: Number("<%= razorpayOrder.amount %>") * 100,
@@ -62,6 +63,7 @@
       };
 
       const rzp = new Razorpay(options);
+
       rzp.on("payment.failed", async function (response) {
         if (paymentFailedHandled) return;
         paymentFailedHandled = true;
@@ -70,7 +72,6 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             rzOrderId: options.order_id,
-            addressId: address,
           }),
         });
 
@@ -81,6 +82,7 @@
           alert("Payment failure not recorded");
         }
       });
+
       rzp.open();
     </script>
   </body>

@@ -75,6 +75,7 @@
                 data-start="<%= item.startDate.toISOString().substring(0, 10) %>"
                 data-end="<%= item.endDate.toISOString().substring(0, 10) %>"
                 data-discount="<%= item.discount %>"
+                data-max-discount="<%= item.maxDiscount %>"
                 data-bs-toggle="modal"
                 data-bs-target="#editOfferModal"
               >
@@ -199,6 +200,16 @@
               placeholder="Enter discount percentage"
             />
           </div>
+          <div class="mb-3">
+            <label for="maxDiscount" class="form-label">Maximum Discount Amount/label>
+            <input
+              type="number"
+              class="form-control"
+              name="maxDiscount"
+              id="maxDiscount"
+              placeholder="Enter max discount amount"
+            />
+          </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -295,13 +306,23 @@
             />
           </div>
           <div class="mb-3">
-            <label for="discount" class="form-label">Discount (%)</label>
+            <label for="ediscount" class="form-label">Discount (%)</label>
             <input
               type="number"
               class="form-control"
               name="ediscount"
               id="ediscount"
               placeholder="Enter discount percentage"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="emaxDiscount" class="form-label">Maximum Discount Amount </label>
+            <input
+              type="number"
+              class="form-control"
+              name="emaxDiscount"
+              id="emaxDiscount"
+              placeholder="Enter max discount amount"
             />
           </div>
         </form>
@@ -373,9 +394,10 @@
           const startDate=document.getElementById("startDate").value
           const endDate=document.getElementById("endDate").value
           const discount=document.getElementById("discount").value
+          const maxDiscount=document.getElementById("maxDiscount").value
           const msgSpace=document.getElementById("msgSpace")
 
-          if (!offerName || !offerType ||!itemSelect||!startDate||!endDate||!discount || !description) {
+          if (!offerName || !offerType ||!itemSelect||!startDate||!endDate||!discount || !description || !maxDiscount) {
           msgSpace.style.display="block"
           msgSpace.style.color="red"
           msgSpace.innerHTML="Fill required spaces"
@@ -388,6 +410,12 @@
           return false;
           }
           if (isNaN(discount) || Number(discount) <= 0 || Number(discount) > 100) {
+          msgSpace.style.display="block"
+          msgSpace.style.color="red"
+          msgSpace.innerHTML="Please enter a valid discount."
+          return false;
+          }
+          if (isNaN(maxDiscount) ) {
           msgSpace.style.display="block"
           msgSpace.style.color="red"
           msgSpace.innerHTML="Please enter a valid discount."
@@ -408,6 +436,7 @@
                 startDate,
                 endDate,
                 discount,
+                maxDiscount
             })
           })
 
@@ -455,6 +484,7 @@
             document.getElementById('estartDate').value = this.dataset.start || '';
             document.getElementById('eendDate').value = this.dataset.end || '';
             document.getElementById('ediscount').value = this.dataset.discount || '';
+            document.getElementById("emaxDiscount").value=this.dataset.maxDiscount || ''
 
             eofferType.value=type
             eitemSelect.innerHTML = '<option value="" disabled>Select an item</option>';
@@ -496,8 +526,9 @@
           const eendDate=document.getElementById("eendDate").value
           const ediscount=document.getElementById("ediscount").value
           const emsgSpace=document.getElementById("emsgSpace")
+          const emaxDiscount=document.getElementById("emaxDiscount").value
 
-          if (!eofferName || !eofferType ||!eitemSelect||!estartDate||!eendDate||!ediscount || !edescription) {
+          if (!eofferName || !eofferType ||!eitemSelect||!estartDate||!eendDate||!ediscount || !edescription || !emaxDiscount) {
           emsgSpace.style.display="block"
           emsgSpace.style.color="red"
           emsgSpace.innerHTML="Fill required spaces"
@@ -510,6 +541,12 @@
           return false;
           }
           if (isNaN(ediscount) || Number(ediscount) <= 0 || Number(ediscount) > 100) {
+          emsgSpace.style.display="block"
+          emsgSpace.style.color="red"
+          emsgSpace.innerHTML="Please enter a valid discount."
+          return false;
+          }
+          if (isNaN(emaxDiscount) ) {
           emsgSpace.style.display="block"
           emsgSpace.style.color="red"
           emsgSpace.innerHTML="Please enter a valid discount."
@@ -530,7 +567,8 @@
                 estartDate,
                 eendDate,
                 ediscount,
-                eofferId
+                eofferId,
+                emaxDiscount
             })
           })
 

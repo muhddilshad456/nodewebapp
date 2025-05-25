@@ -37,11 +37,7 @@ const checkoutPage = async (req, res) => {
 
     const couponCode = req.session.couponCode;
 
-    console.log("couponCode", couponCode);
-
     const applyCoupon = await Coupon.findOne({ couponCode });
-
-    console.log("applyCoupon", applyCoupon);
 
     const activeOffers = await Offer.find({
       status: "Active",
@@ -68,7 +64,13 @@ const checkoutPage = async (req, res) => {
         }
       });
 
-      const offerPrice = Number(item.price) * (1 - maxDiscount / 100);
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalOfferPrice = offerPrice * item.quantity;
       const totalRegularPrice = item.price * item.quantity;
 
@@ -83,9 +85,6 @@ const checkoutPage = async (req, res) => {
       };
     });
 
-    console.log("================++++");
-    console.log("cart with offer", cartWithOffer);
-
     const grandTotal = cartWithOffer.reduce((acc, product) => {
       return acc + product.totalRegularPrice;
     }, 0);
@@ -95,8 +94,12 @@ const checkoutPage = async (req, res) => {
     }, 0);
 
     if (applyCoupon) {
-      grandOfferTotal =
-        Number(grandOfferTotal) * (1 - Number(applyCoupon.discount) / 100);
+      const couponDiscount = (grandOfferTotal * applyCoupon.discount) / 100;
+      const maxCouponDiscount = Math.min(
+        couponDiscount,
+        applyCoupon.maxDiscount
+      );
+      grandOfferTotal = Number(grandOfferTotal) - Number(maxCouponDiscount);
     }
 
     let currentDate = new Date();
@@ -108,10 +111,6 @@ const checkoutPage = async (req, res) => {
     });
 
     const totalDiscount = grandTotal - grandOfferTotal;
-
-    console.log("grandTotal", grandTotal);
-    console.log("grandOfferTotal", grandOfferTotal);
-    console.log("coupon", coupon);
 
     res.render("checkout", {
       cart: cartWithOffer,
@@ -227,8 +226,14 @@ const placeOrder = async (req, res) => {
         }
       });
 
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
       const regularPrice = Number(item.price);
-      const offerPrice = regularPrice * (1 - maxDiscount / 100);
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalRegular = regularPrice * item.quantity;
       const totalDiscounted = offerPrice * item.quantity;
 
@@ -272,12 +277,10 @@ const placeOrder = async (req, res) => {
 
     if (payment === "cod" || payment === "wallet") {
       if (payment === "cod" && finalAmount > 1000) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "COD not allowed for order above 1000",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "COD not allowed for order above 1000",
+        });
       }
       if (payment === "wallet") {
         if (!wallet || wallet.balance < finalAmount) {
@@ -412,8 +415,14 @@ const rzVerifyPayment = async (req, res) => {
         }
       });
 
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
       const regularPrice = Number(item.price);
-      const offerPrice = regularPrice * (1 - maxDiscount / 100);
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalRegular = regularPrice * item.quantity;
       const totalDiscounted = offerPrice * item.quantity;
 
@@ -548,8 +557,14 @@ const paymentFailed = async (req, res) => {
         }
       });
 
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
       const regularPrice = Number(item.price);
-      const offerPrice = regularPrice * (1 - maxDiscount / 100);
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalRegular = regularPrice * item.quantity;
       const totalDiscounted = offerPrice * item.quantity;
 

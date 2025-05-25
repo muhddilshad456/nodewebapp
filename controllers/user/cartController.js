@@ -152,7 +152,13 @@ const cartPage = async (req, res) => {
         }
       });
 
-      const offerPrice = Number(item.price) * (1 - maxDiscount / 100);
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalOfferPrice = offerPrice * item.quantity;
 
       finalCartTotal += totalOfferPrice;
@@ -254,7 +260,13 @@ const updateCartQuantity = async (req, res) => {
         }
       });
 
-      const offerPrice = Number(item.price) * (1 - maxDiscount / 100);
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.price * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
+      const offerPrice = Number(item.price) - maxDiscountAmount;
       const totalOfferPrice = offerPrice * item.quantity;
 
       finalCartTotal += totalOfferPrice;

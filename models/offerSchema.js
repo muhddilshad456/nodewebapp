@@ -16,7 +16,10 @@ const offerSchema = new Schema({
     type: Number,
     required: true,
   },
-
+  maxDiscount: {
+    type: Number,
+    required: true,
+  },
   startDate: {
     type: Date,
     required: true,

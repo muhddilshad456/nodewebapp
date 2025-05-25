@@ -23,10 +23,17 @@ passport.use(
           }
           return done(null, user);
         } else {
+          const userRefName = profile.displayName;
+          const random = Math.floor(1000 + Math.random() * 9000);
+          const referalCode = `${userRefName
+            .substring(0, 3)
+            .toUpperCase()}${random}`;
+
           user = new User({
             name: profile.displayName,
             email: profile.emails[0].value,
             googleId: profile.id,
+            referalCode,
           });
           await user.save();
           return done(null, user);

@@ -69,6 +69,7 @@
                 data-description="<%= item.description %>"
                 data-mincartvalue="<%= item.minCartValue %>"
                 data-discount="<%= item.discount %>"
+                data-max-discount="<%= item.maxDiscount%>"
                 data-start-date="<%= item.startDate.toISOString().substring(0, 10) %>"
                 data-end-date="<%= item.endDate.toISOString().substring(0, 10) %>"
                 data-bs-toggle="modal"
@@ -164,13 +165,24 @@
           </div>
 
           <div class="mb-3">
-            <label for="maxDiscount" class="form-label">Discount</label>
+            <label for="discount" class="form-label">Discount</label>
             <input
               type="number"
               class="form-control"
               name="discount"
               id="discount"
               placeholder="Enter discount"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="maxDiscount" class="form-label">Max Discount</label>
+            <input
+              type="number"
+              class="form-control"
+              name="maxDiscount"
+              id="maxDiscount"
+              placeholder="Enter max discount"
             />
           </div>
 
@@ -272,6 +284,17 @@
           </div>
 
           <div class="mb-3">
+            <label for="emaxDiscount" class="form-label">Max Discount</label>
+            <input
+              type="number"
+              class="form-control"
+              name="emaxDiscount"
+              id="emaxDiscount"
+              placeholder="Enter max discount"
+            />
+          </div>
+
+          <div class="mb-3">
             <label class="form-label">Start date</label>
             <input
               type="date"
@@ -323,6 +346,7 @@
         const description = document.getElementById("description").value;
         const minCartValue = document.getElementById("minCartValue").value;
         const discount = document.getElementById("discount").value;
+        const maxDiscount = document.getElementById("maxDiscount").value;
         const startDate = document.getElementById("startDate").value;
         const endDate = document.getElementById("endDate").value;
         const msgSpace = document.getElementById("msgSpace");
@@ -335,7 +359,8 @@
           !minCartValue ||
           !discount ||
           !endDate ||
-          !startDate
+          !startDate ||
+          !maxDiscount
         ) {
           msgSpace.style.display = "block";
           msgSpace.style.color = "red";
@@ -352,6 +377,12 @@
           msgSpace.style.display = "block";
           msgSpace.style.color = "red";
           msgSpace.innerHTML = "Please enter a valid min cart value.";
+          return false;
+        }
+        if (isNaN(maxDiscount)) {
+          msgSpace.style.display = "block";
+          msgSpace.style.color = "red";
+          msgSpace.innerHTML = "Please enter a valid max discount.";
           return false;
         }
         if (
@@ -379,6 +410,7 @@
               startDate,
               endDate,
               discount,
+              maxDiscount,
             }),
           });
 
@@ -421,6 +453,8 @@
         document.getElementById("eendDate").value = this.dataset.endDate || "";
         document.getElementById("ediscount").value =
           this.dataset.discount || "";
+        document.getElementById("emaxDiscount").value =
+          this.dataset.maxDiscount || "";
         document.getElementById("eminCartValue").value =
           this.dataset.mincartvalue || "";
       });
@@ -435,6 +469,7 @@
         const edescription = document.getElementById("edescription").value;
         const eminCartValue = document.getElementById("eminCartValue").value;
         const ediscount = document.getElementById("ediscount").value;
+        const emaxDiscount = document.getElementById("emaxDiscount").value;
         const estartDate = document.getElementById("estartDate").value;
         const eendDate = document.getElementById("eendDate").value;
         const ecouponId = document.getElementById("ecouponId").value;
@@ -448,7 +483,8 @@
           !eminCartValue ||
           !ediscount ||
           !eendDate ||
-          !estartDate
+          !estartDate ||
+          !emaxDiscount
         ) {
           emsgSpace.style.display = "block";
           emsgSpace.style.color = "red";
@@ -465,6 +501,12 @@
           emsgSpace.style.display = "block";
           emsgSpace.style.color = "red";
           emsgSpace.innerHTML = "Please enter a valid min cart value.";
+          return false;
+        }
+        if (isNaN(emaxDiscount)) {
+          emsgSpace.style.display = "block";
+          emsgSpace.style.color = "red";
+          emsgSpace.innerHTML = "Please enter a valid max discount.";
           return false;
         }
         if (
@@ -491,6 +533,7 @@
               startDate: estartDate,
               endDate: eendDate,
               discount: ediscount,
+              maxDiscount: emaxDiscount,
               couponId: ecouponId,
             }),
           });
