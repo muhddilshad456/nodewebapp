@@ -37,7 +37,13 @@ const checkoutPage = async (req, res) => {
 
     const couponCode = req.session.couponCode;
 
-    const applyCoupon = await Coupon.findOne({ couponCode });
+    let currentDate = new Date();
+    const applyCoupon = await Coupon.findOne({
+      couponCode,
+      status: "Active",
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+    });
 
     const activeOffers = await Offer.find({
       status: "Active",
@@ -45,45 +51,52 @@ const checkoutPage = async (req, res) => {
       endDate: { $gte: new Date() },
     });
 
-    const cartWithOffer = cart.items.map((item) => {
-      let maxDiscount = 0;
-      let appliedOffer = null;
+    const cartWithOffer = cart.items
+      .map((item) => {
+        if (!item.productId) return null;
+        let maxDiscount = 0;
+        let appliedOffer = null;
 
-      activeOffers.forEach((offer) => {
-        const applies =
-          (offer.offerType === "product" &&
-            offer.targetId.toString() === item.productId._id.toString()) ||
-          (offer.offerType === "category" &&
-            offer.targetId.toString() === item.productId.category.toString()) ||
-          (offer.offerType === "brand" &&
-            offer.targetId.toString() === item.productId.brand.toString());
+        activeOffers.forEach((offer) => {
+          const applies =
+            (offer.offerType === "product" &&
+              offer.targetId.toString() === item.productId._id.toString()) ||
+            (offer.offerType === "category" &&
+              offer.targetId.toString() ===
+                item.productId.category.toString()) ||
+            (offer.offerType === "brand" &&
+              offer.targetId.toString() === item.productId.brand.toString());
 
-        if (applies && offer.discount > maxDiscount) {
-          maxDiscount = offer.discount;
-          appliedOffer = offer;
+          if (applies && offer.discount > maxDiscount) {
+            maxDiscount = offer.discount;
+            appliedOffer = offer;
+          }
+        });
+
+        let maxDiscountAmount = 0;
+        if (appliedOffer) {
+          const discountAmount = (item.price * maxDiscount) / 100;
+          maxDiscountAmount = Math.min(
+            discountAmount,
+            appliedOffer.maxDiscount
+          );
         }
-      });
 
-      let maxDiscountAmount = 0;
-      if (appliedOffer) {
-        const discountAmount = (item.price * maxDiscount) / 100;
-        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
-      }
+        const offerPrice = Number(item.price) - maxDiscountAmount;
+        const totalOfferPrice = offerPrice * item.quantity;
+        const totalRegularPrice = item.price * item.quantity;
 
-      const offerPrice = Number(item.price) - maxDiscountAmount;
-      const totalOfferPrice = offerPrice * item.quantity;
-      const totalRegularPrice = item.price * item.quantity;
-
-      return {
-        product: item.productId,
-        quantity: item.quantity,
-        regularPrice: item.price,
-        totalRegularPrice,
-        offerPrice,
-        totalOfferPrice,
-        appliedOffer,
-      };
-    });
+        return {
+          product: item.productId,
+          quantity: item.quantity,
+          regularPrice: item.price,
+          totalRegularPrice,
+          offerPrice,
+          totalOfferPrice,
+          appliedOffer,
+        };
+      })
+      .filter((item) => item !== null);
 
     const grandTotal = cartWithOffer.reduce((acc, product) => {
       return acc + product.totalRegularPrice;
@@ -93,16 +106,17 @@ const checkoutPage = async (req, res) => {
       return acc + product.totalOfferPrice;
     }, 0);
 
-    if (applyCoupon) {
+    if (applyCoupon && grandOfferTotal >= applyCoupon.minCartValue) {
       const couponDiscount = (grandOfferTotal * applyCoupon.discount) / 100;
       const maxCouponDiscount = Math.min(
         couponDiscount,
         applyCoupon.maxDiscount
       );
       grandOfferTotal = Number(grandOfferTotal) - Number(maxCouponDiscount);
+    } else {
+      delete req.session.couponCode;
     }
 
-    let currentDate = new Date();
     const coupon = await Coupon.find({
       status: "Active",
       startDate: { $lte: currentDate },
@@ -151,7 +165,6 @@ const couponApplied = async (req, res) => {
 
 const couponRemove = async (req, res) => {
   try {
-    console.log("hello");
     delete req.session.couponCode;
     res.json({ success: true, message: "Coupon removed successfully" });
   } catch (error) {
@@ -164,7 +177,6 @@ const placeOrder = async (req, res) => {
   try {
     const { addressId, payment } = req.body;
     const userId = req.session.user;
-    console.log("userId", userId);
     if (!addressId || !payment || !userId) {
       return res
         .status(400)
@@ -195,9 +207,13 @@ const placeOrder = async (req, res) => {
 
     const couponCode = req.session.couponCode;
 
-    const coupon = await Coupon.findOne({ couponCode });
-
-    console.log("coupon", coupon);
+    let currentDate = new Date();
+    const applyCoupon = await Coupon.findOne({
+      couponCode,
+      status: "Active",
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+    });
 
     const activeOffers = await Offer.find({
       status: "Active",
@@ -207,52 +223,66 @@ const placeOrder = async (req, res) => {
 
     let finalAmount = 0;
 
-    const orderedItems = cart.items.map((item) => {
-      let maxDiscount = 0;
-      let offerApplied = null;
+    const orderedItems = cart.items
+      .map((item) => {
+        if (!item.productId) return null;
+        let maxDiscount = 0;
+        let offerApplied = null;
 
-      activeOffers.forEach((offer) => {
-        const applies =
-          (offer.offerType === "product" &&
-            offer.targetId.toString() === item.productId._id.toString()) ||
-          (offer.offerType === "category" &&
-            offer.targetId.toString() === item.productId.category.toString()) ||
-          (offer.offerType === "brand" &&
-            offer.targetId.toString() === item.productId.brand.toString());
+        activeOffers.forEach((offer) => {
+          const applies =
+            (offer.offerType === "product" &&
+              offer.targetId.toString() === item.productId._id.toString()) ||
+            (offer.offerType === "category" &&
+              offer.targetId.toString() ===
+                item.productId.category.toString()) ||
+            (offer.offerType === "brand" &&
+              offer.targetId.toString() === item.productId.brand.toString());
 
-        if (applies && offer.discount > maxDiscount) {
-          maxDiscount = offer.discount;
-          appliedOffer = offer;
+          if (applies && offer.discount > maxDiscount) {
+            maxDiscount = offer.discount;
+            offerApplied = offer;
+          }
+        });
+
+        let maxDiscountAmount = 0;
+        if (offerApplied) {
+          const discountAmount = (item.price * maxDiscount) / 100;
+          maxDiscountAmount = Math.min(
+            discountAmount,
+            offerApplied.maxDiscount
+          );
         }
-      });
 
-      let maxDiscountAmount = 0;
-      if (appliedOffer) {
-        const discountAmount = (item.price * maxDiscount) / 100;
-        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
-      }
+        const regularPrice = Number(item.price);
+        const offerPrice = Number(item.price) - maxDiscountAmount;
+        const totalRegular = regularPrice * item.quantity;
+        const totalDiscounted = offerPrice * item.quantity;
 
-      const regularPrice = Number(item.price);
-      const offerPrice = Number(item.price) - maxDiscountAmount;
-      const totalRegular = regularPrice * item.quantity;
-      const totalDiscounted = offerPrice * item.quantity;
+        finalAmount += totalDiscounted;
 
-      finalAmount += totalDiscounted;
+        return {
+          productId: item.productId._id,
+          quantity: item.quantity,
+          price: regularPrice,
+          totalPrice: totalRegular,
+          offerPrice,
+          totalOfferPrice: totalDiscounted,
+          status: "Pending",
+          offerApplied,
+        };
+      })
+      .filter((item) => item !== null);
 
-      return {
-        productId: item.productId._id,
-        quantity: item.quantity,
-        price: regularPrice,
-        totalPrice: totalRegular,
-        offerPrice,
-        totalOfferPrice: totalDiscounted,
-        status: "Pending",
-        offerApplied,
-      };
-    });
-
-    if (coupon) {
-      finalAmount = finalAmount * (1 - coupon.discount / 100);
+    if (applyCoupon && finalAmount >= applyCoupon.minCartValue) {
+      const couponDiscount = (finalAmount * applyCoupon.discount) / 100;
+      const maxCouponDiscount = Math.min(
+        couponDiscount,
+        applyCoupon.maxDiscount
+      );
+      finalAmount = Number(finalAmount) - Number(maxCouponDiscount);
+    } else {
+      delete req.session.couponCode;
     }
 
     const razorpayIns = new Razorpay({
@@ -349,7 +379,6 @@ const placeOrder = async (req, res) => {
 // razor pay verify payment
 const rzVerifyPayment = async (req, res) => {
   try {
-    console.log("razor pay verify payment", req.body);
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     const {
@@ -386,8 +415,6 @@ const rzVerifyPayment = async (req, res) => {
 
     const coupon = await Coupon.findOne({ couponCode });
 
-    console.log("coupon", coupon);
-
     const activeOffers = await Offer.find({
       status: "Active",
       startDate: { $lte: new Date() },
@@ -416,9 +443,9 @@ const rzVerifyPayment = async (req, res) => {
       });
 
       let maxDiscountAmount = 0;
-      if (appliedOffer) {
+      if (offerApplied) {
         const discountAmount = (item.price * maxDiscount) / 100;
-        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+        maxDiscountAmount = Math.min(discountAmount, offerApplied.maxDiscount);
       }
 
       const regularPrice = Number(item.price);
@@ -528,8 +555,6 @@ const paymentFailed = async (req, res) => {
 
     const coupon = await Coupon.findOne({ couponCode });
 
-    console.log("coupon", coupon);
-
     const activeOffers = await Offer.find({
       status: "Active",
       startDate: { $lte: new Date() },
@@ -558,9 +583,9 @@ const paymentFailed = async (req, res) => {
       });
 
       let maxDiscountAmount = 0;
-      if (appliedOffer) {
+      if (offerApplied) {
         const discountAmount = (item.price * maxDiscount) / 100;
-        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+        maxDiscountAmount = Math.min(discountAmount, offerApplied.maxDiscount);
       }
 
       const regularPrice = Number(item.price);
@@ -618,7 +643,6 @@ const paymentFailed = async (req, res) => {
 // razorpay payment failed page
 const paymentFailedPage = async (req, res) => {
   try {
-    console.log("paymentFailedPage", req.query.orderId);
     const orderId = req.query.orderId;
     const order = await Order.findById(orderId);
     res.render("paymentFailedPage", { order });
@@ -654,7 +678,6 @@ const renderRetryPaymentPage = async (req, res) => {
 // razorpay retry payment
 const retryPayment = async (req, res) => {
   try {
-    console.log("retryPayment", req.body);
     const orderId = req.body.orderId;
     const order = await Order.findById(orderId);
     const userId = req.session.user;

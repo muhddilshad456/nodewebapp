@@ -20,22 +20,62 @@ const fs = require("fs");
 const loadHome = async (req, res) => {
   try {
     const user = req.session.user;
-    const allProducts = await Product.find();
     const categories = await Category.find({ isListed: true });
-    let productData = await Product.find({
+    let products = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
+    })
+      .sort({ createdAt: -1 })
+      .limit(8);
+
+    const activeOffers = await Offer.find({
+      status: "Active",
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
     });
-    // sort product
-    productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+
+    const productWithOffer = products.map((item) => {
+      let maxDiscount = 0;
+      let appliedOffer = null;
+
+      activeOffers.forEach((offer) => {
+        const applies =
+          (offer.offerType === "product" &&
+            offer.targetId.toString() === item._id.toString()) ||
+          (offer.offerType === "category" &&
+            offer.targetId.toString() === item.category.toString()) ||
+          (offer.offerType === "brand" &&
+            offer.targetId.toString() === item.brand.toString());
+
+        if (applies && offer.discount > maxDiscount) {
+          maxDiscount = offer.discount;
+          appliedOffer = offer;
+        }
+      });
+
+      let maxDiscountAmount = 0;
+      if (appliedOffer) {
+        const discountAmount = (item.productAmount * maxDiscount) / 100;
+        maxDiscountAmount = Math.min(discountAmount, appliedOffer.maxDiscount);
+      }
+
+      const offerPrice = Number(item.productAmount) - maxDiscountAmount;
+
+      return {
+        product: item,
+        offerPrice,
+        offer: appliedOffer,
+      };
+    });
+
     if (user) {
       const userData = await User.findOne({ _id: user._id });
-      return res.render("home", { user: userData, products: productData });
+      return res.render("home", { user: userData, products: productWithOffer });
     } else {
-      return res.render("home", { products: productData });
+      return res.render("home", { products: productWithOffer });
     }
   } catch (error) {
-    console.log("home page render error");
+    console.log("home page render error", error);
     res.status(500).send("Home page not found");
   }
 };
@@ -403,7 +443,7 @@ const loadShopPage = async (req, res) => {
       ? wishlist.products.map((item) => item.productId.toString())
       : [];
     const page = parseInt(req.query.page) || 1;
-    const limit = 6;
+    const limit = 8;
     const skip = (page - 1) * limit;
     let { search, sort, brandFil, categoryFil, minPrice, maxPrice } = req.query;
     if (!minPrice) {
@@ -500,8 +540,6 @@ const loadShopPage = async (req, res) => {
         offer: appliedOffer,
       };
     });
-
-    console.log("==product with offer==", productWithOffer);
 
     // count products
     const totalProducts = await Product.countDocuments(filter);
@@ -1016,6 +1054,7 @@ const userOrderDetailes = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
+    console.log("HHHHHHEEEEELLLLLLOOOOOOO");
     const userId = req.session.user;
     if (!userId) {
       return res
@@ -1358,6 +1397,7 @@ const invoiceDownload = async (req, res) => {
 //cancel single item
 const cancelSingleItem = async (req, res) => {
   try {
+    console.log("hhhhhhhhhiiiiiiiii");
     const { orderId, itemId } = req.body;
     const userId = req.session.user;
     const wallet = await Wallet.findOne({ userId });

@@ -177,9 +177,6 @@ const cartPage = async (req, res) => {
       return acc + cur.totalPrice;
     }, 0);
 
-    console.log("cartTotal", cartTotal);
-    console.log("finalCartTotal", finalCartTotal);
-    console.log("cart with offer : ", cartWithOffer);
     res.render("cart", { cart: cartWithOffer, cartTotal, finalCartTotal });
   } catch (error) {
     console.log("error from cart page rendering", error);

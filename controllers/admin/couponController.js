@@ -49,9 +49,17 @@ const addCoupon = async (req, res) => {
       startDate,
       endDate,
       discount,
+      maxDiscount,
     } = req.body;
 
-    if (!couponCode || !minCartValue || !startDate || !endDate || !discount) {
+    if (
+      !couponCode ||
+      !minCartValue ||
+      !startDate ||
+      !endDate ||
+      !discount ||
+      !maxDiscount
+    ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -71,6 +79,7 @@ const addCoupon = async (req, res) => {
       startDate,
       endDate,
       discount,
+      maxDiscount,
     });
     await newCoupon.save();
     res.json({ success: true, message: "Coupon added successfully" });
@@ -93,6 +102,7 @@ const editCoupon = async (req, res) => {
       endDate,
       discount,
       couponId,
+      maxDiscount,
     } = req.body;
 
     if (
@@ -101,7 +111,8 @@ const editCoupon = async (req, res) => {
       !startDate ||
       !endDate ||
       !discount ||
-      !couponId
+      !couponId ||
+      !maxDiscount
     ) {
       return res.status(400).json({
         success: false,
@@ -124,6 +135,7 @@ const editCoupon = async (req, res) => {
     coupon.endDate = endDate;
     coupon.startDate = startDate;
     coupon.description = description;
+    coupon.maxDiscount = maxDiscount;
 
     await coupon.save();
     res.json({ success: true, message: "Coupon updated successfully" });

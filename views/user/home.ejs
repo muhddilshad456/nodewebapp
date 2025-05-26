@@ -79,14 +79,14 @@
       <% for (let i = 0; i < products.length; i++) { %>
       <div class="col-lg-3 col-md-4 col-6">
         <div class="product-card p-3">
-          <a href="/productDetailes?id=<%=products[i]._id %>">
+          <a href="/productDetailes?id=<%=products[i].product._id %>">
             <img
               class="product-image"
-              src="<%= products[i].productImage[0] %>"
-              alt="<%=products[i].productName %>"
+              src="<%= products[i].product.productImage[0] %>"
+              alt="<%=products[i].product.productName %>"
             />
           </a>
-          <h5 class="product-title"><%=products[i].productName %></h5>
+          <h5 class="product-title"><%=products[i].product.productName %></h5>
           <div class="ratings">
             <i class="fas fa-star"></i>
             <i class="fas fa-star"></i>
@@ -94,7 +94,23 @@
             <i class="fas fa-star"></i>
             <i class="fas fa-star-half-alt"></i>
           </div>
-          <div class="product-price"><%=products[i].productAmount %></div>
+          <div
+            class="product-price text-dark fw-bold"
+            style="font-size: 1.2rem"
+          >
+            <% if(products[i].offerPrice){ %>
+            <span class="ms-2"> ₹<%= products[i].offerPrice %> </span>
+            <span
+              style="
+                font-size: 0.8rem;
+                text-decoration: line-through;
+                color: grey;
+              "
+            >
+              ₹<%= products[i].product.productAmount %>
+            </span>
+            <% }else{ %> ₹<%= products[i].product.productAmount %> <% } %>
+          </div>
         </div>
       </div>
       <% } %>
