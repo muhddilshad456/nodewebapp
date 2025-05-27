@@ -121,7 +121,7 @@
   <!-- Wishlist Section -->
   <div class="container my-5">
     <h1 class="text-center mb-4">WISHLIST</h1>
-    <% if (!wishlist || wishlist.products.length === 0) { %>
+    <% if (!wishlist || wishlist.length === 0) { %>
     <div class="text-center my-5">
       <i
         class="bi bi-heartbreak-fill"
@@ -144,29 +144,29 @@
         </tr>
       </thead>
       <tbody>
-        <% wishlist.products.forEach(item=>{ %>
+        <% wishlist.forEach(item=>{ %>
         <tr>
           <td>
             <img
-              src="<%= item.productId.productImage[0] %>"
+              src="<%= item.product.productId.productImage[0] %>"
               alt="Kronos Analog Watch"
               class="me-3"
             />
           </td>
           <td>
-            <span><%= item.productId.productName %></span>
+            <span><%= item.product.productId.productName %></span>
           </td>
-          <td>₹<%= item.productId.productAmount %></td>
+          <td>₹<%= item.product.productId.productAmount %></td>
           <td>
             <button
               class="btn btn-add-to-cart"
-              data-itemid="<%= item.productId._id %>"
+              data-itemid="<%= item.product.productId._id %>"
             >
               Add to Cart
             </button>
             <button
               class="btn btn-danger btn-remove"
-              data-itemid="<%= item.productId._id %>"
+              data-itemid="<%= item.product.productId._id %>"
             >
               Remove
             </button>

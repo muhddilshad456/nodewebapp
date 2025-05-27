@@ -4,34 +4,11 @@
   body {
     font-family: Arial, sans-serif;
   }
-  /* Header Styles */
-  .navbar {
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-  }
-  .navbar-brand img {
-    width: 40px;
-  }
-  .navbar-nav {
-    flex-direction: row;
-  }
-  .navbar-nav .nav-link {
-    padding: 0 15px;
-    color: #000;
-  }
-  .navbar-nav .nav-link.active {
-    font-weight: bold;
-  }
-  .navbar-nav .nav-link.icon {
-    padding: 0 10px;
-  }
-  /* Wallet Section Styles */
   .wallet-section {
     margin-top: 30px;
   }
   .wallet-balance {
-    background-color: #000;
+    background-color: #284e27;
     color: #fff;
     padding: 20px;
     border-radius: 5px;
@@ -73,42 +50,6 @@
     padding: 15px;
     vertical-align: middle;
   }
-  /* Footer Styles */
-  .footer {
-    background-color: #000;
-    color: #fff;
-    padding: 30px 0;
-    margin-top: 50px;
-  }
-  .footer h5 {
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  .footer p {
-    margin: 5px 0;
-  }
-  .footer a {
-    color: #fff;
-    text-decoration: none;
-  }
-  .footer a:hover {
-    text-decoration: underline;
-  }
-  .footer .input-group .form-control {
-    background-color: #333;
-    border: none;
-    color: #fff;
-  }
-  .footer .input-group .btn {
-    background-color: #333;
-    border: none;
-    color: #fff;
-  }
-  .footer .social-icons a {
-    color: #fff;
-    margin-right: 10px;
-    font-size: 1.2rem;
-  }
 </style>
 
 <body>
@@ -123,10 +64,13 @@
       <div class="card-details"></div>
     </div>
 
-    <% if(wallet.transactions.length===0){ %>
-    <br />
-    <h2 style="color: red">No Transaction Available</h2>
-    <% }else{ %>
+    <% if(wallet.transactions.length === 0){ %>
+    <div class="alert alert-warning text-center mt-4" role="alert">
+      <strong>No Transactions Found</strong><br />
+      Your wallet doesn't have any transaction history yet.
+    </div>
+    <% } else { %>
+
     <table class="table table-bordered">
       <thead>
         <tr>

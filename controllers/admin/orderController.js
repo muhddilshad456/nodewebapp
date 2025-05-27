@@ -106,28 +106,24 @@ const confirmReturn = async (req, res) => {
     order.status = "Returned";
 
     for (const item of order.orderedItems) {
+      const product = await Product.findOne({ _id: item.productId });
+      if (!product) {
+        console.warn(`Product with ID ${item.productId} not found.`);
+        continue;
+      }
+      if (item.status !== "Returned" && item.status !== "Cancelled") {
+        product.stockCount += item.quantity;
+        await product.save();
+      }
+    }
+
+    for (const item of order.orderedItems) {
       if (item.status !== "Returned") {
         item.status = "Returned";
       }
     }
 
     await order.save();
-
-    for (const item of order.orderedItems) {
-      const product = await Product.findOne({ _id: item.productId });
-      if (!product) {
-        console.warn(`Product with ID ${item.productId} not found.`);
-        continue;
-      }
-      if (
-        item.status !== "Return requisted" &&
-        item.status !== "Returned" &&
-        order.status !== "Cancelled"
-      ) {
-        product.stockCount += item.quantity;
-        await product.save();
-      }
-    }
 
     const wallet = await Wallet.findOne({ userId });
     if (!wallet) {

@@ -1312,11 +1312,11 @@ const invoiceDownload = async (req, res) => {
             width: colWidths[1],
             align: "right",
           })
-          .text(`Rs. ${product.productAmount.toFixed(2)}`, col3, yPos, {
+          .text(`Rs. ${item.offerPrice.toFixed(2)}`, col3, yPos, {
             width: colWidths[2],
             align: "right",
           })
-          .text(`Rs. ${itemTotal.toFixed(2)}`, col4, yPos, {
+          .text(`Rs. ${item.totalOfferPrice.toFixed(2)}`, col4, yPos, {
             width: colWidths[3],
             align: "right",
           });

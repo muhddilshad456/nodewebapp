@@ -151,8 +151,8 @@
             </div>
           </td>
           <td>
-            <% if(item.offer){ %>₹<%=item.offerPrice %> <% }else{ %>
-            ₹<%=item.originalPrice %> <% } %>
+            <% if(item.offer){ %>₹<%=item.offerPrice.toFixed(2) %> <% }else{ %>
+            ₹<%=item.originalPrice.toFixed(2) %> <% } %>
           </td>
           <td>
             <div class="input-group quantity-control w-50">
@@ -181,8 +181,8 @@
             </div>
           </td>
           <td id="price-<%= item.product._id %>">
-            <% if(item.offer){ %>₹<%=item.totalOfferPrice %> <% }else{ %>
-            ₹<%=item.product.totalPrice %> <% } %>
+            <% if(item.offer){ %>₹<%=item.totalOfferPrice.toFixed(2) %> <%
+            }else{ %> ₹<%=item.product.totalPrice.toFixed(2) %> <% } %>
           </td>
           <td>
             <button
@@ -199,10 +199,12 @@
     <% } %>
     <div class="cart-totals">
       <h4>CART TOTALS</h4>
-      <p id="subTotal">Subtotal: ₹<%= cartTotal %></p>
-      <p id="discount">Discount: ₹<%= (cartTotal-finalCartTotal) %></p>
+      <p id="subTotal">Subtotal: ₹<%= cartTotal.toFixed(2) %></p>
+      <p id="discount">
+        Discount: ₹<%= (cartTotal-finalCartTotal).toFixed(2) %>
+      </p>
       <hr />
-      <h5 id="cartTotal">TOTAL: ₹<%= finalCartTotal %></h5>
+      <h5 id="cartTotal">TOTAL: ₹<%= finalCartTotal.toFixed(2) %></h5>
     </div>
 
     <a href="/checkout" class="btn checkout-btn mt-4" id="checkoutBtn"

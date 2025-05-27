@@ -5,6 +5,7 @@ const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema");
+const Offer = require("../../models/offerSchema");
 const { now } = require("mongoose");
 
 // wishlist page rendering
@@ -14,9 +15,64 @@ const wishlistPage = async (req, res) => {
     const wishlist = await Wishlist.findOne({ userId }).populate(
       "products.productId"
     );
-    res.render("wishlist", { wishlist });
+
+    const activeOffers = await Offer.find({
+      status: "Active",
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    });
+
+    const wishListWithOffer = wishlist?.products?.length
+      ? wishlist.products
+          .map((item) => {
+            if (!item.productId) return null;
+            let maxDiscount = 0;
+            let appliedOffer = null;
+
+            activeOffers.forEach((offer) => {
+              const applies =
+                (offer.offerType === "product" &&
+                  offer.targetId.toString() ===
+                    item.productId._id.toString()) ||
+                (offer.offerType === "category" &&
+                  offer.targetId.toString() ===
+                    item.productId.category.toString()) ||
+                (offer.offerType === "brand" &&
+                  offer.targetId.toString() ===
+                    item.productId.brand.toString());
+
+              if (applies && offer.discount > maxDiscount) {
+                maxDiscount = offer.discount;
+                appliedOffer = offer;
+              }
+            });
+
+            let maxDiscountAmount = 0;
+            if (appliedOffer) {
+              const discountAmount = (item.productId.price * maxDiscount) / 100;
+              maxDiscountAmount = Math.min(
+                discountAmount,
+                appliedOffer.maxDiscount
+              );
+            }
+
+            const offerPrice = Number(item.productId.price) - maxDiscountAmount;
+
+            return {
+              product: item,
+              offerPrice,
+              offer: appliedOffer,
+            };
+          })
+          .filter((item) => item !== null)
+      : [];
+
+    console.log("wish list with offer", wishListWithOffer);
+
+    res.render("wishlist", { wishlist: wishListWithOffer });
   } catch (error) {
     console.log("error from wishlist page", error);
+    res.status(500).render("errorPage", { message: "Something went wrong." });
   }
 };
 

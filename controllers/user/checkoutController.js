@@ -348,10 +348,6 @@ const placeOrder = async (req, res) => {
       });
       await newOrder.save();
 
-      cart.cartTotal = 0;
-      cart.items = [];
-
-      await cart.save();
       if (payment === "wallet") {
         wallet.balance -= newOrder.finalAmount;
         wallet.transactions.push({
@@ -363,6 +359,11 @@ const placeOrder = async (req, res) => {
         });
         await wallet.save();
       }
+
+      cart.cartTotal = 0;
+      cart.items = [];
+
+      await cart.save();
 
       delete req.session.couponCode;
       res.json({

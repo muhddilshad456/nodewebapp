@@ -161,7 +161,7 @@
 
       <!-- Order Summary Section (Product Table) -->
       <div class="order-summary">
-        <h6 class="section-header"><%= order.orderId %></h6>
+        <h6 class="section-header"><%= order.orderId.slice(-6) %></h6>
         <div class="table-responsive">
           <table class="product-table">
             <thead>
@@ -185,9 +185,9 @@
                   />
                 </td>
                 <td><%= item.productId.productName %></td>
-                <td><%= item.productId.offerPrice %></td>
+                <td><%= item.offerPrice.toFixed(2) %></td>
                 <td><%= item.quantity %></td>
-                <td>₹<%= item.totalOfferPrice %></td>
+                <td>₹<%= item.totalOfferPrice.toFixed(2) %></td>
                 <td><span class="status-delivered"><%= item.status%></span></td>
 
                 <td>
@@ -254,21 +254,24 @@
       <!-- Total Amount Section -->
       <div class="total-box">
         <h6 class="section-header">Total Amount</h6>
-        <p><strong>Subtotal</strong> ₹<%= order.totalAmount %></p>
+        <p><strong>Subtotal</strong> ₹<%= order.totalAmount.toFixed(2) %></p>
         <p>
-          <strong>Discount</strong> ₹<%= order.totalAmount-order.finalAmount %>
+          <strong>Discount</strong> ₹<%=
+          (order.totalAmount-order.finalAmount).toFixed(2) %>
         </p>
-        <p class="total"><strong>Total</strong> ₹<%= order.finalAmount %></p>
+        <p class="total">
+          <strong>Total</strong> ₹<%= order.finalAmount.toFixed(2) %>
+        </p>
       </div>
 
       <!-- Action Buttons -->
       <div class="d-flex justify-content-between mt-3">
-        <a href="#" class="btn-go-back">Go to page</a>
+        <a href="/orderList" class="btn btn-secondary">Go to page</a>
         <% if (order.status === 'Pending' || order.status === 'Processing' ) {
         %>
         <button class="btn-cancel-order btn-cancel">Cancel Order</button>
         <% } else if (order.status === 'Delivered') { %>
-        <button class="btn-return-order btn-cancel">Return</button>
+        <button class="btn-return-order btn-cancel">Return Order</button>
         <% } else { %>
         <span class="text-muted">Not Available</span>
         <% } %>
