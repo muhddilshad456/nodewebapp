@@ -195,12 +195,12 @@
           <strong>Order Date:</strong> <%=
           order.createdOn.toISOString().slice(0, 10); %>
         </p>
-        <p><strong>Subtotal:</strong> ₹<%= order.totalAmount %></p>
+        <p><strong>Subtotal:</strong> ₹<%= order.totalAmount.toFixed(2) %></p>
         <p>
           <strong>Discount:</strong> ₹<%=
-          Number(order.totalAmount)-Number(order.finalAmount) %>
+          (Number(order.totalAmount)-Number(order.finalAmount)).toFixed(2) %>
         </p>
-        <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
+        <p><strong>Total:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
       </div>
 
       <!-- Delivery Address Section -->

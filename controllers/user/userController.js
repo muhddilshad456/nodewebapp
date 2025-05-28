@@ -1054,7 +1054,6 @@ const userOrderDetailes = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
-    console.log("HHHHHHEEEEELLLLLLOOOOOOO");
     const userId = req.session.user;
     if (!userId) {
       return res
@@ -1085,43 +1084,84 @@ const cancelOrder = async (req, res) => {
 
     order.status = "Cancelled";
 
+    if (
+      order.paymentMethod === "razorpay" ||
+      order.paymentMethod === "wallet"
+    ) {
+      if (
+        order.orderedItems.every(
+          (item) => item.status !== "Returned" && item.status !== "Cancelled"
+        )
+      ) {
+        if (!wallet) {
+          const newWallet = new Wallet({
+            userId,
+            balance: order.finalAmount,
+            transactions: [
+              {
+                amount: order.finalAmount,
+                type: "Credit",
+                method: "Refund",
+                status: "Completed",
+                orderId: order._id,
+              },
+            ],
+          });
+          await newWallet.save();
+        } else {
+          wallet.balance += order.finalAmount;
+          wallet.transactions.push({
+            amount: order.finalAmount,
+            type: "Credit",
+            method: "Refund",
+            status: "Completed",
+            orderId: order._id,
+          });
+          await wallet.save();
+        }
+      } else {
+        const orderedItemsTotalPrice = order.orderedItems.reduce((acc, cur) => {
+          if (cur.status !== "Cancelled" && cur.status !== "Returned") {
+            return acc + (Number(cur.totalOfferPrice) || 0);
+          } else {
+            return acc;
+          }
+        }, 0);
+
+        if (!wallet) {
+          const newWallet = new Wallet({
+            userId,
+            balance: orderedItemsTotalPrice,
+            transactions: [
+              {
+                amount: orderedItemsTotalPrice,
+                type: "Credit",
+                method: "Refund",
+                status: "Completed",
+                orderId: order._id,
+              },
+            ],
+          });
+          await newWallet.save();
+        } else {
+          wallet.balance += orderedItemsTotalPrice;
+          wallet.transactions.push({
+            amount: orderedItemsTotalPrice,
+            type: "Credit",
+            method: "Refund",
+            status: "Completed",
+            orderId: order._id,
+          });
+          await wallet.save();
+        }
+      }
+    }
+
     for (const item of order.orderedItems) {
       item.status = "Cancelled";
     }
 
     await order.save();
-
-    if (
-      order.paymentMethod === "razorpay" ||
-      order.paymentMethod === "wallet"
-    ) {
-      if (!wallet) {
-        const newWallet = new Wallet({
-          userId,
-          balance: order.finalAmount,
-          transactions: [
-            {
-              amount: order.finalAmount,
-              type: "Credit",
-              method: "Refund",
-              status: "Completed",
-              orderId: order._id,
-            },
-          ],
-        });
-        await newWallet.save();
-      } else {
-        wallet.balance += order.finalAmount;
-        wallet.transactions.push({
-          amount: order.finalAmount,
-          type: "Credit",
-          method: "Refund",
-          status: "Completed",
-          orderId: order._id,
-        });
-        await wallet.save();
-      }
-    }
 
     for (const item of order.orderedItems) {
       const product = await Product.findById(item.productId);
@@ -1397,7 +1437,6 @@ const invoiceDownload = async (req, res) => {
 //cancel single item
 const cancelSingleItem = async (req, res) => {
   try {
-    console.log("hhhhhhhhhiiiiiiiii");
     const { orderId, itemId } = req.body;
     const userId = req.session.user;
     const wallet = await Wallet.findOne({ userId });

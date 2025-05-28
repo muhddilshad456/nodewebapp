@@ -70,9 +70,16 @@ const orderStatus = async (req, res) => {
         .status(404)
         .json({ success: false, message: "order not found" });
     }
+    if (order.status === "Cancelled" || order.status === "Returned") {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cant update order status" });
+    }
     order.status = status;
     for (const item of order.orderedItems) {
-      item.status = status;
+      if (item.status !== "Cancelled") {
+        item.status = status;
+      }
     }
     await order.save();
     res.json({ success: true, message: "Status updated" });
@@ -117,6 +124,76 @@ const confirmReturn = async (req, res) => {
       }
     }
 
+    const wallet = await Wallet.findOne({ userId });
+
+    if (
+      order.orderedItems.every(
+        (item) => item.status !== "Returned" && item.status !== "Cancelled"
+      )
+    ) {
+      if (!wallet) {
+        const newWallet = new Wallet({
+          userId,
+          balance: order.finalAmount,
+          transactions: [
+            {
+              amount: order.finalAmount,
+              type: "Credit",
+              method: "Refund",
+              status: "Completed",
+              orderId: order._id,
+            },
+          ],
+        });
+        await newWallet.save();
+      } else {
+        wallet.balance += order.finalAmount;
+        wallet.transactions.push({
+          amount: order.finalAmount,
+          type: "Credit",
+          method: "Refund",
+          status: "Completed",
+          orderId: order._id,
+        });
+        await wallet.save();
+      }
+    } else {
+      const orderedItemsTotalPrice = order.orderedItems.reduce((acc, cur) => {
+        if (cur.status !== "Cancelled" && cur.status !== "Returned") {
+          return acc + (Number(cur.totalOfferPrice) || 0);
+        } else {
+          return acc;
+        }
+      }, 0);
+
+      if (!wallet) {
+        const newWallet = new Wallet({
+          userId,
+          balance: orderedItemsTotalPrice,
+          transactions: [
+            {
+              amount: orderedItemsTotalPrice,
+              type: "Credit",
+              method: "Refund",
+              status: "Completed",
+              orderId: order._id,
+            },
+          ],
+        });
+        await newWallet.save();
+      } else {
+        wallet.balance += orderedItemsTotalPrice;
+        wallet.transactions.push({
+          amount: orderedItemsTotalPrice,
+          type: "Credit",
+          method: "Refund",
+          status: "Completed",
+          orderId: order._id,
+        });
+        await wallet.save();
+      }
+    }
+
     for (const item of order.orderedItems) {
       if (item.status !== "Returned") {
         item.status = "Returned";
@@ -124,34 +201,6 @@ const confirmReturn = async (req, res) => {
     }
 
     await order.save();
-
-    const wallet = await Wallet.findOne({ userId });
-    if (!wallet) {
-      const newWallet = new Wallet({
-        userId,
-        balance: order.finalAmount,
-        transactions: [
-          {
-            amount: order.finalAmount,
-            type: "Credit",
-            method: "Refund",
-            status: "Completed",
-            orderId: order._id,
-          },
-        ],
-      });
-      await newWallet.save();
-    } else {
-      wallet.balance += order.finalAmount;
-      wallet.transactions.push({
-        amount: order.finalAmount,
-        type: "Credit",
-        method: "Refund",
-        status: "Completed",
-        orderId: order._id,
-      });
-      await wallet.save();
-    }
 
     res.json({ success: true, message: "Return successfull" });
   } catch (error) {

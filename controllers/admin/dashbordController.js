@@ -39,8 +39,6 @@ const dashbordPage = async (req, res) => {
       }
     }
 
-    console.log("filtr", filter);
-
     const orders = await Order.find(filter)
       .populate("userId")
       .sort({ createdOn: -1 })
@@ -59,8 +57,6 @@ const dashbordPage = async (req, res) => {
       },
       { $sort: { _id: 1 } },
     ]);
-
-    console.log("chart", graph);
 
     const topSellingProducts = await Order.aggregate([
       { $match: { status: "Delivered" } },

@@ -49,14 +49,16 @@ const wishlistPage = async (req, res) => {
 
             let maxDiscountAmount = 0;
             if (appliedOffer) {
-              const discountAmount = (item.productId.price * maxDiscount) / 100;
+              const discountAmount =
+                (item.productId.productAmount * maxDiscount) / 100;
               maxDiscountAmount = Math.min(
                 discountAmount,
                 appliedOffer.maxDiscount
               );
             }
 
-            const offerPrice = Number(item.productId.price) - maxDiscountAmount;
+            const offerPrice =
+              Number(item.productId.productAmount) - maxDiscountAmount;
 
             return {
               product: item,
@@ -66,8 +68,6 @@ const wishlistPage = async (req, res) => {
           })
           .filter((item) => item !== null)
       : [];
-
-    console.log("wish list with offer", wishListWithOffer);
 
     res.render("wishlist", { wishlist: wishListWithOffer });
   } catch (error) {

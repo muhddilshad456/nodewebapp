@@ -156,7 +156,10 @@
           <td>
             <span><%= item.product.productId.productName %></span>
           </td>
-          <td>₹<%= item.product.productId.productAmount %></td>
+          <td>
+            <% if(item.offer){ %> ₹<%= item.offerPrice %> <% }else{ %> ₹<%=
+            item.product.productId.productAmount %> <% } %>
+          </td>
           <td>
             <button
               class="btn btn-add-to-cart"
