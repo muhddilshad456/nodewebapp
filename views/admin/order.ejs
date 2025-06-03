@@ -206,7 +206,7 @@
           <td><%= item.address.name %></td>
           <td><%= item.orderId.slice(-6) %></td>
           <td><%= item.address.streetAddress %>,<%= item.address.city %></td>
-          <td>₹<%= item.finalAmount %></td>
+          <td>₹<%= item.finalAmount.toFixed(2) %></td>
           <td><%= item.createdOn.toISOString().slice(0, 10); %></td>
           <td><%= item.status %></td>
           <td>
