@@ -28,7 +28,7 @@
           <div class="card card-custom card-small">
             <h5 class="text-muted">Visits</h5>
             <h3 class="fw-bold">
-              367K <span class="text-danger">-0.03% ↓</span>
+              367K <span class="text-danger">-0.033% ↓</span>
             </h3>
           </div>
         </div>
@@ -46,9 +46,7 @@
             <h3 class="fw-bold">
               239K <span class="text-success">+6.08% ↑</span>
             </h3>
-            <a href="#" class="text-primary text-decoration-none"
-              >Show more ></a
-            >
+          
           </div>
         </div>
       </div>
@@ -93,7 +91,7 @@
           <td><%= order.orderId.slice(-6) %></td>
           <td><%= order.createdOn.toISOString().slice(0, 10) %></td>
           <td><%= order.userId.name %></td>
-          <td>₹<%= order.finalAmount %></td>
+          <td>₹<%= order.finalAmount.toFixed(2) %></td>
           <td><%= order.paymentMethod %></td>
           <td><%= order.status %></td>
         </tr>

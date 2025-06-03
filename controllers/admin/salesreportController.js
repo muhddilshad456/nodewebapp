@@ -10,7 +10,6 @@ const salesreportPage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
-    console.log("page number", page);
     let filter = { status: "Delivered" };
 
     const today = new Date();

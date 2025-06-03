@@ -60,7 +60,7 @@ const dashbordPage = async (req, res) => {
 
     const topSellingProducts = await Order.aggregate([
       { $match: { status: "Delivered" } },
-      { $unwind: "$orderedItems" },
+      { $unwind: { path: "$orderedItems", preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: "$orderedItems.productId",
@@ -78,12 +78,12 @@ const dashbordPage = async (req, res) => {
           as: "product",
         },
       },
-      { $unwind: "$product" },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } },
     ]);
 
     const topSellingCategories = await Order.aggregate([
       { $match: { status: "Delivered" } },
-      { $unwind: "$orderedItems" },
+      { $unwind: { path: "$orderedItems", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "products",
@@ -92,8 +92,13 @@ const dashbordPage = async (req, res) => {
           as: "product",
         },
       },
-      { $unwind: "$product" },
-      { $unwind: "$product.category" },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: {
+          path: "$product.category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $group: {
           _id: "$product.category",
@@ -109,14 +114,14 @@ const dashbordPage = async (req, res) => {
           as: "category",
         },
       },
-      { $unwind: "$category" },
+      { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
       { $sort: { totalSold: -1 } },
       { $limit: 10 },
     ]);
 
     const topSellingBrands = await Order.aggregate([
       { $match: { status: "Delivered" } },
-      { $unwind: "$orderedItems" },
+      { $unwind: { path: "$orderedItems", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "products",
@@ -125,8 +130,8 @@ const dashbordPage = async (req, res) => {
           as: "product",
         },
       },
-      { $unwind: "$product" },
-      { $unwind: "$product.brand" },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: "$product.brand", preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: "$product.brand",
@@ -142,7 +147,7 @@ const dashbordPage = async (req, res) => {
           as: "brand",
         },
       },
-      { $unwind: "$brand" },
+      { $unwind: { path: "$brand", preserveNullAndEmptyArrays: true } },
       { $sort: { totalSold: -1 } },
       { $limit: 10 },
     ]);

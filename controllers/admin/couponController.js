@@ -7,7 +7,6 @@ const Coupon = require("../../models/couponScema");
 // coupon page rendering
 const couponPage = async (req, res) => {
   try {
-    console.log("search : ", req.query.search);
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 4;
@@ -20,13 +19,9 @@ const couponPage = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    console.log("coupon : ", coupon);
-
     const totalCoupons = await Coupon.countDocuments({
       couponCode: { $regex: ".*" + search + ".*", $options: "i" },
     });
-
-    console.log("totalCoupons : ", totalCoupons);
 
     const totalPages = Math.ceil(totalCoupons / limit);
     res.render("coupon", {
@@ -127,8 +122,6 @@ const editCoupon = async (req, res) => {
         .json({ success: false, message: "Coupon not found" });
     }
 
-    console.log("copon to edit", coupon);
-
     coupon.couponCode = couponCode;
     coupon.minCartValue = minCartValue;
     coupon.discount = discount;
@@ -150,7 +143,6 @@ const editCoupon = async (req, res) => {
 // disable coupon
 const disableCoupon = async (req, res) => {
   try {
-    console.log("disableCoupon", req.body);
     const { couponId } = req.body;
     const coupon = await Coupon.findById(couponId);
 
@@ -168,7 +160,6 @@ const disableCoupon = async (req, res) => {
 // enable coupon
 const enableCoupon = async (req, res) => {
   try {
-    console.log("enableCoupon", req.body);
     const { couponId } = req.body;
     const coupon = await Coupon.findById(couponId);
 
