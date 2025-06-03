@@ -65,7 +65,7 @@
   <!-- Filter Dropdown -->
   <div class="d-flex justify-content-end mb-3">
     <select class="form-select w-auto" id="filterSelect" name="filterSelect">
-      <option value="all">All Orders</option>
+      <option value="all" <%= !filter ? 'selected' : '' %>>All Orders</option>
       <option value="today" <%= filter==="today" ? 'selected' : '' %>>Today</option>
       <option value="week" <%= filter==="week" ? 'selected' : '' %>>This Week</option>
       <option value="month" <%= filter==="month" ? 'selected' : '' %>>This Month</option>

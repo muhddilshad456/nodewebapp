@@ -18,7 +18,7 @@ const dashbordPage = async (req, res) => {
         toDate.setHours(23, 59, 59, 999);
         filter.createdOn = { $gte: fromDate, $lte: toDate };
       } else if (filterData === "week") {
-        const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+        const dayOfWeek = today.getDay();
         const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         fromDate = new Date(today);
         fromDate.setDate(today.getDate() - diffToMonday);
