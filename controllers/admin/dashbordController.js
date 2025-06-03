@@ -2,7 +2,7 @@ const Order = require("../../models/orderSchema");
 
 const dashbordPage = async (req, res) => {
   try {
-    const filterData = req.query.filter;
+    const filterData = req.query.filter || "all";
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const today = new Date();
