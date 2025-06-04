@@ -322,16 +322,16 @@
       .then((data) => {
         document.getElementById(
           `price-${itemId}`
-        ).textContent = `₹${data.newPrice}`;
+        ).textContent = `₹${data.newPrice.toFixed(2)}`;
         document.getElementById(
           "subTotal"
         ).textContent = `Subtotal: ₹${data.cartTotal}`;
-        document.getElementById("discount").textContent = `Discount : ₹${
+        document.getElementById("discount").textContent = `Discount : ₹${(
           data.cartTotal - data.finalCartTotal
-        }`;
+        ).toFixed(2)}`;
         document.getElementById(
           "cartTotal"
-        ).textContent = `TOTAL:₹${data.finalCartTotal}`;
+        ).textContent = `TOTAL:₹${data.finalCartTotal.toFixed(2)}`;
         console.log("Quantity updated successfully");
       })
       .catch((error) => {
